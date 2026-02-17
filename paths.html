@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary meta tags & SEO -->
+  <title>SkillForge Hub · learning paths to clarity</title>
+  <meta name="description" content="SkillForge Hub: explore our flagship learning paths — AI, UX, Data. Guided mentorship, project‑based curriculum, and a calm focused approach.">
+  <!-- Bootstrap grid & icons (layout only) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- fonts & AOS -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <!-- Font Awesome (optional extra icons) -->
+  <script src="https://kit.fontawesome.com/1b30ffa950.js" crossorigin="anonymous"></script>
+  <style>
+    /* ---------- GLOBAL STYLES (same as index, to preserve consistency) ---------- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;        /* deep navy – trust */
+      --fog-mid: #2b5f6b;          /* tealish blue – calm */
+      --fog-soft: #e5f0f5;         /* background */
+      --mist-green: #7fc3b0;       /* soft green – growth */
+      --accent-glow: #ffb347;       /* warm amber – energy */
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
+    }
+
+    /* ---------- scroll orb (copied from index for completeness) ---------- */
+    #orb-scroll {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50% 20% 50% 50%;
+      background: rgba(127, 195, 176, 0.3);
+      backdrop-filter: blur(16px) saturate(180%);
+      border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.2rem;
+      cursor: pointer;
+      transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%;
+      background: #7fc3b0;
+      transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+
+    /* ---------- custom navbar (exact copy from index to keep identical) ---------- */
+    .nav-fog {
+      background: rgba(15, 43, 60, 0.7);
+      backdrop-filter: blur(18px);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      padding: 0.6rem 2rem;
+      border-bottom: 2px solid rgba(127, 195, 176, 0.3);
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-block img {
+      height: 48px;
+      filter: drop-shadow(0 4px 8px #7fc3b0);
+    }
+    .logo-text {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(130deg, #ffffff, #b8e3d9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 0.4rem;
+      list-style: none;
+      margin: 0;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      transition: 0.25s;
+      font-size: 1.05rem;
+    }
+    .nav-links a:hover {
+      background: #7fc3b0;
+      color: #0f2b3c;
+      transform: translateY(-3px);
+    }
+    .nav-cta a {
+      background: white;
+      color: #0f2b3c !important;
+      font-weight: 700;
+      padding: 0.6rem 2rem;
+      border-radius: 60px;
+      border: 2px solid #ffb347;
+      text-decoration: none;
+    }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle {
+      display: none;
+      background: transparent;
+      border: 2px solid #7fc3b0;
+      color: white;
+      font-size: 2rem;
+      border-radius: 40px;
+      padding: 0.2rem 1rem;
+      cursor: pointer;
+    }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background: rgba(15,43,60,0.95);
+        backdrop-filter: blur(20px);
+        position: absolute;
+        top: 85px;
+        left: 5%;
+        width: 90%;
+        border-radius: 40px;
+        padding: 2rem;
+        z-index: 999;
+      }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+
+    /* ---------- footer (reused) ---------- */
+    .footer-fog {
+      background: #0f2b3c;
+      color: #e5f0f5;
+      padding: 4rem 5% 2rem;
+      border-top: 8px solid #7fc3b0;
+    }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+
+    /* ---------- section title utility (consistent) ---------- */
+    .section-title { text-align: center; margin: 4rem 0 2rem; }
+    .section-title h2 { font-size: 2.5rem; font-weight: 700; color: #0f2b3c; }
+    .section-title .line { width: 100px; height: 6px; background: #7fc3b0; margin: 0.5rem auto; border-radius: 6px; }
+
+    /* ---------- global btn-mist etc (preserved) ---------- */
+    .btn-mist {
+      background: #7fc3b0; border: none; padding: 1rem 2.5rem; border-radius: 60px;
+      font-weight: 700; color: #0f2b3c; text-decoration: none; transition: 0.3s;
+      box-shadow: 0 12px 20px -10px #7fc3b0; display: inline-block;
+    }
+    .btn-mist:hover { background: #ffb347; transform: scale(1.03); }
+
+    /* ========== PATHS PAGE SPECIFIC ENHANCEMENTS ========== */
+    /* prefix: sf-paths-  (world‑class, non‑breaking) */
+
+    /* hero */
+    .sf-paths-hero {
+      margin-top: 120px;
+      padding: 4rem 5%;
+      background: radial-gradient(circle at 70% 30%, #d6f0e8, #ffffff);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 3rem;
+      border-bottom: 2px solid rgba(127,195,176,0.2);
+    }
+    .sf-paths-hero-content {
+      flex: 1 1 500px;
+    }
+    .sf-paths-hero-content h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #0f2b3c;
+      margin-bottom: 1.5rem;
+    }
+    .sf-paths-hero-content h1 span {
+      color: #7fc3b0;
+      text-decoration: underline 0.1em rgba(255,180,70,0.4);
+    }
+    .sf-paths-hero-visual {
+      flex: 1 1 400px;
+      text-align: center;
+    }
+    .sf-paths-hero-visual svg {
+      max-width: 400px;
+      filter: drop-shadow(0 20px 30px rgba(0,80,70,0.2));
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    @media (max-width: 768px) {
+      .sf-paths-hero-content h1 { font-size: 2.8rem; }
+    }
+
+    /* path cards grid */
+    .sf-paths-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .sf-paths-card {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 50px;
+      padding: 2rem 1.8rem;
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 40px 50px -30px #1c2e3f;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1), box-shadow 0.4s, border-color 0.2s;
+      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .sf-paths-card:hover {
+      transform: translateY(-12px) scale(1.01);
+      box-shadow: 0 50px 70px -25px #0f2b3c, 0 0 0 2px rgba(127,195,176,0.5);
+      border-color: #7fc3b0;
+      background: white;
+    }
+    .sf-paths-card-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      background: rgba(127,195,176,0.2);
+      width: 80px;
+      height: 80px;
+      border-radius: 40% 60% 40% 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2b5f6b;
+      transition: 0.3s;
+    }
+    .sf-paths-card:hover .sf-paths-card-icon {
+      background: #7fc3b0;
+      color: #0f2b3c;
+      border-radius: 50% 40% 50% 40%;
+    }
+    .sf-paths-card h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0.75rem 0 0.5rem;
+    }
+    .sf-paths-card p {
+      color: #2b5f6b;
+      flex: 1;
+    }
+    .sf-paths-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.5rem 0 1rem;
+    }
+    .sf-paths-skill-tag {
+      background: rgba(127,195,176,0.15);
+      padding: 0.3rem 1rem;
+      border-radius: 60px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid rgba(127,195,176,0.3);
+    }
+    .sf-paths-card .btn-mist {
+      align-self: flex-start;
+      margin-top: 1rem;
+      padding: 0.7rem 2rem;
+      font-size: 1rem;
+      background: white;
+      border: 2px solid #7fc3b0;
+      color: #0f2b3c;
+      box-shadow: none;
+    }
+    .sf-paths-card .btn-mist:hover {
+      background: #ffb347;
+      border-color: #ffb347;
+    }
+
+    /* ai recommendation snippet inside card (world‑class) */
+    .sf-paths-ai-snip {
+      margin: 1rem 0 0.5rem;
+      background: rgba(255,255,240,0.6);
+      border-radius: 40px;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      border-left: 6px solid #ffb347;
+      backdrop-filter: blur(4px);
+      color: #0f2b3c;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sf-paths-ai-snip i {
+      color: #ffb347;
+      font-size: 1.3rem;
+    }
+
+    /* feature mini cards */
+    .sf-paths-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin: 4rem 0;
+    }
+    .sf-paths-feature {
+      flex: 1 1 200px;
+      max-width: 260px;
+      text-align: center;
+      background: rgba(255,255,255,0.4);
+      backdrop-filter: blur(6px);
+      border-radius: 50px;
+      padding: 2rem 1.5rem;
+      border: 1px solid rgba(255,255,255,0.7);
+      transition: all 0.3s;
+    }
+    .sf-paths-feature:hover {
+      background: white;
+      transform: translateY(-6px);
+      box-shadow: 0 30px 40px -20px #2b5f6b;
+    }
+    .sf-paths-feature i {
+      font-size: 2.5rem;
+      color: #7fc3b0;
+      margin-bottom: 1rem;
+    }
+
+    /* testimonials (reused style, subtle animation) */
+    .sf-paths-testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .sf-paths-testimonial {
+      background: white;
+      border-radius: 40px;
+      padding: 2rem;
+      box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1);
+      transition: transform 0.3s, opacity 0.3s;
+      opacity: 0.95;
+    }
+    .sf-paths-testimonial:hover {
+      transform: scale(1.02) translateY(-4px);
+      opacity: 1;
+      box-shadow: 0 30px 40px -10px #7fc3b0;
+    }
+
+    /* modal for path preview (world‑class, no conflict) */
+    .sf-paths-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,43,60,0.6);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1100;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .sf-paths-modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    .sf-paths-modal-content {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 70px;
+      max-width: 600px;
+      width: 90%;
+      padding: 2.5rem;
+      box-shadow: 0 70px 100px -40px #0f2b3c, 0 0 0 2px rgba(127,195,176,0.4) inset;
+      transform: scale(0.96);
+      transition: transform 0.3s;
+    }
+    .sf-paths-modal.show .sf-paths-modal-content {
+      transform: scale(1);
+    }
+    .sf-paths-modal h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #0f2b3c;
+    }
+    .sf-paths-modal ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sf-paths-modal li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(127,195,176,0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .sf-paths-modal li i {
+      color: #7fc3b0;
+      font-size: 1.3rem;
+    }
+
+    /* entrance micro-animation (AOS will also apply, but extra scale) */
+    [data-aos="path-card"] {
+      opacity: 0;
+      transform: scale(0.92) translateY(30px);
+      transition-property: transform, opacity;
+    }
+    [data-aos="path-card"].aos-animate {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    /* progress indicator (if needed) */
+    .sf-paths-progress {
+      height: 6px;
+      background: #e5f0f5;
+      border-radius: 10px;
+      margin: 1rem 0;
+    }
+    .sf-paths-progress-bar {
+      height: 100%;
+      background: #7fc3b0;
+      border-radius: 10px;
+      width: 0%;
+    }
+
+    /* responsive tweaks */
+    @media (max-width: 768px) {
+      .sf-paths-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- scroll orb (copied from index) -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- custom navbar (identical to index) -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="paths.html" style="background: #7fc3b0; color:#0f2b3c;">Paths</a></li>
+        <li><a href="#">Courses</a></li>
+        <li><a href="#">Mentors</a></li>
+        <li><a href="#">Community</a></li>
+        <li><a href="#">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="#">Enroll Now</a></div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION (paths) -->
+  <section class="sf-paths-hero">
+    <div class="sf-paths-hero-content" data-aos="fade-right">
+      <h1>Your <span>personalized</span> learning paths</h1>
+      <p class="fs-4" style="color: #2b5f6b;">Guided trails designed by experts, adapted to your goals — from first click to career transformation.</p>
+      <div class="mt-4">
+        <a href="#paths-grid" class="btn-mist">Explore paths <i class="bi bi-arrow-down"></i></a>
+        <a href="#" class="btn-ghost ms-3" style="border:2px solid #7fc3b0;">How it works</a>
+      </div>
+    </div>
+    <div class="sf-paths-hero-visual" data-aos="fade-left">
+      <!-- simple animated SVG illustration (calm fog waves) -->
+      <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10,100 Q40,70 70,100 T130,100 T190,100" stroke="#7fc3b0" fill="none" stroke-width="6" stroke-linecap="round" opacity="0.6">
+          <animate attributeName="d" values="M10,100 Q40,70 70,100 T130,100 T190,100; M10,90 Q50,120 90,90 T150,110 T190,90; M10,100 Q40,70 70,100 T130,100 T190,100" dur="8s" repeatCount="indefinite"/>
+        </path>
+        <circle cx="140" cy="70" r="12" fill="#ffb347" opacity="0.9">
+          <animate attributeName="cy" values="70;60;70" dur="5s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <div class="container" id="paths-grid">
+    <div class="section-title" data-aos="fade-up">
+      <span class="line"></span>
+      <h2>flagship fog trails</h2>
+      <p>choose your depth</p>
+    </div>
+
+    <!-- PATHS GRID (3–5 cards) with AI recommendation snippet -->
+    <div class="sf-paths-grid">
+      <!-- AI Product Trail -->
+      <div class="sf-paths-card" data-aos="path-card" data-aos-delay="50" data-path="ai">
+        <div class="sf-paths-card-icon"><i class="bi bi-cpu"></i></div>
+        <h3>AI Product Trail</h3>
+        <p>Build, deploy, and scale AI features — from prompt engineering to product thinking.</p>
+        <div class="sf-paths-skills">
+          <span class="sf-paths-skill-tag">LLMs</span>
+          <span class="sf-paths-skill-tag">Python</span>
+          <span class="sf-paths-skill-tag">AI ethics</span>
+        </div>
+        <!-- AI recommendation snippet (world‑class) -->
+        <div class="sf-paths-ai-snip">
+          <i class="bi bi-stars"></i> <span>Recommended: your interest in automation & hands‑on style</span>
+        </div>
+        <button class="btn-mist view-path-btn" data-path="ai">View path →</button>
+      </div>
+
+      <!-- Immersive UX Trail -->
+      <div class="sf-paths-card" data-aos="path-card" data-aos-delay="100" data-path="ux">
+        <div class="sf-paths-card-icon"><i class="bi bi-palette"></i></div>
+        <h3>Immersive UX Trail</h3>
+        <p>End‑to‑end design: research, wireframing, prototyping, and portfolio polishing.</p>
+        <div class="sf-paths-skills">
+          <span class="sf-paths-skill-tag">Figma</span>
+          <span class="sf-paths-skill-tag">User research</span>
+          <span class="sf-paths-skill-tag">Prototyping</span>
+        </div>
+        <div class="sf-paths-ai-snip">
+          <i class="bi bi-stars"></i> <span>Your empathy & creativity point straight to UX</span>
+        </div>
+        <button class="btn-mist view-path-btn" data-path="ux">View path →</button>
+      </div>
+
+      <!-- Data Analyst Trail -->
+      <div class="sf-paths-card" data-aos="path-card" data-aos-delay="150" data-path="data">
+        <div class="sf-paths-card-icon"><i class="bi bi-bar-chart-steps"></i></div>
+        <h3>Data Analyst Trail</h3>
+        <p>SQL, Python, Tableau — turn messy data into clear decisions and dashboards.</p>
+        <div class="sf-paths-skills">
+          <span class="sf-paths-skill-tag">SQL</span>
+          <span class="sf-paths-skill-tag">Python</span>
+          <span class="sf-paths-skill-tag">Tableau</span>
+        </div>
+        <div class="sf-paths-ai-snip">
+          <i class="bi bi-stars"></i> <span>Curious mind + structured thinking → ideal for data</span>
+        </div>
+        <button class="btn-mist view-path-btn" data-path="data">View path →</button>
+      </div>
+
+      <!-- Advanced AI / MLOps (fourth path) -->
+      <div class="sf-paths-card" data-aos="path-card" data-aos-delay="200" data-path="mlops">
+        <div class="sf-paths-card-icon"><i class="bi bi-gear-wide-connected"></i></div>
+        <h3>MLOps Specialization</h3>
+        <p>Deploy, monitor, and maintain models in production — for experienced builders.</p>
+        <div class="sf-paths-skills">
+          <span class="sf-paths-skill-tag">Docker</span>
+          <span class="sf-paths-skill-tag">Kubeflow</span>
+          <span class="sf-paths-skill-tag">CI/CD</span>
+        </div>
+        <div class="sf-paths-ai-snip">
+          <i class="bi bi-stars"></i> <span>You love systems & scalability — this is your next step</span>
+        </div>
+        <button class="btn-mist view-path-btn" data-path="mlops">View path →</button>
+      </div>
+
+      <!-- Product Management (fifth path) -->
+      <div class="sf-paths-card" data-aos="path-card" data-aos-delay="250" data-path="pm">
+        <div class="sf-paths-card-icon"><i class="bi bi-bullseye"></i></div>
+        <h3>Product Management</h3>
+        <p>Bridge business, tech, and design. Lead products from concept to launch.</p>
+        <div class="sf-paths-skills">
+          <span class="sf-paths-skill-tag">Agile</span>
+          <span class="sf-paths-skill-tag">Strategy</span>
+          <span class="sf-paths-skill-tag">Analytics</span>
+        </div>
+        <div class="sf-paths-ai-snip">
+          <i class="bi bi-stars"></i> <span>Your goal: leadership & cross‑functional impact</span>
+        </div>
+        <button class="btn-mist view-path-btn" data-path="pm">View path →</button>
+      </div>
+    </div>
+
+    <!-- FEATURE HIGHLIGHTS (mini cards) -->
+    <div class="sf-paths-features">
+      <div class="sf-paths-feature" data-aos="zoom-in" data-aos-delay="50">
+        <i class="bi bi-people"></i>
+        <h4>Mentor guidance</h4>
+        <p>Weekly 1:1 sessions with industry experts.</p>
+      </div>
+      <div class="sf-paths-feature" data-aos="zoom-in" data-aos-delay="100">
+        <i class="bi bi-chat-square-quote"></i>
+        <h4>Active community</h4>
+        <p>Study groups, feedback, and accountability.</p>
+      </div>
+      <div class="sf-paths-feature" data-aos="zoom-in" data-aos-delay="150">
+        <i class="bi bi-robot"></i>
+        <h4>AI recommendations</h4>
+        <p>Paths adapt to your skill assessment results.</p>
+      </div>
+      <div class="sf-paths-feature" data-aos="zoom-in" data-aos-delay="200">
+        <i class="bi bi-briefcase"></i>
+        <h4>Career first</h4>
+        <p>Portfolio projects + hiring partner network.</p>
+      </div>
+    </div>
+
+    <!-- TESTIMONIALS section (from existing vibe) -->
+    <div class="section-title" data-aos="fade-up">
+      <span class="line"></span>
+      <h2>from fog to clarity</h2>
+      <p>real stories from our pathfinders</p>
+    </div>
+    <div class="sf-paths-testimonials">
+      <div class="sf-paths-testimonial" data-aos="fade-up" data-aos-delay="50">
+        <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i>
+        <p class="mt-2">“The AI trail gave me the confidence to switch from teaching to ML engineering. Mentors were there every step.”</p>
+        <span>— <strong>Elena R.</strong>, AI Engineer</span>
+      </div>
+      <div class="sf-paths-testimonial" data-aos="fade-up" data-aos-delay="100">
+        <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i>
+        <p class="mt-2">“UX trail was immersive — I built three portfolio projects and got hired at a fintech startup. Worth every minute.”</p>
+        <span>— <strong>Marcus D.</strong>, Product Designer</span>
+      </div>
+      <div class="sf-paths-testimonial" data-aos="fade-up" data-aos-delay="150">
+        <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i>
+        <p class="mt-2">“Data analyst path combined SQL, Python and storytelling — now I lead analytics at a non-profit.”</p>
+        <span>— <strong>Jasmine T.</strong>, Data Lead</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER (reused from index style) -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="assets/img/person/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
+        </div>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="paths.html">Paths</a></li><li><a href="#">Courses</a></li><li><a href="#">Mentors</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">Blog</a></li><li><a href="#">Research</a></li><li><a href="#">Events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL for path preview (dynamic) -->
+  <div id="sfPathsModal" class="sf-paths-modal">
+    <div class="sf-paths-modal-content">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 id="modalPathTitle">AI Product Trail</h2>
+        <button type="button" class="btn-close btn-close-dark" id="closePathModal" aria-label="Close"></button>
+      </div>
+      <div class="mt-3" id="modalPathContent">
+        <!-- filled by js -->
+      </div>
+      <div class="mt-4 d-flex gap-3">
+        <a href="#" class="btn-mist" id="modalCta">Start this path</a>
+        <button class="btn-ghost" id="modalCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      // AOS init (same as index)
+      AOS.init({ duration: 800, once: true });
+
+      // scroll orb
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) orb.classList.add('visible');
+        else orb.classList.remove('visible');
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // mobile toggle
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => { if (links.classList.contains('show')) links.classList.remove('show'); });
+      });
+
+      // ---------- ANALYTICS (mock) ----------
+      function trackEvent(eventName, metadata) {
+        console.log(`📈 paths page | ${eventName}`, metadata);
+        // In prod: send to analytics
+      }
+
+      // Path data for modal
+      const pathDetails = {
+        ai: {
+          title: 'AI Product Trail',
+          curriculum: ['LLM fundamentals', 'Prompt engineering', 'AI product metrics', 'Ethics & safety', 'Capstone: AI feature'],
+          tests: ['Python for AI', 'AI product case study'],
+          commitment: '6 months · 8–10 hrs/week',
+          next: 'After this path: MLOps or AI PM'
+        },
+        ux: {
+          title: 'Immersive UX Trail',
+          curriculum: ['Design thinking', 'User research', 'Wireframing (Figma)', 'Prototyping & testing', 'Portfolio polish'],
+          tests: ['UX portfolio review', 'Design challenge'],
+          commitment: '7 months · 7–9 hrs/week',
+          next: 'Advanced UX or Product Management'
+        },
+        data: {
+          title: 'Data Analyst Trail',
+          curriculum: ['SQL for analysis', 'Python (Pandas, Viz)', 'Tableau', 'Statistics', 'Capstone: analytics dashboard'],
+          tests: ['SQL assessment', 'Data storytelling'],
+          commitment: '8 months · 8–10 hrs/week',
+          next: 'Data engineering or ML'
+        },
+        mlops: {
+          title: 'MLOps Specialization',
+          curriculum: ['Docker & Kubernetes', 'Model deployment', 'CI/CD for ML', 'Monitoring', 'Capstone: deploy LLM'],
+          tests: ['ML fundamentals', 'Python advanced'],
+          commitment: '5 months · 10 hrs/week',
+          next: 'Lead ML engineer track'
+        },
+        pm: {
+          title: 'Product Management',
+          curriculum: ['Product strategy', 'Agile & scrum', 'Data-informed decisions', 'User stories', 'Capstone: product launch'],
+          tests: ['Product sense interview', 'Analytics'],
+          commitment: '6 months · 6–8 hrs/week',
+          next: 'Senior PM / leadership'
+        }
+      };
+
+      // modal elements
+      const modal = document.getElementById('sfPathsModal');
+      const modalTitle = document.getElementById('modalPathTitle');
+      const modalContent = document.getElementById('modalPathContent');
+      const closeBtn = document.getElementById('closePathModal');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+      const modalCta = document.getElementById('modalCta');
+
+      function showModal(pathKey) {
+        const data = pathDetails[pathKey] || pathDetails.ai;
+        trackEvent('path_modal_opened', { path: data.title });
+        modalTitle.innerText = data.title;
+        let html = `
+          <div class="sf-paths-progress mb-3"><div class="sf-paths-progress-bar" style="width:65%"></div></div>
+          <p><strong>⏱️ ${data.commitment}</strong></p>
+          <h5>Core curriculum:</h5><ul>`;
+        data.curriculum.forEach(item => html += `<li><i class="bi bi-check-circle-fill"></i> ${item}</li>`);
+        html += `</ul><h5>Recommended skill tests:</h5><ul>`;
+        data.tests.forEach(t => html += `<li><i class="bi bi-pencil-square"></i> ${t}</li>`);
+        html += `</ul><p><i class="bi bi-arrow-right-circle"></i> <strong>Suggested next:</strong> ${data.next}</p>`;
+        modalContent.innerHTML = html;
+        modalCta.href = '#';
+        modalCta.addEventListener('click', (e) => {
+          e.preventDefault();
+          trackEvent('cta_clicked', { path: data.title, cta: 'start_path' });
+          alert('✨ you would be enrolled — assessment ready (mock)');
+        });
+        modal.classList.add('show');
+      }
+
+      document.querySelectorAll('.view-path-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const path = btn.closest('.sf-paths-card')?.dataset.path || 'ai';
+          trackEvent('view_path_clicked', { path });
+          showModal(path);
+        });
+      });
+
+      function closeModal() {
+        modal.classList.remove('show');
+      }
+      closeBtn.addEventListener('click', closeModal);
+      modalCloseBtn.addEventListener('click', closeModal);
+      window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+      // additional tracking for card hover (optional)
+      document.querySelectorAll('.sf-paths-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          trackEvent('path_card_hover', { path: card.dataset.path });
+        });
+      });
+    })();
+  </script>
+  <!-- small style for btn-ghost (if missing) -->
+  <style>
+    .btn-ghost {
+      background: transparent; border: 2px solid #2b5f6b; color: #1c2e3f; padding: 1rem 2.5rem;
+      border-radius: 60px; font-weight: 600; text-decoration: none; display: inline-block;
+      transition: 0.2s;
+    }
+    .btn-ghost:hover { background: #2b5f6b; color: white; }
+  </style>
+</body>
+</html>

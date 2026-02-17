@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary meta tags & SEO -->
+  <title>SkillForge Hub · world‑class mentors</title>
+  <meta name="description" content="Meet our elite mentors: AI researchers, UX leaders, data storytellers. Book 1:1 sessions, view courses, and get AI‑matched guidance.">
+  <!-- Bootstrap grid & icons (layout only) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- fonts & AOS -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <!-- Font Awesome (optional) -->
+  <script src="https://kit.fontawesome.com/1b30ffa950.js" crossorigin="anonymous"></script>
+  <style>
+    /* ========== GLOBAL STYLES (consistent with index) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;
+      --fog-mid: #2b5f6b;
+      --fog-soft: #e5f0f5;
+      --mist-green: #7fc3b0;
+      --accent-glow: #ffb347;
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
+    }
+
+    /* ---------- scroll orb ---------- */
+    #orb-scroll {
+      position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
+      border-radius: 50% 20% 50% 50%; background: rgba(127,195,176,0.3);
+      backdrop-filter: blur(16px) saturate(180%); border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; color: white;
+      font-size: 2.2rem; cursor: pointer; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0; visibility: hidden; z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%; background: #7fc3b0; transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+
+    /* ---------- custom navbar (identical) ---------- */
+    .nav-fog {
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(18px); position: fixed; width: 100%; top: 0;
+      z-index: 1000; padding: 0.6rem 2rem; border-bottom: 2px solid rgba(127,195,176,0.3);
+    }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+    .logo-block { display: flex; align-items: center; gap: 8px; }
+    .logo-block img { height: 48px; filter: drop-shadow(0 4px 8px #7fc3b0); }
+    .logo-text { font-size: 1.9rem; font-weight: 800; background: linear-gradient(130deg, #ffffff, #b8e3d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+    .nav-links { display: flex; gap: 0.4rem; list-style: none; margin: 0; }
+    .nav-links a { text-decoration: none; color: rgba(255,255,255,0.85); font-weight: 500; padding: 0.6rem 1.4rem; border-radius: 50px; transition: 0.25s; font-size: 1.05rem; }
+    .nav-links a:hover { background: #7fc3b0; color: #0f2b3c; transform: translateY(-3px); }
+    .nav-cta a { background: white; color: #0f2b3c !important; font-weight: 700; padding: 0.6rem 2rem; border-radius: 60px; border: 2px solid #ffb347; text-decoration: none; }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle { display: none; background: transparent; border: 2px solid #7fc3b0; color: white; font-size: 2rem; border-radius: 40px; padding: 0.2rem 1rem; cursor: pointer; }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links { display: none; flex-direction: column; background: rgba(15,43,60,0.95); backdrop-filter: blur(20px); position: absolute; top: 85px; left: 5%; width: 90%; border-radius: 40px; padding: 2rem; z-index: 999; }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+
+    /* ---------- footer ---------- */
+    .footer-fog { background: #0f2b3c; color: #e5f0f5; padding: 4rem 5% 2rem; border-top: 8px solid #7fc3b0; }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+
+    /* ---------- section title ---------- */
+    .section-title { text-align: center; margin: 4rem 0 2rem; }
+    .section-title h2 { font-size: 2.5rem; font-weight: 700; color: #0f2b3c; }
+    .section-title .line { width: 100px; height: 6px; background: #7fc3b0; margin: 0.5rem auto; border-radius: 6px; }
+
+    /* ========== MENTORS PAGE SPECIFIC ========== prefix: sf-mentor- */
+
+    /* ----- HERO (stunning, animated) ----- */
+    .sf-mentor-hero {
+      margin-top: 90px;
+      background: linear-gradient(135deg, #0b2b36 0%, #1b4c57 100%);
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 5rem 5%;
+      display: flex;
+      align-items: center;
+      min-height: 70vh;
+    }
+    .sf-mentor-hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 50%, rgba(127,195,176,0.2) 0%, transparent 50%);
+      animation: pulseBg 8s infinite alternate;
+      z-index: -1;
+    }
+    @keyframes pulseBg {
+      0% { opacity: 0.4; transform: scale(1); }
+      100% { opacity: 0.8; transform: scale(1.2); }
+    }
+    .sf-mentor-hero-content {
+      color: white;
+      max-width: 700px;
+    }
+    .sf-mentor-hero h1 {
+      font-size: 4.5rem;
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .sf-mentor-hero p {
+      font-size: 1.4rem;
+      margin: 1.5rem 0;
+      color: #c3e8dd;
+    }
+    .sf-mentor-hero .btn-mist {
+      background: #ffb347;
+      color: #0f2b3c;
+      border: none;
+      font-size: 1.3rem;
+      padding: 1.2rem 3rem;
+    }
+    .sf-mentor-hero .btn-mist:hover { background: white; transform: scale(1.05); }
+
+    /* ----- filter bar (interactive) ----- */
+    .sf-mentor-filter-bar {
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); border-radius: 100px;
+      padding: 1.2rem 2.5rem; margin: -2.5rem auto 3rem; max-width: 1100px;
+      border: 2px solid rgba(127,195,176,0.4); box-shadow: 0 30px 40px -20px #0f2b3c;
+      display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; position: relative; z-index: 5;
+    }
+    .sf-mentor-filter-group { display: flex; align-items: center; gap: 1rem; }
+    .sf-mentor-filter-group label { font-weight: 600; color: #0f2b3c; }
+    .sf-mentor-filter-group select, .sf-mentor-filter-group input {
+      background: white; border: 2px solid #e5f0f5; border-radius: 60px; padding: 0.6rem 1.8rem;
+      font-weight: 500; transition: 0.2s;
+    }
+    .sf-mentor-filter-group select:hover { border-color: #7fc3b0; }
+
+    /* ----- mentor grid (cards) ----- */
+    .sf-mentor-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;
+      margin: 3rem 0;
+    }
+    .sf-mentor-card {
+      background: white; border-radius: 60px; padding: 2rem 1.8rem;
+      box-shadow: 0 20px 30px -15px rgba(0,0,0,0.1); border: 2px solid rgba(255,255,255,0.8);
+      transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer;
+      display: flex; flex-direction: column;
+    }
+    .sf-mentor-card:hover {
+      transform: translateY(-12px) scale(1.02); box-shadow: 0 40px 60px -20px #0f2b3c, 0 0 0 3px #7fc3b0;
+      background: rgba(255,255,255,0.98);
+    }
+    .sf-mentor-card img {
+      width: 120px; height: 120px; border-radius: 40% 60% 40% 60%; object-fit: cover;
+      margin: 0 auto 1.5rem; border: 4px solid #7fc3b0; transition: 0.3s;
+    }
+    .sf-mentor-card:hover img { border-radius: 50% 40% 50% 40%; border-color: #ffb347; }
+    .sf-mentor-card h3 { font-size: 1.8rem; font-weight: 700; text-align: center; }
+    .sf-mentor-card .specialty { color: #2b5f6b; text-align: center; font-weight: 500; margin: 0.5rem 0; }
+    .sf-mentor-card .rating { color: #ffb347; text-align: center; margin: 0.5rem 0; }
+    .sf-mentor-card .availability {
+      text-align: center; font-size: 0.9rem; padding: 0.4rem; border-radius: 60px;
+      background: #e5fcf5; color: #0f2b3c; margin-top: 1rem;
+    }
+
+    /* ----- premium modal ----- */
+    .sf-mentor-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(12px); align-items: center;
+      justify-content: center; z-index: 10000; opacity: 0; transition: opacity 0.3s;
+    }
+    .sf-mentor-modal.show { display: flex; opacity: 1; }
+    .sf-mentor-modal-content {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-radius: 70px;
+      max-width: 900px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 2.5rem;
+      box-shadow: 0 80px 100px -40px #0f2b3c, 0 0 0 2px rgba(127,195,176,0.4) inset;
+      transform: scale(0.96); transition: transform 0.3s;
+    }
+    .sf-mentor-modal.show .sf-mentor-modal-content { transform: scale(1); }
+    .sf-mentor-modal-close {
+      float: right; font-size: 2.5rem; background: none; border: none; cursor: pointer;
+    }
+    .sf-mentor-ai-recommendation {
+      background: #ffb34715; border-radius: 40px; padding: 1.5rem; margin: 1.5rem 0;
+      border-left: 8px solid #ffb347; display: flex; gap: 1rem; align-items: center;
+    }
+    .sf-mentor-ai-recommendation i { font-size: 2.5rem; color: #ffb347; }
+    .sf-mentor-progress {
+      height: 8px; background: #e5f0f5; border-radius: 40px; margin: 1.5rem 0;
+    }
+    .sf-mentor-progress-fill { height: 100%; background: #7fc3b0; border-radius: 40px; width: 0%; }
+    .sf-mentor-availability-badge {
+      display: inline-block; padding: 0.4rem 1.5rem; border-radius: 60px; font-weight: 600;
+    }
+    .sf-mentor-online { background: #7fc3b0; color: #0f2b3c; }
+    .sf-mentor-busy { background: #e0e0e0; color: #555; }
+    .sf-mentor-modal-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .sf-mentor-hero h1 { font-size: 3rem; }
+      .sf-mentor-filter-bar { border-radius: 40px; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <!-- scroll orb -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- navbar (preserved) -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="#" style="background: #7fc3b0; color:#0f2b3c;">Mentors</a></li>
+        <li><a href="#">Community</a></li>
+        <li><a href="#">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="#">Enroll Now</a></div>
+    </div>
+  </nav>
+
+  <!-- HERO (premium, animated) -->
+  <section class="sf-mentor-hero">
+    <div class="sf-mentor-hero-bg"></div>
+    <div class="sf-mentor-hero-content" data-aos="fade-right">
+      <h1>learn from <span style="color:#ffb347;">world‑class</span> mentors</h1>
+      <p>AI researchers, UX leaders, data storytellers — all here to guide you, 1:1.</p>
+      <a href="#mentor-grid" class="btn-mist">✨ meet your mentor</a>
+    </div>
+  </section>
+
+  <div class="container" id="mentor-grid">
+    <!-- FILTER BAR (interactive) -->
+    <div class="sf-mentor-filter-bar" data-aos="fade-up">
+      <div class="sf-mentor-filter-group">
+        <label>Expertise</label>
+        <select id="expertiseFilter">
+          <option value="all">All</option>
+          <option value="AI">AI</option>
+          <option value="UX">UX</option>
+          <option value="Data">Data</option>
+          <option value="Product">Product</option>
+        </select>
+      </div>
+      <div class="sf-mentor-filter-group">
+        <label>Availability</label>
+        <select id="availabilityFilter">
+          <option value="all">All</option>
+          <option value="online">Online</option>
+          <option value="busy">Busy</option>
+        </select>
+      </div>
+      <div class="sf-mentor-filter-group">
+        <label>Search</label>
+        <input type="text" id="searchInput" placeholder="name or keyword" class="form-control">
+      </div>
+    </div>
+
+    <!-- MENTOR GRID (6 premium mentors) -->
+    <div class="sf-mentor-grid" id="mentorGrid">
+      <!-- mentor 1 - Dr. Alina Koh -->
+      <div class="sf-mentor-card" data-expertise="AI" data-availability="online" data-name="Alina Koh">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dr. Alina Koh">
+        <h3>Dr. Alina Koh</h3>
+        <div class="specialty">AI research · ex‑Meta</div>
+        <div class="rating">★★★★★ <span>(124)</span></div>
+        <div class="availability sf-mentor-online">🟢 Online now</div>
+      </div>
+      <!-- mentor 2 - Marcus Velez -->
+      <div class="sf-mentor-card" data-expertise="UX" data-availability="busy" data-name="Marcus Velez">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Marcus Velez">
+        <h3>Marcus Velez</h3>
+        <div class="specialty">UX lead · Fintech</div>
+        <div class="rating">★★★★☆ <span>(98)</span></div>
+        <div class="availability sf-mentor-busy">⏳ In sessions</div>
+      </div>
+      <!-- mentor 3 - Sophia Chen -->
+      <div class="sf-mentor-card" data-expertise="Data" data-availability="online" data-name="Sophia Chen">
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Sophia Chen">
+        <h3>Sophia Chen</h3>
+        <div class="specialty">Data storyteller · ex‑NYT</div>
+        <div class="rating">★★★★★ <span>(213)</span></div>
+        <div class="availability sf-mentor-online">🟢 Online now</div>
+      </div>
+      <!-- mentor 4 - Carlos Mendez -->
+      <div class="sf-mentor-card" data-expertise="AI" data-availability="online" data-name="Carlos Mendez">
+        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Carlos Mendez">
+        <h3>Carlos Mendez</h3>
+        <div class="specialty">MLOps · Spotify</div>
+        <div class="rating">★★★★☆ <span>(67)</span></div>
+        <div class="availability sf-mentor-online">🟢 Online now</div>
+      </div>
+      <!-- mentor 5 - Nina Kapoor -->
+      <div class="sf-mentor-card" data-expertise="Product" data-availability="busy" data-name="Nina Kapoor">
+        <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Nina Kapoor">
+        <h3>Nina Kapoor</h3>
+        <div class="specialty">Product · ex‑Google</div>
+        <div class="rating">★★★★★ <span>(54)</span></div>
+        <div class="availability sf-mentor-busy">⏳ In sessions</div>
+      </div>
+      <!-- mentor 6 - David Kim -->
+      <div class="sf-mentor-card" data-expertise="UX" data-availability="online" data-name="David Kim">
+        <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="David Kim">
+        <h3>David Kim</h3>
+        <div class="specialty">UX research · Airbnb</div>
+        <div class="rating">★★★★☆ <span>(42)</span></div>
+        <div class="availability sf-mentor-online">🟢 Online now</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREMIUM MODAL (dynamic) -->
+  <div id="mentorModal" class="sf-mentor-modal">
+    <div class="sf-mentor-modal-content">
+      <button class="sf-mentor-modal-close" id="closeModalBtn">&times;</button>
+      <div id="modalMentorContent">
+        <!-- filled by js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER (identical) -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="assets/img/person/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
+        </div>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="paths.html">Paths</a></li><li><a href="courses.html">Courses</a></li><li><a href="#">Mentors</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">Blog</a></li><li><a href="#">Research</a></li><li><a href="#">Events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      AOS.init({ duration: 800, once: true });
+
+      // scroll orb
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        orb.classList.toggle('visible', window.scrollY > 500);
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // mobile toggle
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => links.classList.remove('show'));
+      });
+
+      // analytics hook
+      function trackEvent(event, metadata) {
+        console.log('📊 mentors |', event, metadata);
+      }
+
+      // ---------- MENTOR DETAILS (rich dataset) ----------
+      const mentorDetails = {
+        'Dr. Alina Koh': {
+          fullName: 'Dr. Alina Koh',
+          img: 'https://randomuser.me/api/portraits/women/44.jpg',
+          specialties: ['AI research', 'LLMs', 'Product ethics'],
+          bio: 'Alina spent 8 years at Meta AI leading product-focused research. She now mentors builders to create responsible, impactful AI features.',
+          courses: ['AI Product Trail', 'Prompt Engineering'],
+          rating: 4.9,
+          achievements: ['PhD in ML', '10+ patents', 'Keynote at NeurIPS'],
+          aiReason: 'Your interest in AI & hands-on projects makes Alina your ideal mentor. She excels at bridging research and product.',
+          progress: 68, // % of learner's courses with this mentor
+          availability: 'online',
+          nextSlot: 'Today 4pm',
+        },
+        'Marcus Velez': {
+          fullName: 'Marcus Velez',
+          img: 'https://randomuser.me/api/portraits/men/32.jpg',
+          specialties: ['UX design', 'Figma', 'Design systems'],
+          bio: 'Marcus led design at a fintech unicorn. He helps designers craft portfolios and ace interviews.',
+          courses: ['UX Immersive', 'Design Systems'],
+          rating: 4.7,
+          achievements: ['Design Lead @Fintech', 'Speaker at Config'],
+          aiReason: 'Your empathy and creativity align with Marcus’s mentoring style. He turns strong instincts into job-ready skills.',
+          progress: 42,
+          availability: 'busy',
+          nextSlot: 'Tomorrow 11am',
+        },
+        'Sophia Chen': {
+          fullName: 'Sophia Chen',
+          img: 'https://randomuser.me/api/portraits/women/68.jpg',
+          specialties: ['Data analysis', 'Tableau', 'Storytelling'],
+          bio: 'Sophia translated complex data into narratives at The New York Times. Now she teaches analysts to communicate with impact.',
+          courses: ['Data Analyst Trail', 'Data Viz'],
+          rating: 5.0,
+          achievements: ['Data Journalism Award', 'Published author'],
+          aiReason: 'Your structured thinking and curiosity are a perfect match. Sophia will sharpen your analytical voice.',
+          progress: 23,
+          availability: 'online',
+          nextSlot: 'Today 2pm',
+        },
+        'Carlos Mendez': {
+          fullName: 'Carlos Mendez',
+          img: 'https://randomuser.me/api/portraits/men/75.jpg',
+          specialties: ['MLOps', 'Kubernetes', 'CI/CD'],
+          bio: 'Carlos builds ML infrastructure at Spotify. He mentors engineers aiming for production-scale systems.',
+          courses: ['MLOps Specialization'],
+          rating: 4.6,
+          achievements: ['Infrastructure lead', 'Open source contributor'],
+          aiReason: 'Your interest in systems & scalability is exactly what Carlos specializes in. He’ll guide you to production-ready skills.',
+          progress: 10,
+          availability: 'online',
+          nextSlot: 'Today 5pm',
+        },
+        'Nina Kapoor': {
+          fullName: 'Nina Kapoor',
+          img: 'https://randomuser.me/api/portraits/women/33.jpg',
+          specialties: ['Product strategy', 'Agile', 'Leadership'],
+          bio: 'Nina led products at Google and several startups. She helps aspiring PMs land roles and thrive.',
+          courses: ['Product Management'],
+          rating: 4.9,
+          achievements: ['Google Product Lead', 'MBA'],
+          aiReason: 'Your strategic thinking matches Nina’s mentee profile. She’s helped dozens transition into PM.',
+          progress: 5,
+          availability: 'busy',
+          nextSlot: 'Wed 10am',
+        },
+        'David Kim': {
+          fullName: 'David Kim',
+          img: 'https://randomuser.me/api/portraits/men/46.jpg',
+          specialties: ['UX research', 'User testing', 'Accessibility'],
+          bio: 'David leads research at Airbnb. He mentors researchers to uncover insights that shape products.',
+          courses: ['UX Research'],
+          rating: 4.8,
+          achievements: ['Airbnb design team', 'PhD in HCI'],
+          aiReason: 'Your curiosity about people and systems makes David the perfect guide to deepen your research skills.',
+          progress: 30,
+          availability: 'online',
+          nextSlot: 'Today 3pm',
+        },
+      };
+
+      // modal elements
+      const modal = document.getElementById('mentorModal');
+      const modalContent = document.getElementById('modalMentorContent');
+      const closeBtn = document.getElementById('closeModalBtn');
+
+      // open modal on card click
+      document.querySelectorAll('.sf-mentor-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const name = card.querySelector('h3').innerText;
+          const data = mentorDetails[name];
+          if (!data) return;
+          trackEvent('modal_open', { mentor: name });
+
+          const availabilityClass = data.availability === 'online' ? 'sf-mentor-online' : 'sf-mentor-busy';
+          const availabilityText = data.availability === 'online' ? '🟢 Online now' : '⏳ Busy';
+
+          let html = `
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+              <img src="${data.img}" style="width:120px; height:120px; border-radius: 40% 60% 40% 60%; border:4px solid #7fc3b0;" alt="${data.fullName}">
+              <div>
+                <h2 class="fw-bold">${data.fullName}</h2>
+                <p>${data.specialties.join(' · ')}</p>
+                <span class="sf-mentor-availability-badge ${availabilityClass}">${availabilityText} · next: ${data.nextSlot}</span>
+              </div>
+            </div>
+            <div class="sf-mentor-ai-recommendation">
+              <i class="bi bi-stars"></i>
+              <div><strong>🧠 AI match explanation</strong><br>${data.aiReason}</div>
+            </div>
+            <p>${data.bio}</p>
+            <div><strong>Courses taught:</strong> ${data.courses.join(', ')}</div>
+            <div class="mt-2"><strong>Achievements:</strong> ${data.achievements.join(' · ')}</div>
+            <div class="sf-mentor-progress mt-4"><div class="sf-mentor-progress-fill" style="width:${data.progress}%"></div></div>
+            <p class="text-muted">Your progress with this mentor: ${data.progress}% (simulated)</p>
+            <div class="sf-mentor-modal-actions">
+              <a href="#" class="btn-mist" id="scheduleSession">📅 Schedule session</a>
+              <a href="#" class="btn-ghost" id="viewCourses">📚 View courses</a>
+              <a href="#" class="btn-ghost" id="followMentor">➕ Follow</a>
+              <a href="#" class="btn-ghost" id="messageMentor">✉️ Message</a>
+            </div>
+          `;
+          modalContent.innerHTML = html;
+          modal.classList.add('show');
+
+          // button trackers
+          document.getElementById('scheduleSession')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('schedule_session', { mentor: name }); alert('mock: scheduling flow');
+          });
+          document.getElementById('viewCourses')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('view_courses', { mentor: name }); alert('mock: courses by mentor');
+          });
+          document.getElementById('followMentor')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('follow_mentor', { mentor: name }); alert('mock: followed');
+          });
+          document.getElementById('messageMentor')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('message_mentor', { mentor: name }); alert('mock: message ui');
+          });
+        });
+      });
+
+      // close modal
+      closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+      window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+
+      // ---------- FILTERING & SEARCH ----------
+      const grid = document.getElementById('mentorGrid');
+      const cards = Array.from(document.querySelectorAll('.sf-mentor-card'));
+
+      function filterMentors() {
+        const expertise = document.getElementById('expertiseFilter').value;
+        const availability = document.getElementById('availabilityFilter').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+
+        cards.forEach(card => {
+          const expMatch = expertise === 'all' || card.dataset.expertise === expertise;
+          const availMatch = availability === 'all' || card.dataset.availability === availability;
+          const nameMatch = card.dataset.name.toLowerCase().includes(search) || card.querySelector('.specialty').innerText.toLowerCase().includes(search);
+          if (expMatch && availMatch && nameMatch) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        trackEvent('filter', { expertise, availability, search });
+      }
+
+      document.getElementById('expertiseFilter').addEventListener('change', filterMentors);
+      document.getElementById('availabilityFilter').addEventListener('change', filterMentors);
+      document.getElementById('searchInput').addEventListener('input', filterMentors);
+    })();
+  </script>
+</body>
+</html>

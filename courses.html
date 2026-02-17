@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary meta tags & SEO -->
+  <title>SkillForge Hub · world‑class courses</title>
+  <meta name="description" content="Explore premium AI, UX, and Data courses. Interactive modals, AI recommendations, and seamless enrollment.">
+  <!-- Bootstrap grid & icons (layout only) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- fonts & AOS -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <style>
+    /* ========== GLOBAL STYLES (identical to index) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;
+      --fog-mid: #2b5f6b;
+      --fog-soft: #e5f0f5;
+      --mist-green: #7fc3b0;
+      --accent-glow: #ffb347;
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
+    }
+    /* ---------- scroll orb ---------- */
+    #orb-scroll {
+      position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
+      border-radius: 50% 20% 50% 50%; background: rgba(127,195,176,0.3);
+      backdrop-filter: blur(16px) saturate(180%); border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; color: white;
+      font-size: 2.2rem; cursor: pointer; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0; visibility: hidden; z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%; background: #7fc3b0; transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+    /* ---------- custom navbar (preserved) ---------- */
+    .nav-fog {
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(18px); position: fixed; width: 100%; top: 0;
+      z-index: 1000; padding: 0.6rem 2rem; border-bottom: 2px solid rgba(127,195,176,0.3);
+    }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+    .logo-block { display: flex; align-items: center; gap: 8px; }
+    .logo-block img { height: 48px; filter: drop-shadow(0 4px 8px #7fc3b0); }
+    .logo-text { font-size: 1.9rem; font-weight: 800; background: linear-gradient(130deg, #ffffff, #b8e3d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+    .nav-links { display: flex; gap: 0.4rem; list-style: none; margin: 0; }
+    .nav-links a { text-decoration: none; color: rgba(255,255,255,0.85); font-weight: 500; padding: 0.6rem 1.4rem; border-radius: 50px; transition: 0.25s; font-size: 1.05rem; }
+    .nav-links a:hover { background: #7fc3b0; color: #0f2b3c; transform: translateY(-3px); }
+    .nav-cta a { background: white; color: #0f2b3c !important; font-weight: 700; padding: 0.6rem 2rem; border-radius: 60px; border: 2px solid #ffb347; text-decoration: none; }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle { display: none; background: transparent; border: 2px solid #7fc3b0; color: white; font-size: 2rem; border-radius: 40px; padding: 0.2rem 1rem; cursor: pointer; }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links { display: none; flex-direction: column; background: rgba(15,43,60,0.95); backdrop-filter: blur(20px); position: absolute; top: 85px; left: 5%; width: 90%; border-radius: 40px; padding: 2rem; z-index: 999; }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+    /* ---------- footer ---------- */
+    .footer-fog { background: #0f2b3c; color: #e5f0f5; padding: 4rem 5% 2rem; border-top: 8px solid #7fc3b0; }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+    /* ---------- section title ---------- */
+    .section-title { text-align: center; margin: 4rem 0 2rem; }
+    .section-title h2 { font-size: 2.5rem; font-weight: 700; color: #0f2b3c; }
+    .section-title .line { width: 100px; height: 6px; background: #7fc3b0; margin: 0.5rem auto; border-radius: 6px; }
+    .btn-mist { background: #7fc3b0; border: none; padding: 1rem 2.5rem; border-radius: 60px; font-weight: 700; color: #0f2b3c; text-decoration: none; transition: 0.3s; box-shadow: 0 12px 20px -10px #7fc3b0; display: inline-block; }
+    .btn-mist:hover { background: #ffb347; transform: scale(1.03); }
+
+    /* ========== COURSES PAGE ENHANCEMENTS ========== prefix: sf-courses- */
+    /* filter bar */
+    .sf-courses-filter-bar {
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); border-radius: 100px;
+      padding: 1rem 2rem; margin: 2rem 0; display: flex; flex-wrap: wrap; gap: 2rem;
+      justify-content: center; border: 2px solid rgba(127,195,176,0.3);
+    }
+    .sf-courses-filter-group { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .sf-courses-filter-group label { font-weight: 600; color: #0f2b3c; }
+    .sf-courses-filter-group select, .sf-courses-filter-group input {
+      background: white; border: 2px solid #e5f0f5; border-radius: 60px; padding: 0.5rem 1.5rem;
+      font-weight: 500; transition: 0.2s;
+    }
+    .sf-courses-filter-group select:hover { border-color: #7fc3b0; }
+    .sf-courses-filter-group input:checked { accent-color: #7fc3b0; }
+
+    /* course grid – preserve existing but enhance cards */
+    .sf-courses-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;
+      margin: 3rem 0;
+    }
+    .sf-courses-card {
+      background: white; border-radius: 50px; padding: 1.8rem; box-shadow: 0 20px 30px -15px rgba(0,0,0,0.1);
+      border: 2px solid rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1);
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .sf-courses-card:hover {
+      transform: translateY(-10px) scale(1.01); box-shadow: 0 40px 50px -20px #0f2b3c, 0 0 0 2px #7fc3b0;
+      background: rgba(255,255,255,0.95);
+    }
+    .sf-courses-card-badge {
+      background: #ffb347; color: #0f2b3c; border-radius: 60px; padding: 0.3rem 1rem;
+      display: inline-block; font-weight: 600; font-size: 0.8rem; margin-bottom: 1rem;
+    }
+    .sf-courses-card h3 { font-size: 1.8rem; font-weight: 700; }
+    .sf-courses-card-instructor { display: flex; align-items: center; gap: 0.8rem; margin: 1rem 0; }
+    .sf-courses-card-instructor img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .sf-courses-card-rating { color: #ffb347; margin: 0.5rem 0; }
+    .sf-courses-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+    .sf-courses-price { font-size: 1.6rem; font-weight: 700; color: #0f2b3c; }
+
+    /* premium modal */
+    .sf-courses-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(12px); align-items: center;
+      justify-content: center; z-index: 10000; opacity: 0; transition: opacity 0.3s;
+    }
+    .sf-courses-modal.show { display: flex; opacity: 1; }
+    .sf-courses-modal-content {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-radius: 70px;
+      max-width: 800px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 2.5rem;
+      box-shadow: 0 80px 100px -50px #0f2b3c, 0 0 0 2px rgba(127,195,176,0.4) inset;
+      transform: scale(0.96); transition: transform 0.3s;
+    }
+    .sf-courses-modal.show .sf-courses-modal-content { transform: scale(1); }
+    .sf-courses-modal-close {
+      float: right; font-size: 2rem; background: none; border: none; cursor: pointer;
+    }
+    .sf-courses-ai-explanation {
+      background: #ffb34710; border-radius: 40px; padding: 1.5rem; margin: 1.5rem 0;
+      border-left: 10px solid #ffb347; display: flex; gap: 1rem; align-items: center;
+    }
+    .sf-courses-ai-explanation i { font-size: 2.5rem; color: #ffb347; }
+    .sf-courses-progress {
+      height: 8px; background: #e5f0f5; border-radius: 40px; margin: 1.5rem 0;
+    }
+    .sf-courses-progress-fill {
+      height: 100%; background: #7fc3b0; border-radius: 40px; width: 0%;
+    }
+    .sf-courses-modal-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+
+    /* smooth entrance */
+    [data-aos="course-card"] { opacity: 0; transform: translateY(30px); transition: 0.6s; }
+    [data-aos="course-card"].aos-animate { opacity: 1; transform: translateY(0); }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .sf-courses-filter-bar { border-radius: 40px; flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <!-- scroll orb -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- navbar (exact copy) -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="#" style="background: #7fc3b0; color:#0f2b3c;">Courses</a></li>
+        <li><a href="#">Mentors</a></li>
+        <li><a href="#">Community</a></li>
+        <li><a href="#">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="#">Enroll Now</a></div>
+    </div>
+  </nav>
+
+  <!-- hero (simple, consistent) -->
+  <section style="margin-top: 100px; padding: 3rem 5%; background: radial-gradient(circle at 70% 20%, #d7f0e8, white);">
+    <div class="container text-center">
+      <h1 class="display-3 fw-bold" data-aos="fade-up">premium <span style="color:#7fc3b0;">courses</span></h1>
+      <p class="fs-4" data-aos="fade-up" data-aos-delay="50">AI‑powered recommendations · mentor‑guided · project‑first</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- FILTER & SORT (enhanced, interactive) -->
+    <div class="sf-courses-filter-bar" data-aos="fade-up">
+      <div class="sf-courses-filter-group">
+        <label>Category</label>
+        <select id="categoryFilter">
+          <option value="all">All</option>
+          <option value="ai">AI</option>
+          <option value="ux">UX</option>
+          <option value="data">Data</option>
+        </select>
+      </div>
+      <div class="sf-courses-filter-group">
+        <label>Level</label>
+        <select id="levelFilter">
+          <option value="all">All</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="sf-courses-filter-group">
+        <label>Sort by</label>
+        <select id="sortFilter">
+          <option value="popular">Most popular</option>
+          <option value="price-low">Price: low to high</option>
+          <option value="price-high">Price: high to low</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- COURSE GRID (cards with all existing data + enhancements) -->
+    <div class="sf-courses-grid" id="coursesGrid">
+      <!-- AI Product Course -->
+      <div class="sf-courses-card" data-category="ai" data-level="advanced" data-price="249" data-popularity="95" data-aos="course-card" data-aos-delay="50">
+        <span class="sf-courses-card-badge">⭐ advanced</span>
+        <h3>AI Product Trail</h3>
+        <div class="sf-courses-card-instructor">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dr. Alina Koh">
+          <span>Dr. Alina Koh · AI research</span>
+        </div>
+        <div class="sf-courses-card-rating">★★★★★ <span class="text-muted">(124)</span></div>
+        <p>Build & ship AI features — from prompt engineering to product metrics. Mentor-led.</p>
+        <div class="sf-courses-card-footer">
+          <span class="sf-courses-price">$249</span>
+          <button class="btn-mist view-details-btn" style="padding:0.6rem 1.5rem;">View</button>
+        </div>
+      </div>
+
+      <!-- UX Immersive -->
+      <div class="sf-courses-card" data-category="ux" data-level="intermediate" data-price="199" data-popularity="88" data-aos="course-card" data-aos-delay="100">
+        <span class="sf-courses-card-badge">🎯 intermediate</span>
+        <h3>UX Immersive</h3>
+        <div class="sf-courses-card-instructor">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Marcus Velez">
+          <span>Marcus Velez · UX lead</span>
+        </div>
+        <div class="sf-courses-card-rating">★★★★☆ <span class="text-muted">(98)</span></div>
+        <p>End‑to‑end design: research, Figma, prototyping, portfolio polish.</p>
+        <div class="sf-courses-card-footer">
+          <span class="sf-courses-price">$199</span>
+          <button class="btn-mist view-details-btn" style="padding:0.6rem 1.5rem;">View</button>
+        </div>
+      </div>
+
+      <!-- Data Analyst -->
+      <div class="sf-courses-card" data-category="data" data-level="beginner" data-price="179" data-popularity="92" data-aos="course-card" data-aos-delay="150">
+        <span class="sf-courses-card-badge">📊 beginner</span>
+        <h3>Data Analyst Trail</h3>
+        <div class="sf-courses-card-instructor">
+          <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Sophia Chen">
+          <span>Sophia Chen · Data storyteller</span>
+        </div>
+        <div class="sf-courses-card-rating">★★★★★ <span class="text-muted">(213)</span></div>
+        <p>SQL, Python, Tableau — from zero to dashboard hero.</p>
+        <div class="sf-courses-card-footer">
+          <span class="sf-courses-price">$179</span>
+          <button class="btn-mist view-details-btn" style="padding:0.6rem 1.5rem;">View</button>
+        </div>
+      </div>
+
+      <!-- MLOps (advanced) -->
+      <div class="sf-courses-card" data-category="ai" data-level="advanced" data-price="299" data-popularity="75" data-aos="course-card" data-aos-delay="200">
+        <span class="sf-courses-card-badge">⚙️ advanced</span>
+        <h3>MLOps Specialization</h3>
+        <div class="sf-courses-card-instructor">
+          <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Carlos M.">
+          <span>Carlos M. · ML engineer</span>
+        </div>
+        <div class="sf-courses-card-rating">★★★★☆ <span class="text-muted">(67)</span></div>
+        <p>Deploy, monitor & maintain models in production. Docker, Kubeflow, CI/CD.</p>
+        <div class="sf-courses-card-footer">
+          <span class="sf-courses-price">$299</span>
+          <button class="btn-mist view-details-btn" style="padding:0.6rem 1.5rem;">View</button>
+        </div>
+      </div>
+
+      <!-- Product Management (new) -->
+      <div class="sf-courses-card" data-category="ux" data-level="intermediate" data-price="229" data-popularity="81" data-aos="course-card" data-aos-delay="250">
+        <span class="sf-courses-card-badge">🚀 intermediate</span>
+        <h3>Product Management</h3>
+        <div class="sf-courses-card-instructor">
+          <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Nina K.">
+          <span>Nina K. · ex‑Google PM</span>
+        </div>
+        <div class="sf-courses-card-rating">★★★★☆ <span class="text-muted">(54)</span></div>
+        <p>Bridge business, tech & design. Lead products from concept to launch.</p>
+        <div class="sf-courses-card-footer">
+          <span class="sf-courses-price">$229</span>
+          <button class="btn-mist view-details-btn" style="padding:0.6rem 1.5rem;">View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREMIUM MODAL (dynamic) -->
+  <div id="courseModal" class="sf-courses-modal">
+    <div class="sf-courses-modal-content">
+      <button class="sf-courses-modal-close" id="closeModalBtn">&times;</button>
+      <div id="modalCourseContent">
+        <!-- injected via js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER (identical) -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="assets/img/person/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
+        </div>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="paths.html">Paths</a></li><li><a href="#">Courses</a></li><li><a href="#">Mentors</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">Blog</a></li><li><a href="#">Research</a></li><li><a href="#">Events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      AOS.init({ duration: 800, once: true });
+
+      // scroll orb
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        orb.classList.toggle('visible', window.scrollY > 500);
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // mobile toggle
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => links.classList.remove('show'));
+      });
+
+      // analytics hook
+      function trackEvent(event, metadata) {
+        console.log('📊 courses |', event, metadata);
+        // later send to GA / dataLayer
+      }
+
+      // ---------- COURSE DATA (extended) ----------
+      const courseDetails = {
+        'AI Product Trail': {
+          description: 'Master AI product development: define, prototype, and evaluate AI features. Work on real product cases, get mentor feedback, and emerge with a portfolio piece.',
+          syllabus: ['Module 1: AI product foundations', 'Module 2: Prompt engineering', 'Module 3: AI metrics', 'Module 4: Capstone project'],
+          duration: '6 weeks · 8–10 hrs/week',
+          prerequisites: 'Python basics, product curiosity',
+          instructor: 'Dr. Alina Koh — AI research lead, former Meta AI',
+          price: '$249',
+          aiReason: 'Your assessment shows strong interest in AI & automation, plus a hands‑on learning style. This course gives you direct mentorship and real‑world projects.',
+          progress: 68, // % for logged‑in user
+          badges: ['advanced', 'mentor‑led', 'project']
+        },
+        'UX Immersive': {
+          description: 'End‑to‑end UX design: from user research to high‑fidelity prototypes. Build a job‑ready portfolio with mentor critique.',
+          syllabus: ['Module 1: Design thinking', 'Module 2: User research', 'Module 3: Figma & prototyping', 'Module 4: Portfolio polish'],
+          duration: '7 months · 7–9 hrs/week',
+          prerequisites: 'No design experience needed',
+          instructor: 'Marcus Velez — UX lead at fintech startup',
+          price: '$199',
+          aiReason: 'Your empathy and visual thinking scores are high. This immersive path will turn your creativity into a standout portfolio.',
+          progress: 42,
+          badges: ['intermediate', 'portfolio']
+        },
+        'Data Analyst Trail': {
+          description: 'SQL, Python, Tableau — turn messy data into clear decisions. Build dashboards and get career support.',
+          syllabus: ['Module 1: SQL for analysis', 'Module 2: Python (Pandas, Viz)', 'Module 3: Tableau', 'Module 4: Capstone'],
+          duration: '8 months · 8–10 hrs/week',
+          prerequisites: 'Basic math, spreadsheet comfort',
+          instructor: 'Sophia Chen — data storyteller, former NYT',
+          price: '$179',
+          aiReason: 'You love patterns and structured thinking — data analysis is your ideal playground. This course builds job‑ready skills.',
+          progress: 23,
+          badges: ['beginner', 'certificate']
+        },
+        'MLOps Specialization': {
+          description: 'Deploy, monitor, and maintain ML models in production. Focus on tooling and best practices.',
+          syllabus: ['Module 1: Docker & containers', 'Module 2: CI/CD for ML', 'Module 3: Model monitoring', 'Module 4: Project'],
+          duration: '5 months · 10 hrs/week',
+          prerequisites: 'ML knowledge, Python',
+          instructor: 'Carlos M. — ML engineer at Spotify',
+          price: '$299',
+          aiReason: 'Your experience and interest in systems point to MLOps. This advanced path gives you production‑ready skills.',
+          progress: 10,
+          badges: ['advanced', 'infrastructure']
+        },
+        'Product Management': {
+          description: 'Lead products from concept to launch. Learn strategy, user stories, and cross‑functional leadership.',
+          syllabus: ['Module 1: Product strategy', 'Module 2: Agile & scrum', 'Module 3: Analytics', 'Module 4: Capstone'],
+          duration: '6 months · 6–8 hrs/week',
+          prerequisites: 'Curiosity, communication',
+          instructor: 'Nina K. — ex‑Google PM',
+          price: '$229',
+          aiReason: 'You show strong strategic thinking and communication. Product management will amplify those strengths.',
+          progress: 5,
+          badges: ['intermediate', 'leadership']
+        }
+      };
+
+      // modal elements
+      const modal = document.getElementById('courseModal');
+      const modalContent = document.getElementById('modalCourseContent');
+      const closeBtn = document.getElementById('closeModalBtn');
+
+      // open modal when any "View" button clicked
+      document.querySelectorAll('.view-details-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = btn.closest('.sf-courses-card');
+          const title = card.querySelector('h3').innerText;
+          const data = courseDetails[title] || courseDetails['AI Product Trail'];
+          trackEvent('modal_open', { course: title });
+
+          // build modal html
+          let html = `
+            <h2 class="fw-bold">${title}</h2>
+            <div class="my-2">${data.badges.map(b => `<span class="sf-courses-card-badge me-2">${b}</span>`).join('')}</div>
+            <p class="fs-5">${data.description}</p>
+            <div class="sf-courses-ai-explanation">
+              <i class="bi bi-stars"></i>
+              <div><strong>✨ AI recommendation</strong><br>${data.aiReason}</div>
+            </div>
+            <div><i class="bi bi-clock"></i> ${data.duration}</div>
+            <div><i class="bi bi-book"></i> Prerequisites: ${data.prerequisites}</div>
+            <div class="mt-3"><i class="bi bi-person-circle"></i> ${data.instructor}</div>
+            <div class="sf-courses-progress"><div class="sf-courses-progress-fill" style="width:${data.progress}%"></div></div>
+            <p class="text-end text-muted">Your progress: ${data.progress}% (simulated)</p>
+            <h4 class="mt-3">Syllabus preview</h4><ul>${data.syllabus.map(s => `<li><i class="bi bi-check-circle-fill me-2" style="color:#7fc3b0;"></i>${s}</li>`).join('')}</ul>
+            <div class="sf-courses-modal-ctas">
+              <a href="#" class="btn-mist" id="enrollFromModal">Enroll now – ${data.price}</a>
+              <a href="#" class="btn-ghost" id="freeTrialModal">Start free trial</a>
+              <a href="#" class="btn-ghost" id="wishlistModal">♡ Wishlist</a>
+            </div>
+          `;
+          modalContent.innerHTML = html;
+          modal.classList.add('show');
+
+          // track modal ctas
+          document.getElementById('enrollFromModal')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('enroll_modal', { course: title });
+            alert('✨ Enrollment flow (mock)');
+          });
+          document.getElementById('freeTrialModal')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('free_trial_modal', { course: title });
+            alert('✨ Free trial started (mock)');
+          });
+          document.getElementById('wishlistModal')?.addEventListener('click', (e) => {
+            e.preventDefault(); trackEvent('wishlist', { course: title });
+            alert('Added to wishlist');
+          });
+        });
+      });
+
+      // close modal
+      closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+      window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+
+      // ---------- FILTER, SORT (interactive) ----------
+      const grid = document.getElementById('coursesGrid');
+      const cards = Array.from(document.querySelectorAll('.sf-courses-card'));
+
+      function filterAndSort() {
+        const cat = document.getElementById('categoryFilter').value;
+        const lvl = document.getElementById('levelFilter').value;
+        const sort = document.getElementById('sortFilter').value;
+
+        let visible = cards.filter(card => {
+          const catMatch = cat === 'all' || card.dataset.category === cat;
+          const lvlMatch = lvl === 'all' || card.dataset.level === lvl;
+          return catMatch && lvlMatch;
+        });
+
+        // sorting
+        if (sort === 'price-low') visible.sort((a,b) => +a.dataset.price - +b.dataset.price);
+        if (sort === 'price-high') visible.sort((a,b) => +b.dataset.price - +a.dataset.price);
+        if (sort === 'popular') visible.sort((a,b) => +b.dataset.popularity - +a.dataset.popularity);
+
+        // reorder DOM
+        cards.forEach(c => c.remove());
+        visible.forEach(c => grid.appendChild(c));
+
+        trackEvent('filter_change', { category: cat, level: lvl, sort });
+      }
+
+      document.getElementById('categoryFilter').addEventListener('change', filterAndSort);
+      document.getElementById('levelFilter').addEventListener('change', filterAndSort);
+      document.getElementById('sortFilter').addEventListener('change', filterAndSort);
+
+      // initial sort (popular)
+      filterAndSort();
+
+      // additional card click to open modal (via view button already)
+      cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('btn-mist')) {
+            // simulate view button click
+            card.querySelector('.view-details-btn')?.click();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

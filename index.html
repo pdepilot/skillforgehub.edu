@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary meta tags & SEO -->
+  <title>SkillForge Hub · where focus meets flow</title>
+  <meta name="description" content="SkillForge Hub: learn with calm focus. Explore project‑based courses in AI, design, data science with mentor guidance. start your 7‑day free trial.">
+  <!-- Bootstrap grid & icons (layout only) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- fonts & AOS -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <!-- Font Awesome (optional extra icons) -->
+  <script src="https://kit.fontawesome.com/1b30ffa950.js" crossorigin="anonymous"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;        /* deep navy – trust */
+      --fog-mid: #2b5f6b;          /* tealish blue – calm */
+      --fog-soft: #e5f0f5;         /* background */
+      --mist-green: #7fc3b0;       /* soft green – growth */
+      --accent-glow: #ffb347;       /* warm amber – energy */
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
+    }
+
+    /* ---------- preloader (fog dissolve) ---------- */
+    #skillforge-preloader {
+      position: fixed;
+      inset: 0;
+      background: #0b202b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.8s ease, visibility 0.8s;
+      backdrop-filter: blur(4px);
+    }
+    .fog-particles {
+      display: flex;
+      gap: 1.5rem;
+      filter: drop-shadow(0 0 25px #7fc3b0);
+    }
+    .particle {
+      width: 1.3rem;
+      height: 10rem;
+      background: linear-gradient(180deg, rgba(127,195,176,0.3) 0%, #7fc3b0 50%, rgba(127,195,176,0.2) 100%);
+      border-radius: 100px;
+      transform: rotate(15deg) scaleY(0.4);
+      animation: fogRise 2.2s infinite alternate ease-in-out;
+      mix-blend-mode: screen;
+    }
+    .particle:nth-child(2) { animation-delay: 0.2s; background: #b8e0d5; height: 12rem; }
+    .particle:nth-child(3) { animation-delay: 0.5s; background: #9fcfc0; height: 7rem; }
+    .particle:nth-child(4) { animation-delay: 0.7s; background: #7fc3b0; height: 14rem; }
+    .particle:nth-child(5) { animation-delay: 1s; background: #c4e6db; height: 9rem; }
+    .particle:nth-child(6) { animation-delay: 0.3s; background: #7fc3b0; height: 11rem; }
+    .particle:nth-child(7) { animation-delay: 0.9s; background: #b0d9cc; height: 8rem; }
+    .particle:nth-child(8) { animation-delay: 0.1s; background: #e1f3ed; height: 13rem; }
+    @keyframes fogRise {
+      0% { transform: rotate(12deg) scaleY(0.3) translateY(40px); opacity: 0.2; }
+      100% { transform: rotate(22deg) scaleY(1.1) translateY(-40px); opacity: 1; }
+    }
+    .preloader-brand {
+      position: absolute;
+      bottom: 20%;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #f0fcf9, #c5e6df);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+
+    /* ---------- scroll orb ---------- */
+    #orb-scroll {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50% 20% 50% 50%;
+      background: rgba(127, 195, 176, 0.3);
+      backdrop-filter: blur(16px) saturate(180%);
+      border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.2rem;
+      cursor: pointer;
+      transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%;
+      background: #7fc3b0;
+      transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+    #orb-scroll:hover i { transform: rotate(360deg) scale(1.2); color: #0f2b3c; }
+
+    /* ---------- custom navbar ---------- */
+    .nav-fog {
+      background: rgba(15, 43, 60, 0.7);
+      backdrop-filter: blur(18px);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      padding: 0.6rem 2rem;
+      border-bottom: 2px solid rgba(127, 195, 176, 0.3);
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-block img {
+      height: 48px;
+      filter: drop-shadow(0 4px 8px #7fc3b0);
+    }
+    .logo-text {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(130deg, #ffffff, #b8e3d9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 0.4rem;
+      list-style: none;
+      margin: 0;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      transition: 0.25s;
+      font-size: 1.05rem;
+    }
+    .nav-links a:hover {
+      background: #7fc3b0;
+      color: #0f2b3c;
+      transform: translateY(-3px);
+    }
+    .nav-cta a {
+      background: white;
+      color: #0f2b3c !important;
+      font-weight: 700;
+      padding: 0.6rem 2rem;
+      border-radius: 60px;
+      border: 2px solid #ffb347;
+      text-decoration: none;
+    }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle {
+      display: none;
+      background: transparent;
+      border: 2px solid #7fc3b0;
+      color: white;
+      font-size: 2rem;
+      border-radius: 40px;
+      padding: 0.2rem 1rem;
+      cursor: pointer;
+    }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background: rgba(15,43,60,0.95);
+        backdrop-filter: blur(20px);
+        position: absolute;
+        top: 85px;
+        left: 5%;
+        width: 90%;
+        border-radius: 40px;
+        padding: 2rem;
+        z-index: 999;
+      }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+
+    /* ---------- hero ---------- */
+    .hero-fog {
+      margin-top: 90px;
+      padding: 4rem 5%;
+      background: radial-gradient(circle at 10% 30%, #cbeae3, #f0f9ff);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3rem;
+    }
+    .hero-content { flex: 1 1 500px; }
+    .hero-content h1 {
+      font-size: 3.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #0f2b3c;
+    }
+    @media (max-width: 768px) { .hero-content h1 { font-size: 2.5rem; } }
+    .hero-content h1 span { color: #7fc3b0; -webkit-text-stroke: 1px #0f2b3c; }
+    .hero-stats {
+      display: flex; gap: 3rem; margin: 2rem 0; flex-wrap: wrap;
+    }
+    .stat-item h3 { font-size: 2.8rem; font-weight: 700; color: #2b5f6b; }
+    .hero-actions { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .btn-mist {
+      background: #7fc3b0; border: none; padding: 1rem 2.5rem; border-radius: 60px;
+      font-weight: 700; color: #0f2b3c; text-decoration: none; transition: 0.3s;
+      box-shadow: 0 12px 20px -10px #7fc3b0; display: inline-block;
+    }
+    .btn-mist:hover { background: #ffb347; transform: scale(1.03); }
+    .btn-ghost {
+      background: transparent; border: 2px solid #2b5f6b; color: #1c2e3f; padding: 1rem 2.5rem;
+      border-radius: 60px; font-weight: 600; text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { background: #2b5f6b; color: white; }
+    .hero-visual { flex: 1 1 400px; position: relative; }
+    .hero-visual img {
+      width: 100%; max-width: 500px; border-radius: 40px 40px 40px 120px;
+      box-shadow: 40px 40px 60px rgba(0,0,0,0.1);
+      border: 6px solid white;
+    }
+    .floating-badge {
+      position: absolute; bottom: 20px; left: -20px; background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(12px); padding: 1rem 2rem; border-radius: 100px;
+      font-weight: 600; color: #0f2b3c; border-left: 8px solid #ffb347;
+    }
+
+    /* section title utility */
+    .section-title { text-align: center; margin: 4rem 0 2rem; }
+    .section-title h2 { font-size: 2.5rem; font-weight: 700; color: #0f2b3c; }
+    .section-title .line { width: 100px; height: 6px; background: #7fc3b0; margin: 0.5rem auto; border-radius: 6px; }
+
+    /* cards */
+    .course-card-fog, .mentor-card, .path-card, .resource-card {
+      background: var(--card-white); backdrop-filter: blur(6px);
+      border-radius: var(--border-radius-md); padding: 2rem;
+      box-shadow: var(--box-shadow-light);
+      border: 1px solid rgba(255,255,255,0.7);
+      transition: 0.3s;
+      height: 100%;
+    }
+    .course-card-fog:hover, .mentor-card:hover, .path-card:hover, .resource-card:hover {
+      transform: translateY(-8px); background: white; border-color: #7fc3b0;
+    }
+    .price-badge { background: #ffb347; color: #0f2b3c; padding: 0.4rem 1.2rem; border-radius: 40px; display: inline-block; font-weight: 700; }
+
+    /* footer */
+    .footer-fog {
+      background: #0f2b3c; color: #e5f0f5; padding: 4rem 5% 2rem;
+      border-top: 8px solid #7fc3b0;
+    }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+
+    /* ========== STABILITY-FIRST ENHANCEMENTS ========== */
+    /* All additions are prefixed with sf-enhance- and scoped to avoid conflicts */
+    
+    /* ----- Hero enhancements (no layout shift) ----- */
+    .sf-enhance-trust-strip {
+      margin-top: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .sf-enhance-avatars {
+      display: flex;
+      align-items: center;
+    }
+    .sf-enhance-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid white;
+      background: #e5f0f5;
+      margin-right: -8px;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .sf-enhance-avatar-count {
+      background: #7fc3b0;
+      color: #0f2b3c;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    .sf-enhance-microcopy {
+      font-size: 0.95rem;
+      color: #2b5f6b;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .sf-enhance-microcopy i {
+      color: #7fc3b0;
+      font-size: 1.1rem;
+    }
+    /* dashboard preview card - absolutely positioned, no layout impact */
+    .sf-enhance-dashboard-preview {
+      position: absolute;
+      bottom: -30px;
+      right: -30px;
+      background: white;
+      border-radius: 24px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 30px 40px -20px rgba(0,0,0,0.3);
+      border: 1px solid rgba(127, 195, 176, 0.3);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+      pointer-events: none;
+      transform: rotate(2deg);
+      min-width: 200px;
+    }
+    @media (max-width: 768px) {
+      .sf-enhance-dashboard-preview {
+        display: none; /* Hide on mobile to prevent overflow */
+      }
+    }
+    .sf-enhance-dashboard-preview::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 20px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      transform: rotate(45deg);
+      border-left: 1px solid rgba(127,195,176,0.3);
+      border-top: 1px solid rgba(127,195,176,0.3);
+    }
+    .sf-enhance-dashboard-preview h5 {
+      font-size: 0.9rem;
+      color: #0f2b3c;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .sf-enhance-preview-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+    .sf-enhance-preview-bar {
+      flex: 1;
+      height: 6px;
+      background: #e5f0f5;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .sf-enhance-preview-bar span {
+      display: block;
+      height: 100%;
+      width: 75%;
+      background: #7fc3b0;
+      border-radius: 10px;
+    }
+    
+    /* ----- Contextual labels & helper text (surgical additions) ----- */
+    .sf-enhance-context-label {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #0f2b3c;
+      border: 1px solid rgba(127, 195, 176, 0.3);
+      margin-bottom: 0.5rem;
+    }
+    .sf-enhance-badge-subtle {
+      background: rgba(127, 195, 176, 0.15);
+      color: #2b5f6b;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 40px;
+      border: 1px solid rgba(127, 195, 176, 0.3);
+      font-weight: 500;
+      display: inline-block;
+    }
+    .sf-enhance-reassurance {
+      font-size: 0.85rem;
+      color: #2b5f6b;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .sf-enhance-reassurance i {
+      color: #7fc3b0;
+    }
+    
+    /* Subtle hover states (dimensions unchanged) */
+    .mentor-card:hover .sf-enhance-badge-subtle,
+    .path-card:hover .sf-enhance-badge-subtle,
+    .resource-card:hover .sf-enhance-badge-subtle {
+      background: rgba(127, 195, 176, 0.3);
+      transition: background 0.2s;
+    }
+    
+    /* ----- Differentiation section (safely inserted) ----- */
+    .sf-enhance-diff-section {
+      margin: 4rem 0;
+      padding: 0 5%;
+    }
+    .sf-enhance-diff-grid {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .sf-enhance-diff-item {
+      flex: 1 1 200px;
+      max-width: 250px;
+      text-align: center;
+    }
+    .sf-enhance-diff-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(127, 195, 176, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem;
+      color: #2b5f6b;
+      border: 1px dashed #7fc3b0;
+    }
+    .sf-enhance-diff-item h4 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0f2b3c;
+      margin-bottom: 0.5rem;
+    }
+    .sf-enhance-diff-item p {
+      font-size: 0.9rem;
+      color: #2b5f6b;
+      margin-bottom: 0.5rem;
+    }
+    .sf-enhance-diff-tag {
+      background: #ffb347;
+      color: #0f2b3c;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      display: inline-block;
+    }
+    
+    /* ----- Pricing teaser block (lightweight) - PART 1 STYLING ----- */
+    .sf-enhance-pricing-teaser {
+      margin: 5rem auto;
+      padding: 3rem 2rem;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 100px;
+      text-align: center;
+      border: 2px solid rgba(127, 195, 176, 0.25);
+      box-shadow: 0 40px 50px -30px rgba(0, 80, 70, 0.3), 0 0 0 1px rgba(255,255,255,0.5) inset;
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+      max-width: 1100px;
+    }
+    .sf-enhance-pricing-teaser:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 50px 60px -30px #2b5f6b, 0 0 0 2px rgba(127,195,176,0.3) inset;
+    }
+    .sf-enhance-pricing-teaser h3 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #0f2b3c;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .sf-enhance-pricing-teaser p {
+      font-size: 1.3rem;
+      color: #2b5f6b;
+      font-weight: 400;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sf-enhance-pricing-badge {
+      background: #ffb347;
+      color: #0f2b3c;
+      font-size: 1.2rem;
+      padding: 0.75rem 2.5rem;
+      border-radius: 80px;
+      display: inline-block;
+      font-weight: 700;
+      margin-top: 2rem;
+      border: 2px solid white;
+      box-shadow: 0 15px 25px -12px rgba(255,180,70,0.4);
+      transition: 0.2s;
+    }
+    .sf-enhance-pricing-badge:hover {
+      background: #ffa726;
+      transform: scale(1.02);
+    }
+    @media (max-width: 768px) {
+      .sf-enhance-pricing-teaser { padding: 2rem 1rem; border-radius: 60px; margin: 3rem auto; }
+      .sf-enhance-pricing-teaser h3 { font-size: 2rem; }
+      .sf-enhance-pricing-teaser p { font-size: 1.1rem; }
+      .sf-enhance-pricing-badge { font-size: 1rem; padding: 0.6rem 1.5rem; }
+    }
+    
+    /* Ensure no overflow issues */
+    .hero-fog, .container {
+      overflow: visible;
+    }
+
+    /* ---------- PART 2,3,4,5,6: modal, quiz, result, pdf ---------- */
+    /* modal overlay */
+    .sf-enhance-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 43, 60, 0.6);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sf-enhance-modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    .sf-enhance-modal-content {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 60px;
+      max-width: 650px;
+      width: 90%;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 60px 80px -40px #0f2b3c, 0 0 0 2px rgba(255,255,255,0.6) inset;
+      border: 1px solid rgba(127,195,176,0.4);
+      transform: scale(0.96);
+      transition: transform 0.3s ease;
+    }
+    .sf-enhance-modal.show .sf-enhance-modal-content {
+      transform: scale(1);
+    }
+    .sf-enhance-modal h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #0f2b3c;
+    }
+    .sf-enhance-progress {
+      height: 8px;
+      background: #e5f0f5;
+      border-radius: 40px;
+      margin: 1.5rem 0 2rem;
+      overflow: hidden;
+    }
+    .sf-enhance-progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #7fc3b0;
+      transition: width 0.3s;
+    }
+    .sf-enhance-question h3 {
+      font-size: 1.6rem;
+      margin-bottom: 1.8rem;
+      color: #0f2b3c;
+      font-weight: 600;
+    }
+    .sf-enhance-option {
+      display: block;
+      background: white;
+      border: 2px solid rgba(127,195,176,0.3);
+      border-radius: 60px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: 0.15s;
+      font-weight: 500;
+    }
+    .sf-enhance-option:hover {
+      background: #e5fcf5;
+      border-color: #7fc3b0;
+    }
+    .sf-enhance-option.selected {
+      background: #7fc3b0;
+      border-color: #0f2b3c;
+      color: #0f2b3c;
+      font-weight: 600;
+    }
+    .sf-enhance-nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2.5rem;
+    }
+    .sf-enhance-btn {
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      padding: 0.8rem 2.2rem;
+      border-radius: 60px;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+    .sf-enhance-btn-primary {
+      background: #7fc3b0;
+      color: #0f2b3c;
+    }
+    .sf-enhance-btn-primary:hover { background: #ffb347; transform: scale(1.02); }
+    .sf-enhance-btn-secondary {
+      background: white;
+      border: 2px solid #7fc3b0;
+      color: #0f2b3c;
+    }
+    .sf-enhance-btn-secondary:hover { background: #f0f9fc; }
+    .sf-enhance-result-card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 50px;
+      padding: 2rem;
+      margin: 2rem 0 1.5rem;
+      border: 1px solid #7fc3b0;
+      text-align: center;
+    }
+    .sf-enhance-recommendation-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f2b3c;
+    }
+    .sf-enhance-explanation {
+      font-size: 1.1rem;
+      color: #2b5f6b;
+      margin: 1rem 0;
+    }
+    .sf-enhance-glow {
+      animation: glowPulse 0.8s ease-out;
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 0 0 #ffb347; }
+      70% { box-shadow: 0 0 0 20px rgba(255,180,70,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,180,70,0); }
+    }
+    /* loading spinner */
+    .sf-enhance-spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-top-color: #0f2b3c;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <!-- preloader (fog dissolve) -->
+  <div id="skillforge-preloader">
+    <div class="fog-particles">
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+      <div class="particle"></div><div class="particle"></div>
+    </div>
+    <div class="preloader-brand">SkillForge Hub</div>
+  </div>
+
+  <!-- scroll orb -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- custom navbar -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" style="background: #7fc3b0; color:#0f2b3c;">Home</a></li>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="mentors.html">Mentors</a></li>
+        <li><a href="community.html">Community</a></li>
+        <li><a href="resources.html">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="#">Enroll Now</a></div>
+    </div>
+  </nav>
+
+  <!-- HERO section with enhancements -->
+  <section class="hero-fog">
+    <div class="hero-content" data-aos="fade-right">
+      <h1>Learn in a <span>calm fog</span>,<br> emerge with clarity.</h1>
+      <p style="font-size: 1.2rem; color: #2b5f6b; max-width: 600px;">SkillForge Hub is where deep focus meets guided learning. No distractions, just growth.</p>
+      <div class="hero-stats">
+        <div class="stat-item"><h3>35k+</h3><span>active minds</span></div>
+        <div class="stat-item"><h3>420+</h3><span>fog‑certified courses</span></div>
+        <div class="stat-item"><h3>92%</h3><span>completion rate</span></div>
+      </div>
+      
+      <!-- ENHANCEMENT: Trust strip with avatars and microcopy (no layout shift) -->
+      <div class="sf-enhance-trust-strip">
+        <div class="sf-enhance-avatars">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" class="sf-enhance-avatar" alt="student" loading="lazy">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" class="sf-enhance-avatar" alt="student" loading="lazy">
+          <img src="https://randomuser.me/api/portraits/women/68.jpg" class="sf-enhance-avatar" alt="student" loading="lazy">
+          <img src="https://randomuser.me/api/portraits/men/75.jpg" class="sf-enhance-avatar" alt="student" loading="lazy">
+          <span class="sf-enhance-avatar-count">+2.3k</span>
+        </div>
+        <div class="sf-enhance-microcopy">
+          <i class="bi bi-star-fill" style="color: #ffb347;"></i>
+          <span>4.9/5 from 1.2k reviews</span>
+        </div>
+      </div>
+      
+      <!-- ENHANCEMENT: Value microcopy -->
+      <div class="sf-enhance-microcopy" style="margin-top: 0.8rem;">
+        <i class="bi bi-shield-check"></i>
+        <span>7-day free trial · No credit card required · Cancel anytime</span>
+      </div>
+      
+      <div class="hero-actions">
+        <a href="#" class="btn-mist">Explore paths <i class="bi bi-arrow-right"></i></a>
+        <a href="#" class="btn-ghost">Watch trailer</a>
+      </div>
+    </div>
+    <div class="hero-visual" data-aos="fade-left" style="position: relative;">
+      <img src="./img/man.jpg" alt="learner in flow using laptop">
+      <div class="floating-badge">🍃 7‑day free trial</div>
+      
+      <!-- ENHANCEMENT: Dashboard preview card (absolutely positioned) -->
+      <div class="sf-enhance-dashboard-preview">
+        <h5>Your learning dashboard</h5>
+        <div class="sf-enhance-preview-item">
+          <i class="bi bi-check-circle-fill" style="color: #7fc3b0; font-size: 0.8rem;"></i>
+          <span style="flex: 1;">AI fundamentals</span>
+          <div class="sf-enhance-preview-bar"><span style="width: 75%;"></span></div>
+        </div>
+        <div class="sf-enhance-preview-item">
+          <i class="bi bi-check-circle-fill" style="color: #7fc3b0; font-size: 0.8rem;"></i>
+          <span style="flex: 1;">UX research</span>
+          <div class="sf-enhance-preview-bar"><span style="width: 45%;"></span></div>
+        </div>
+        <div class="sf-enhance-preview-item">
+          <i class="bi bi-check-circle-fill" style="color: #7fc3b0; font-size: 0.8rem;"></i>
+          <span style="flex: 1;">Data viz</span>
+          <div class="sf-enhance-preview-bar"><span style="width: 30%;"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. HOW IT WORKS (The Fog Journey) -->
+  <section class="container" data-aos="fade-up">
+    <div class="section-title">
+      <span class="line"></span>
+      <h2>Your fog journey</h2>
+      <p style="color: #2b5f6b;">four steps to clarity</p>
+    </div>
+    <div class="row g-4 text-center">
+      <div class="col-md-3"><div class="p-4 bg-white rounded-5 shadow-sm h-100"><span class="badge bg-warning text-dark px-3 py-2 mb-3">1</span><h4>Enter the fog</h4><p>Skill assessment & goal setting</p><!-- ENHANCEMENT: Contextual label --><div class="sf-enhance-context-label" style="margin-top: 0.5rem;">✨ 5 min assessment</div></div></div>
+      <div class="col-md-3"><div class="p-4 bg-white rounded-5 shadow-sm h-100"><span class="badge bg-warning text-dark px-3 py-2 mb-3">2</span><h4>Guided clarity</h4><p>Weekly mentor check‑ins</p><!-- ENHANCEMENT: Contextual label --><div class="sf-enhance-context-label" style="margin-top: 0.5rem;">🗓️ 30 min/week</div></div></div>
+      <div class="col-md-3"><div class="p-4 bg-white rounded-5 shadow-sm h-100"><span class="badge bg-warning text-dark px-3 py-2 mb-3">3</span><h4>Breakthrough</h4><p>Build your capstone project</p><!-- ENHANCEMENT: Contextual label --><div class="sf-enhance-context-label" style="margin-top: 0.5rem;">🚀 portfolio ready</div></div></div>
+      <div class="col-md-3"><div class="p-4 bg-white rounded-5 shadow-sm h-100"><span class="badge bg-warning text-dark px-3 py-2 mb-3">4</span><h4>Emerge</h4><p>Certification + portfolio</p><!-- ENHANCEMENT: Contextual label --><div class="sf-enhance-context-label" style="margin-top: 0.5rem;">🎓 industry recognized</div></div></div>
+    </div>
+  </section>
+
+  <!-- 2. FEATURED MENTORS (Fog Guides) -->
+  <section class="container" style="margin-top: 5rem;" data-aos="fade-up">
+    <div class="section-title">
+      <span class="line"></span>
+      <h2>Meet your fog guides</h2>
+      <p>industry experts who care</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="mentor-card text-center"><img src="./img/person-m-11.webp" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover; background:#ccc;" alt="mentor"><h4>Dr. Alina Koh</h4><p class="text-primary">AI research</p><span class="badge bg-success">office hours wed</span><p class="mt-2">1800+ students</p><!-- ENHANCEMENT: Subtle badge --><div class="sf-enhance-badge-subtle" style="margin-top: 0.5rem;">⭐ top rated</div></div></div>
+      <div class="col-md-4"><div class="mentor-card text-center"><img src="./img/person-m-6.webp" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover; background:#ccc;" alt="mentor"><h4>Marcus Velez</h4><p class="text-primary">UX lead, Figma</p><span class="badge bg-success">office hours thu</span><p class="mt-2">2300+ students</p><!-- ENHANCEMENT: Subtle badge --><div class="sf-enhance-badge-subtle" style="margin-top: 0.5rem;">⭐ 5+ years exp</div></div></div>
+      <div class="col-md-4"><div class="mentor-card text-center"><img src="./img/person-f-3.webp" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover; background:#ccc;" alt="mentor"><h4>Sophia Chen</h4><p class="text-primary">Data storyteller</p><span class="badge bg-success">office hours mon</span><p class="mt-2">3100+ students</p><!-- ENHANCEMENT: Subtle badge --><div class="sf-enhance-badge-subtle" style="margin-top: 0.5rem;">⭐ former Meta</div></div></div>
+    </div>
+  </section>
+
+  <!-- ENHANCEMENT: Differentiation section (safely inserted between existing sections) -->
+  <section class="sf-enhance-diff-section" data-aos="fade-up">
+    <div class="section-title">
+      <span class="line"></span>
+      <h2>Why SkillForge stands out</h2>
+      <p>the fog difference</p>
+    </div>
+    <div class="sf-enhance-diff-grid">
+      <div class="sf-enhance-diff-item">
+        <div class="sf-enhance-diff-icon"><i class="bi bi-clock-history"></i></div>
+        <h4>Self‑paced, no deadlines</h4>
+        <p>Learn at your rhythm without pressure</p>
+        <span class="sf-enhance-diff-tag">92% completion</span>
+      </div>
+      <div class="sf-enhance-diff-item">
+        <div class="sf-enhance-diff-icon"><i class="bi bi-people"></i></div>
+        <h4>Mentor‑guided, not automated</h4>
+        <p>Real humans giving real feedback</p>
+        <span class="sf-enhance-diff-tag">1:1 sessions</span>
+      </div>
+      <div class="sf-enhance-diff-item">
+        <div class="sf-enhance-diff-icon"><i class="bi bi-briefcase"></i></div>
+        <h4>Project‑first curriculum</h4>
+        <p>Build portfolio from day one</p>
+        <span class="sf-enhance-diff-tag">hire‑ready</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. LEARNING PATHS (Fog Trails) -->
+  <section style="background: #eaf4f0; margin: 5rem 0; padding: 3rem 0;" data-aos="fade-up">
+    <div class="container">
+      <div class="section-title"><h2>choose your fog trail</h2><p>curated paths to mastery</p></div>
+      <div class="row g-4">
+        <div class="col-md-4"><div class="path-card"><h3>🤖 AI product trail</h3><p>4 courses • 6 months</p><div class="progress mb-2"><div class="progress-bar bg-success" style="width:75%"></div></div><span>75% completion average</span><a href="#" class="btn btn-sm btn-outline-success mt-3">view path</a><!-- ENHANCEMENT: Reassurance microcopy --><div class="sf-enhance-reassurance"><i class="bi bi-shield-check"></i> <span>Includes capstone project</span></div></div></div>
+        <div class="col-md-4"><div class="path-card"><h3>🎨 immersive UX trail</h3><p>5 courses • 7 months</p><div class="progress mb-2"><div class="progress-bar bg-success" style="width:82%"></div></div><span>82% completion</span><a href="#" class="btn btn-sm btn-outline-success mt-3">view path</a><!-- ENHANCEMENT: Reassurance microcopy --><div class="sf-enhance-reassurance"><i class="bi bi-shield-check"></i> <span>Portfolio review included</span></div></div></div>
+        <div class="col-md-4"><div class="path-card"><h3>📊 data analyst trail</h3><p>6 courses • 8 months</p><div class="progress mb-2"><div class="progress-bar bg-success" style="width:68%"></div></div><span>68% completion</span><a href="#" class="btn btn-sm btn-outline-success mt-3">view path</a><!-- ENHANCEMENT: Reassurance microcopy --><div class="sf-enhance-reassurance"><i class="bi bi-shield-check"></i> <span>SQL + Python + Tableau</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. SUCCESS STORIES (Fog Graduates) -->
+  <section class="container" data-aos="fade-up">
+    <div class="section-title"><h2>fog graduates</h2><p>real outcomes, real people</p></div>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="p-4 bg-white rounded-5 shadow-sm"><p>“From sales to UX designer in 8 months. SkillForge changed my career.”</p><span><strong>— Mia S.</strong> now @ Google</span><!-- ENHANCEMENT: Contextual badge --><div class="sf-enhance-badge-subtle mt-2">hired 2024</div></div></div>
+      <div class="col-md-4"><div class="p-4 bg-white rounded-5 shadow-sm"><p>“My salary doubled after completing the AI trail. Mentors are world‑class.”</p><span><strong>— Carlos R.</strong> AI engineer</span><!-- ENHANCEMENT: Contextual badge --><div class="sf-enhance-badge-subtle mt-2">salary +120%</div></div></div>
+      <div class="col-md-4"><div class="p-4 bg-white rounded-5 shadow-sm"><p>“The fog method really works – focused, no burnout, real portfolio.”</p><span><strong>— Jing L.</strong> product analyst</span><!-- ENHANCEMENT: Contextual badge --><div class="sf-enhance-badge-subtle mt-2">promoted</div></div></div>
+    </div>
+  </section>
+
+  <!-- 5. UPCOMING LIVE SESSIONS (Fog Gatherings) -->
+  <section class="container mt-5" data-aos="fade-up">
+    <div class="section-title"><h2>fog gatherings</h2><p>live workshops & mentor AMA</p></div>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="d-flex bg-white p-3 rounded-4"><i class="bi bi-calendar-event fs-1 me-3 text-success"></i><div><h5>AI prototyping lab</h5><p>Mar 5 · 11am ET · Dr. Koh</p><a href="#">reserve</a></div></div></div>
+      <div class="col-md-4"><div class="d-flex bg-white p-3 rounded-4"><i class="bi bi-calendar-event fs-1 me-3 text-success"></i><div><h5>portfolio review</h5><p>Mar 8 · 2pm ET · Marcus</p><a href="#">reserve</a></div></div></div>
+      <div class="col-md-4"><div class="d-flex bg-white p-3 rounded-4"><i class="bi bi-calendar-event fs-1 me-3 text-success"></i><div><h5>SQL mastery</h5><p>Mar 12 · 10am ET · Sophia</p><a href="#">reserve</a></div></div></div>
+    </div>
+  </section>
+
+  <!-- 6. SKILLS ASSESSMENT (Fog Gauge) -->
+  <section class="container mt-5 p-5" style="background: linear-gradient(145deg,#d1ece2,white); border-radius: 80px;" data-aos="zoom-in">
+    <div class="row align-items-center">
+      <div class="col-md-8"><h2 class="fw-bold">🔍 not sure where to start?</h2><p class="fs-5">take the 2‑min fog gauge – get a personalized trail recommendation</p></div>
+      <div class="col-md-4 text-end"><a href="#" id="sfOpenAssessmentBtn" class="btn-mist">assess my skills</a></div>
+    </div>
+  </section>
+
+  <!-- 7. RESOURCE LIBRARY PREVIEW (Fog Library) -->
+  <section class="container mt-5" data-aos="fade-up">
+    <div class="section-title"><h2>fog library</h2><p>free downloads · updated weekly</p></div>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="resource-card"><i class="bi bi-file-pdf fs-1 text-danger"></i><h5>AI cheat sheet</h5><p>1.2k downloads</p><a href="#" class="sf-pdf-download" data-path="/assets/resources/ai-cheat-sheet.pdf">download</a><div class="sf-enhance-badge-subtle mt-2">new</div></div></div>
+      <div class="col-md-4"><div class="resource-card"><i class="bi bi-file-pdf fs-1 text-danger"></i><h5>UX portfolio template</h5><p>3k downloads</p><a href="#" class="sf-pdf-download" data-path="/assets/resources/ux-template.pdf">download</a><div class="sf-enhance-badge-subtle mt-2">popular</div></div></div>
+      <div class="col-md-4"><div class="resource-card"><i class="bi bi-file-pdf fs-1 text-danger"></i><h5>data interview guide</h5><p>2.4k downloads</p><a href="#" class="sf-pdf-download" id="sfDataInterviewGuide" data-path="/assets/resources/data-interview-guide.pdf">download</a><div class="sf-enhance-badge-subtle mt-2">updated</div></div></div>
+    </div>
+  </section>
+
+  <!-- PART 1 — PRICING TEASER (styled) -->
+  <section class="sf-enhance-pricing-teaser container" data-aos="fade-up">
+    <h3>✨ Start for free, upgrade when ready</h3>
+    <p>All plans include access to our core library and community.</p>
+    <div class="sf-enhance-pricing-badge">
+      🎯 7-day free trial on Navigator plan
+    </div>
+  </section>
+
+  <!-- 8. COMMUNITY SPOTLIGHT (Fog Network) -->
+  <section style="background: #0f2b3c; color: white; margin: 5rem 0; padding: 4rem 0;" data-aos="fade-up">
+    <div class="container">
+      <div class="section-title"><h2 style="color:white;">🌫️ fog network spotlight</h2><span class="line" style="background:#ffb347;"></span></div>
+      <div class="row text-center">
+        <div class="col-md-4"><i class="bi bi-chat-quote fs-1 text-warning"></i><p class="fw-bold">"just finished my AI capstone – feeling proud"</p><span>– rachel, project of the week</span><!-- ENHANCEMENT: Badge --><div class="sf-enhance-badge-subtle mt-2" style="background: rgba(255,255,255,0.2); color: white;">🏆 featured</div></div>
+        <div class="col-md-4"><i class="bi bi-people fs-1 text-warning"></i><p class="fw-bold">14 study groups active now</p><a href="#" class="text-warning">join a group →</a><!-- ENHANCEMENT: Badge --><div class="sf-enhance-badge-subtle mt-2" style="background: rgba(255,255,255,0.2); color: white;">👥 3 new today</div></div>
+        <div class="col-md-4"><i class="bi bi-trophy fs-1 text-warning"></i><p class="fw-bold">this month's top contributor: David K.</p><!-- ENHANCEMENT: Badge --><div class="sf-enhance-badge-subtle mt-2" style="background: rgba(255,255,255,0.2); color: white;">⭐ 500+ helped</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. PRICING PLANS (Fog Membership) -->
+  <section class="container" data-aos="fade-up">
+    <div class="section-title"><h2>fog membership</h2><p>choose your clarity</p></div>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="p-4 bg-white rounded-5 shadow-sm"><h4>Drifter</h4><p class="display-6">free</p><ul class="list-unstyled"><li>✓ 5 free courses</li><li>✓ community access</li><li>✗ mentorship</li></ul><a href="#" class="btn btn-outline-secondary w-100">start free</a><!-- ENHANCEMENT: Helper text --><div class="sf-enhance-reassurance justify-content-center"><i class="bi bi-info-circle"></i> No card required</div></div></div>
+      <div class="col-md-4"><div class="p-4 bg-white rounded-5 shadow-sm border border-warning border-3"><h4>Navigator <span class="badge bg-warning">popular</span></h4><p class="display-6">$29/mo</p><ul><li>✓ all courses</li><li>✓ monthly mentor call</li><li>✓ portfolio reviews</li></ul><a href="#" class="btn-mist w-100 text-center">get navigator</a><!-- ENHANCEMENT: Helper text --><div class="sf-enhance-reassurance justify-content-center"><i class="bi bi-star-fill" style="color: #ffb347;"></i> Most flexible</div></div></div>
+      <div class="col-md-4"><div class="p-4 bg-white rounded-5 shadow-sm"><h4>Guide</h4><p class="display-6">$249/yr</p><ul><li>✓ everything in navigator</li><li>✓ 4 mentor calls/mo</li><li>✓ career coaching</li></ul><a href="#" class="btn btn-outline-secondary w-100">save 30%</a><!-- ENHANCEMENT: Helper text --><div class="sf-enhance-reassurance justify-content-center"><i class="bi bi-lightning-charge"></i> Best value</div></div></div>
+    </div>
+  </section>
+
+  <!-- 10. TRUST SIGNALS / PARTNERS (Fog Alliances) -->
+  <section class="container my-5 text-center" data-aos="fade-up">
+    <p style="color: #2b5f6b;">trusted by teams from</p>
+    <div class="d-flex flex-wrap justify-content-center gap-5 fs-3 text-secondary opacity-75">
+      <span>Google</span> <span>Microsoft</span> <span>Stripe</span> <span>Figma</span> <span>Notion</span>
+    </div>
+  </section>
+
+  <!-- 11. BLOG PREVIEW (Fog Signals) -->
+  <section class="container" data-aos="fade-up">
+    <div class="section-title"><h2>fog signals</h2><p>insights from our community</p></div>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="p-3 bg-white rounded-4"><h5>how to stay focused while learning</h5><p>5 min read · by Dr. Koh</p><a href="#">read →</a><!-- ENHANCEMENT: Badge --><div class="sf-enhance-badge-subtle mt-2">🔥 trending</div></div></div>
+      <div class="col-md-4"><div class="p-3 bg-white rounded-4"><h5>portfolio projects that hire</h5><p>7 min read · by Marcus</p><a href="#">read →</a><!-- ENHANCEMENT: Badge --><div class="sf-enhance-badge-subtle mt-2">📌 must read</div></div></div>
+      <div class="col-md-4"><div class="p-3 bg-white rounded-4"><h5>data storytelling secrets</h5><p>4 min read · by Sophia</p><a href="#">read →</a><!-- ENHANCEMENT: Badge --><div class="sf-enhance-badge-subtle mt-2">⭐ new</div></div></div>
+    </div>
+  </section>
+
+  <!-- 12. FAQ (Fog Clarity) -->
+  <section class="container my-5" data-aos="fade-up">
+    <div class="section-title"><h2>fog clarity · faq</h2></div>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="accordion" id="faqAccordion">
+          <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">How does mentorship work?</button></h2><div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion"><div class="accordion-body">Weekly 1:1 video calls + async feedback.<!-- ENHANCEMENT: Helper text --> <span class="sf-enhance-badge-subtle ms-2">included in Navigator+</span></div></div></div>
+          <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Can I switch paths?</button></h2><div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Absolutely — you can change anytime.<!-- ENHANCEMENT: Helper text --> <span class="sf-enhance-badge-subtle ms-2">free</span></div></div></div>
+          <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">Refund policy?</button></h2><div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">30‑day full refund, no questions asked.<!-- ENHANCEMENT: Helper text --> <span class="sf-enhance-badge-subtle ms-2">risk-free</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. ACHIEVEMENT WALL (Fog Milestones) -->
+  <section class="container text-center my-5" data-aos="fade-up">
+    <h3 class="fw-bold">🏆 recent fog milestones</h3>
+    <div class="d-flex flex-wrap justify-content-center gap-4 mt-4">
+      <span class="badge bg-light text-dark p-3">Linda completed AI lab</span>
+      <span class="badge bg-light text-dark p-3">Mark earned UX certificate</span>
+      <span class="badge bg-light text-dark p-3">Alex 300‑day streak</span>
+    </div>
+    <!-- ENHANCEMENT: Reassurance microcopy -->
+    <div class="sf-enhance-reassurance justify-content-center mt-3">
+      <i class="bi bi-trophy-fill" style="color: #ffb347;"></i>
+      <span>Join 2,500+ graduates this month</span>
+    </div>
+  </section>
+
+  <!-- 14. MOBILE APP PROMO (Fog Anywhere) -->
+  <section style="background: #7fc3b0; color:#0f2b3c; border-radius: 80px; padding: 3rem; margin: 5rem auto;" class="container" data-aos="flip-up">
+    <div class="row align-items-center">
+      <div class="col-md-8"><h2 class="fw-bold">📱 fog anywhere</h2><p>download the app, learn offline</p></div>
+      <div class="col-md-4"><img src="./img/download1-removebg-preview.png" alt="app store" style="height:50px;"> <img src="./img/download2-removebg-preview.png" alt="google play" style="height:50px;"></div>
+    </div>
+  </section>
+
+  <!-- 15. HIRING PARTNERS (Fog Bridge) -->
+  <section class="container my-5 text-center" data-aos="fade-up">
+    <h4>companies who hire our graduates</h4>
+    <div class="d-flex flex-wrap justify-content-center gap-4 fs-4 text-muted mt-3">Shopify · Amazon · Deloitte · Adobe · Spotify</div>
+    <a href="#" class="btn btn-outline-success mt-4">hire our alumni</a>
+    <!-- ENHANCEMENT: Reassurance microcopy -->
+    <div class="sf-enhance-reassurance justify-content-center mt-3">
+      <i class="bi bi-briefcase-fill"></i>
+      <span>87% hired within 6 months of graduation</span>
+    </div>
+  </section>
+
+  <!-- FINAL CTA (Fog Collective) -->
+  <section style="background: #0f2b3c; color: white; padding: 5rem; border-radius: 80px 80px 0 0;" data-aos="fade-up">
+    <div class="container text-center">
+      <h2 style="font-size: 2.8rem;">join the fog collective</h2>
+      <p style="color: #b0d9cc;">teach · learn · grow — at your own pace</p>
+      <a href="#" style="background: #ffb347; color: #0f2b3c; padding: 1rem 3rem; border-radius: 60px; font-weight: 700; text-decoration: none; display: inline-block; margin-top: 2rem;">Begin your journey</a>
+    </div>
+  </section>
+
+  <!-- FOOTER (SkillForge Hub) -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="assets/img/person/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
+        </div>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="#">courses</a></li><li><a href="#">paths</a></li><li><a href="#">mentors</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">blog</a></li><li><a href="#">research</a></li><li><a href="#">events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
+    </div>
+  </footer>
+
+  <!-- SKILL ASSESSMENT MODAL (PARTS 2,3,4,6) -->
+  <div id="sfSkillModal" class="sf-enhance-modal">
+    <div class="sf-enhance-modal-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold">🧭 fog gauge</h2>
+        <button type="button" class="btn-close btn-close-dark" id="sfCloseModal" aria-label="Close"></button>
+      </div>
+      <div class="sf-enhance-progress">
+        <div class="sf-enhance-progress-bar" id="sfProgressBar"></div>
+      </div>
+      <div id="sfQuizContainer">
+        <!-- dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      // ----- ANALYTICS (PART 4) -----
+      function trackEvent(eventName, metadata = {}) {
+        console.log(`📊 Track: ${eventName}`, metadata); // mock analytics
+        // In production send to endpoint or dataLayer
+      }
+
+      // ----- PDF DOWNLOAD (PART 5) -----
+      document.querySelectorAll('.sf-pdf-download').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const pdfPath = this.dataset.path || '/assets/resources/sample.pdf';
+          trackEvent('pdf_download', { path: pdfPath, label: this.innerText.trim() });
+          // simulate download via anchor (real path needed)
+          const a = document.createElement('a');
+          a.href = pdfPath;
+          a.download = pdfPath.split('/').pop() || 'resource.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          // subtle loading feedback (optional)
+          const originalText = this.innerText;
+          this.innerText = '⏳ downloading...';
+          setTimeout(() => { this.innerText = originalText; }, 800);
+        });
+      });
+
+      // ----- ASSESSMENT QUESTIONS (PART 2,3) -----
+      const questions = [
+        { text: "What's your experience level?", options: ["Beginner", "Intermediate", "Advanced"] },
+        { text: "Main learning goal?", options: ["Career switch", "Promotion / upskill", "Personal project", "Explore field"] },
+        { text: "Interest area?", options: ["AI & automation", "Design & UX", "Data analysis", "Unsure yet"] },
+        { text: "Time commitment weekly?", options: ["< 3 hours", "3–6 hours", "6–10 hours", "10+ hours"] },
+        { text: "Preferred learning style?", options: ["Hands-on projects", "Video lectures", "Reading & docs", "Mentor guidance"] }
+      ];
+      let currentQuestion = 0;
+      const answers = [];
+      let scores = { AI: 0, UX: 0, Data: 0 };
+
+      const modal = document.getElementById('sfSkillModal');
+      const container = document.getElementById('sfQuizContainer');
+      const progressBar = document.getElementById('sfProgressBar');
+      const openBtn = document.getElementById('sfOpenAssessmentBtn');
+      const closeBtn = document.getElementById('sfCloseModal');
+
+      function updateProgress() {
+        const percent = ((currentQuestion + 1) / questions.length) * 100;
+        progressBar.style.width = percent + '%';
+      }
+
+      function renderQuestion() {
+        if (currentQuestion >= questions.length) {
+          showResult();
+          return;
+        }
+        const q = questions[currentQuestion];
+        let html = `<div class="sf-enhance-question"><h3>${q.text}</h3>`;
+        q.options.forEach(opt => {
+          const saved = answers[currentQuestion] === opt ? 'selected' : '';
+          html += `<div class="sf-enhance-option ${saved}" data-value="${opt}">${opt}</div>`;
+        });
+        html += `</div><div class="sf-enhance-nav-buttons">`;
+        if (currentQuestion > 0) html += `<button class="sf-enhance-btn sf-enhance-btn-secondary" id="sfPrevBtn">← Back</button>`;
+        else html += `<div></div>`;
+        const nextLabel = currentQuestion === questions.length - 1 ? 'See my path' : 'Next →';
+        html += `<button class="sf-enhance-btn sf-enhance-btn-primary" id="sfNextBtn">${nextLabel}</button>`;
+        html += `</div>`;
+        container.innerHTML = html;
+
+        document.querySelectorAll('.sf-enhance-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+            document.querySelectorAll('.sf-enhance-option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+            answers[currentQuestion] = this.dataset.value;
+          });
+        });
+        if (answers[currentQuestion]) {
+          const selectedDiv = Array.from(document.querySelectorAll('.sf-enhance-option')).find(el => el.dataset.value === answers[currentQuestion]);
+          if (selectedDiv) selectedDiv.classList.add('selected');
+        }
+
+        document.getElementById('sfNextBtn')?.addEventListener('click', () => {
+          if (!answers[currentQuestion]) { alert('Please select an option'); return; }
+          trackEvent('question_answered', { question: q.text, answer: answers[currentQuestion], step: currentQuestion+1 });
+          if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            renderQuestion();
+            updateProgress();
+          } else {
+            computeScores();
+            showResult();
+          }
+        });
+        if (document.getElementById('sfPrevBtn')) {
+          document.getElementById('sfPrevBtn').addEventListener('click', () => {
+            currentQuestion--;
+            renderQuestion();
+            updateProgress();
+          });
+        }
+      }
+
+      function computeScores() {
+        scores = { AI: 0, UX: 0, Data: 0 };
+        // simple mapping
+        answers.forEach((ans, idx) => {
+          if (idx === 2) { // interest area
+            if (ans.includes('AI')) scores.AI += 3;
+            else if (ans.includes('Design') || ans.includes('UX')) scores.UX += 3;
+            else if (ans.includes('Data')) scores.Data += 3;
+            else { scores.AI += 1; scores.UX += 1; scores.Data += 1; }
+          } else if (idx === 0) { // experience
+            if (ans === 'Beginner') { scores.AI += 1; scores.UX += 2; scores.Data += 1; }
+            else if (ans === 'Intermediate') { scores.AI += 2; scores.UX += 2; scores.Data += 2; }
+            else { scores.AI += 3; scores.UX += 1; scores.Data += 2; }
+          } else if (idx === 1) { // goal
+            if (ans.includes('Career')) { scores.AI += 2; scores.UX += 3; scores.Data += 2; }
+            else if (ans.includes('Promotion')) { scores.AI += 3; scores.UX += 1; scores.Data += 3; }
+            else if (ans.includes('Personal')) { scores.AI += 2; scores.UX += 2; scores.Data += 1; }
+          } else if (idx === 3) { // time
+            if (ans.includes('< 3')) { scores.AI += 1; scores.UX += 2; scores.Data += 1; }
+            else if (ans.includes('3–6')) { scores.AI += 2; scores.UX += 2; scores.Data += 2; }
+            else { scores.AI += 3; scores.UX += 1; scores.Data += 3; }
+          } else if (idx === 4) { // style
+            if (ans.includes('Hands-on')) { scores.AI += 2; scores.UX += 3; scores.Data += 2; }
+            else if (ans.includes('Video')) { scores.AI += 2; scores.UX += 2; scores.Data += 2; }
+            else if (ans.includes('Mentor')) { scores.AI += 3; scores.UX += 3; scores.Data += 3; }
+          }
+        });
+      }
+
+      function getTopPath() {
+        if (scores.AI >= scores.UX && scores.AI >= scores.Data) return 'AI Product Trail';
+        if (scores.UX >= scores.AI && scores.UX >= scores.Data) return 'Immersive UX Trail';
+        return 'Data Analyst Trail';
+      }
+
+      function showResult() {
+        const top = getTopPath();
+        trackEvent('assessment_completed', { scores, recommended: top });
+        let explanation = '';
+        if (top.includes('AI')) explanation = 'We suggested this path because your answers show strong interest in AI & automation, combined with your preferred learning style and goals.';
+        else if (top.includes('UX')) explanation = 'We suggested this path because you value design and user empathy, and you’re ready to build a standout portfolio.';
+        else explanation = 'We suggested this path because data storytelling and analysis match your curiosity and time commitment.';
+        
+        container.innerHTML = `
+          <div class="sf-enhance-result-card sf-enhance-glow">
+            <div class="sf-enhance-recommendation-title">✨ ${top}</div>
+            <p class="sf-enhance-explanation">${explanation}</p>
+            <a href="#" class="btn-mist" style="display:inline-block;">View your path →</a>
+          </div>
+          <div class="text-center mt-4">
+            <button class="sf-enhance-btn sf-enhance-btn-secondary" id="sfRestartBtn">← Retake assessment</button>
+          </div>
+        `;
+        document.getElementById('sfRestartBtn')?.addEventListener('click', () => {
+          currentQuestion = 0;
+          answers.length = 0;
+          scores = { AI:0, UX:0, Data:0 };
+          renderQuestion();
+          updateProgress();
+        });
+      }
+
+      openBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        trackEvent('assessment_started');
+        modal.classList.add('show');
+        currentQuestion = 0;
+        answers.length = 0;
+        scores = { AI:0, UX:0, Data:0 };
+        renderQuestion();
+        updateProgress();
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('show');
+      });
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('show');
+      });
+
+      // ----- existing scripts (preloader, orb, mobile) -----
+      AOS.init({ duration: 800, once: true });
+      window.addEventListener('load', () => {
+        const preloader = document.getElementById('skillforge-preloader');
+        preloader.style.opacity = '0';
+        preloader.style.visibility = 'hidden';
+      });
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) orb.classList.add('visible');
+        else orb.classList.remove('visible');
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => { if (links.classList.contains('show')) links.classList.remove('show'); });
+      });
+    })();
+  </script>
+</body>
+</html>
