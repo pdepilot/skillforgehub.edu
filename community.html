@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary meta tags & SEO -->
+  <title>SkillForge Hub · premium community</title>
+  <meta name="description" content="Join a thriving community of learners, mentors, and creators. Live discussions, events, and AI‑matched connections.">
+  <!-- Bootstrap grid & icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- premium fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Raleway:wght@300;400;600;700&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <style>
+    /* ========== GLOBAL (matching index) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;
+      --fog-mid: #2b5f6b;
+      --fog-soft: #e5f0f5;
+      --mist-green: #7fc3b0;
+      --accent-glow: #ffb347;
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
+    }
+
+    /* ---------- scroll orb ---------- */
+    #orb-scroll {
+      position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
+      border-radius: 50% 20% 50% 50%; background: rgba(127,195,176,0.3);
+      backdrop-filter: blur(16px) saturate(180%); border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; color: white;
+      font-size: 2.2rem; cursor: pointer; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0; visibility: hidden; z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%; background: #7fc3b0; transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+
+    /* ---------- custom navbar (identical) ---------- */
+    .nav-fog {
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(18px); position: fixed; width: 100%; top: 0;
+      z-index: 1000; padding: 0.6rem 2rem; border-bottom: 2px solid rgba(127,195,176,0.3);
+    }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+    .logo-block { display: flex; align-items: center; gap: 8px; }
+    .logo-block img { height: 48px; filter: drop-shadow(0 4px 8px #7fc3b0); }
+    .logo-text { font-size: 1.9rem; font-weight: 800; background: linear-gradient(130deg, #ffffff, #b8e3d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+    .nav-links { display: flex; gap: 0.4rem; list-style: none; margin: 0; }
+    .nav-links a { text-decoration: none; color: rgba(255,255,255,0.85); font-weight: 500; padding: 0.6rem 1.4rem; border-radius: 50px; transition: 0.25s; font-size: 1.05rem; }
+    .nav-links a:hover { background: #7fc3b0; color: #0f2b3c; transform: translateY(-3px); }
+    .nav-cta a { background: white; color: #0f2b3c !important; font-weight: 700; padding: 0.6rem 2rem; border-radius: 60px; border: 2px solid #ffb347; text-decoration: none; }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle { display: none; background: transparent; border: 2px solid #7fc3b0; color: white; font-size: 2rem; border-radius: 40px; padding: 0.2rem 1rem; cursor: pointer; }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links { display: none; flex-direction: column; background: rgba(15,43,60,0.95); backdrop-filter: blur(20px); position: absolute; top: 85px; left: 5%; width: 90%; border-radius: 40px; padding: 2rem; z-index: 999; }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+
+    /* ---------- footer ---------- */
+    .footer-fog { background: #0f2b3c; color: #e5f0f5; padding: 4rem 5% 2rem; border-top: 8px solid #7fc3b0; }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+
+    /* ========== COMMUNITY PAGE SPECIFIC ========== prefix: sf-comm- */
+
+    /* ----- hero (vibrant, animated) ----- */
+    .sf-comm-hero {
+      margin-top: 90px;
+      background: linear-gradient(145deg, #0b2b36 0%, #1f5563 100%);
+      position: relative;
+      isolation: isolate;
+      padding: 5rem 5%;
+      display: flex;
+      align-items: center;
+      color: white;
+      overflow: hidden;
+    }
+    .sf-comm-hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 30%, rgba(255,180,70,0.2) 0%, transparent 40%);
+      animation: floatParticles 12s infinite alternate;
+      z-index: -1;
+    }
+    @keyframes floatParticles {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 0.8; transform: scale(1.3); }
+    }
+    .sf-comm-hero-content { max-width: 700px; }
+    .sf-comm-hero h1 { font-size: 4.2rem; font-weight: 800; line-height: 1.1; text-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+    .sf-comm-hero p { font-size: 1.5rem; margin: 1.5rem 0; color: #c3e8dd; }
+    .sf-comm-hero .btn-mist { background: #ffb347; color: #0f2b3c; border: none; padding: 1.2rem 3rem; font-size: 1.3rem; }
+    .sf-comm-hero .btn-mist:hover { background: white; transform: scale(1.05); }
+
+    /* ----- filter bar (glass) ----- */
+    .sf-comm-filter-bar {
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); border-radius: 80px;
+      padding: 1.2rem 2rem; margin: -2rem auto 3rem; max-width: 1200px;
+      border: 2px solid rgba(127,195,176,0.4); display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;
+    }
+    .sf-comm-filter-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+    .sf-comm-filter-group label { font-weight: 600; color: #0f2b3c; }
+    .sf-comm-filter-group input, .sf-comm-filter-group select {
+      background: white; border: 2px solid #e5f0f5; border-radius: 60px; padding: 0.5rem 1.5rem;
+    }
+    .sf-comm-checkbox-group { display: flex; gap: 1rem; }
+    .sf-comm-checkbox-group label { margin-right: 0.5rem; }
+
+    /* ----- grid cards (member, topic, group) ----- */
+    .sf-comm-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;
+      margin: 3rem 0;
+    }
+    .sf-comm-card {
+      background: white; border-radius: 50px; padding: 1.8rem;
+      box-shadow: 0 20px 30px -15px rgba(0,0,0,0.1); border: 2px solid rgba(255,255,255,0.8);
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1); cursor: pointer;
+    }
+    .sf-comm-card:hover {
+      transform: translateY(-10px) scale(1.01); box-shadow: 0 40px 60px -20px #0f2b3c, 0 0 0 3px #7fc3b0;
+      background: rgba(255,255,255,0.98);
+    }
+    .sf-comm-card img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem; }
+    .sf-comm-card h3 { font-size: 1.6rem; font-weight: 700; }
+    .sf-comm-badge { background: #ffb347; border-radius: 60px; padding: 0.2rem 1rem; display: inline-block; font-size: 0.8rem; font-weight: 600; }
+    .sf-comm-stats { display: flex; gap: 1rem; margin: 1rem 0; color: #2b5f6b; }
+
+    /* ----- event section ----- */
+    .sf-comm-events {
+      background: linear-gradient(145deg, #ffffff, #f0f9fc); border-radius: 80px; padding: 3rem;
+      margin: 4rem 0; border: 2px dashed #7fc3b0;
+    }
+    .sf-comm-event-item { display: flex; align-items: center; gap: 1.5rem; background: white; border-radius: 60px; padding: 1.2rem 2rem; margin-bottom: 1rem; }
+
+    /* ----- premium modal (member/topic/group) ----- */
+    .sf-comm-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(12px); align-items: center;
+      justify-content: center; z-index: 10000; opacity: 0; transition: opacity 0.3s;
+    }
+    .sf-comm-modal.show { display: flex; opacity: 1; }
+    .sf-comm-modal-content {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-radius: 70px;
+      max-width: 800px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 2.5rem;
+      box-shadow: 0 80px 100px -40px #0f2b3c, 0 0 0 2px rgba(127,195,176,0.4) inset;
+      transform: scale(0.96); transition: transform 0.3s;
+    }
+    .sf-comm-modal.show .sf-comm-modal-content { transform: scale(1); }
+    .sf-comm-modal-close { float: right; font-size: 2.5rem; background: none; border: none; cursor: pointer; }
+    .sf-comm-ai-snip {
+      background: #ffb34715; border-radius: 40px; padding: 1.5rem; margin: 1.5rem 0;
+      border-left: 8px solid #ffb347; display: flex; gap: 1rem; align-items: center;
+    }
+    .sf-comm-ai-snip i { font-size: 2.5rem; color: #ffb347; }
+
+    /* confetti / milestone effect (simple) */
+    .sf-comm-badge-highlight {
+      animation: glowPulse 0.8s ease-out;
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 0 0 #ffb347; }
+      70% { box-shadow: 0 0 0 20px rgba(255,180,70,0); }
+    }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .sf-comm-hero h1 { font-size: 2.8rem; }
+      .sf-comm-filter-bar { border-radius: 40px; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <!-- scroll orb -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- navbar (identical) -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="mentors.html">Mentors</a></li>
+        <li><a href="community.html" style="background: #7fc3b0; color:#0f2b3c;">Community</a></li>
+        <li><a href="resources.html">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="#">Enroll Now</a></div>
+    </div>
+  </nav>
+
+  <!-- HERO (vibrant community) -->
+  <section class="sf-comm-hero">
+    <div class="sf-comm-hero-bg"></div>
+    <div class="sf-comm-hero-content" data-aos="fade-right">
+      <h1>where <span style="color:#ffb347;">learners</span> become a community</h1>
+      <p>Connect, share, and grow with 35k+ active minds. Live events, AI‑matched groups, and daily discussions.</p>
+      <div class="d-flex gap-3 flex-wrap">
+        <a href="#" class="btn-mist" id="joinNowHero">✨ Join now – it's free</a>
+        <a href="#" class="btn-ghost" style="background: rgba(255,255,255,0.2); border-color: white; color:white;">Explore groups</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- FILTER & SEARCH (dynamic) -->
+    <div class="sf-comm-filter-bar" data-aos="fade-up">
+      <div class="sf-comm-filter-group">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="Search members, topics, groups...">
+      </div>
+      <div class="sf-comm-filter-group">
+        <label>Type</label>
+        <select id="typeFilter">
+          <option value="all">All</option>
+          <option value="member">Members</option>
+          <option value="topic">Topics</option>
+          <option value="group">Groups</option>
+        </select>
+      </div>
+      <div class="sf-comm-filter-group">
+        <label>Sort</label>
+        <select id="sortFilter">
+          <option value="active">Most Active</option>
+          <option value="new">Newest</option>
+          <option value="popular">Popular</option>
+          <option value="recommended">AI Recommended</option>
+        </select>
+      </div>
+      <div class="sf-comm-checkbox-group">
+        <label><input type="checkbox" id="trendingOnly" value="trending"> 🔥 Trending</label>
+        <label><input type="checkbox" id="liveOnly" value="live"> 🟢 Live now</label>
+      </div>
+    </div>
+
+    <!-- DYNAMIC GRID (members, topics, groups) -->
+    <div class="sf-comm-grid" id="communityGrid">
+      <!-- member cards (populated via js) -->
+    </div>
+
+    <!-- FEATURED EVENTS SECTION -->
+    <section class="sf-comm-events" data-aos="zoom-in">
+      <h2 class="fw-bold mb-4">📅 live & upcoming events</h2>
+      <div class="sf-comm-event-item">
+        <i class="bi bi-camera-video fs-1" style="color:#7fc3b0;"></i>
+        <div><strong>AI AMA with Dr. Alina Koh</strong><br>Today 6pm ET · 230 attending</div>
+        <button class="btn-mist ms-auto">Join</button>
+      </div>
+      <div class="sf-comm-event-item">
+        <i class="bi bi-chat-dots fs-1" style="color:#7fc3b0;"></i>
+        <div><strong>UX portfolio review circle</strong><br>Tomorrow 3pm ET · 89 attending</div>
+        <button class="btn-mist ms-auto">Join</button>
+      </div>
+      <div class="sf-comm-event-item">
+        <i class="bi bi-bar-chart fs-1" style="color:#7fc3b0;"></i>
+        <div><strong>Data storytelling jam</strong><br>Wed 5pm ET · 145 attending</div>
+        <button class="btn-mist ms-auto">Join</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- PREMIUM MODAL (shared for member/topic/group) -->
+  <div id="communityModal" class="sf-comm-modal">
+    <div class="sf-comm-modal-content">
+      <button class="sf-comm-modal-close" id="closeModalBtn">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER (identical) -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="assets/img/person/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
+        </div>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="paths.html">Paths</a></li><li><a href="courses.html">Courses</a></li><li><a href="mentors.html">Mentors</a></li><li><a href="#">Community</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">Blog</a></li><li><a href="#">Research</a></li><li><a href="#">Events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      AOS.init({ duration: 800, once: true });
+
+      // scroll orb
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        orb.classList.toggle('visible', window.scrollY > 500);
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // mobile toggle
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => links.classList.remove('show'));
+      });
+
+      // analytics hook
+      function trackEvent(event, metadata) {
+        console.log('📊 community |', event, metadata);
+      }
+
+      // ---------- SAMPLE DATA (members, topics, groups) ----------
+      const communityItems = [
+        { type: 'member', id: 'm1', name: 'Elena R.', img: 'https://randomuser.me/api/portraits/women/44.jpg', role: 'AI engineer', followers: 234, posts: 56, badges: ['top contributor', 'mentee'], bio: 'Switched from teaching to ML. Now building AI products.', aiConnect: 'You both love AI ethics — connect!' },
+        { type: 'member', id: 'm2', name: 'Marcus D.', img: 'https://randomuser.me/api/portraits/men/32.jpg', role: 'Product designer', followers: 189, posts: 34, badges: ['design leader'], bio: 'Designing fintech apps. Mentor at SkillForge.', aiConnect: 'Similar portfolio goals — perfect peer.' },
+        { type: 'member', id: 'm3', name: 'Jasmine T.', img: 'https://randomuser.me/api/portraits/women/68.jpg', role: 'Data analyst', followers: 312, posts: 102, badges: ['top contributor', 'data viz'], bio: 'SQL + Python + Tableau. Love storytelling.', aiConnect: 'You both follow Sophia Chen — great match.' },
+        { type: 'topic', id: 't1', name: '🔥 Prompt engineering tips', replies: 45, views: 2.3, lastActive: '5 min ago', starter: 'Elena R.', tags: ['AI', 'discussion'] },
+        { type: 'topic', id: 't2', name: '🎨 Design systems deep dive', replies: 32, views: 1.8, lastActive: '1 hour ago', starter: 'Marcus D.', tags: ['UX', 'resources'] },
+        { type: 'topic', id: 't3', name: '📊 SQL vs Python for analysis', replies: 67, views: 4.1, lastActive: 'just now', starter: 'Jasmine T.', tags: ['data', 'debate'] },
+        { type: 'group', id: 'g1', name: 'AI Builders', members: 1250, topics: 98, created: '2025-01', description: 'For anyone building AI products. Weekly paper club.', aiMatch: 'Your AI interest aligns — 80% match.' },
+        { type: 'group', id: 'g2', name: 'UX Research & Strategy', members: 890, topics: 67, created: '2024-11', description: 'Deep dives into user behavior and research methods.' },
+        { type: 'group', id: 'g3', name: 'Data Storytellers', members: 2100, topics: 156, created: '2024-09', description: 'From data to narrative — Tableau, Python, and beyond.' },
+      ];
+
+      const grid = document.getElementById('communityGrid');
+      const modal = document.getElementById('communityModal');
+      const modalContent = document.getElementById('modalContent');
+      const closeBtn = document.getElementById('closeModalBtn');
+
+      function renderGrid(items) {
+        grid.innerHTML = '';
+        items.forEach(item => {
+          let card = document.createElement('div');
+          card.className = 'sf-comm-card';
+          card.dataset.type = item.type;
+          card.dataset.id = item.id;
+          if (item.type === 'member') {
+            card.innerHTML = `
+              <img src="${item.img}" alt="${item.name}">
+              <h3>${item.name}</h3>
+              <div class="sf-comm-badge">${item.role}</div>
+              <div class="sf-comm-stats"><i class="bi bi-people"></i> ${item.followers} · <i class="bi bi-chat"></i> ${item.posts}</div>
+              <p>${item.bio.substring(0,40)}…</p>
+            `;
+          } else if (item.type === 'topic') {
+            card.innerHTML = `
+              <i class="bi bi-chat-square-text fs-1" style="color:#7fc3b0;"></i>
+              <h3>${item.name}</h3>
+              <div class="sf-comm-stats"><i class="bi bi-reply"></i> ${item.replies} · 👁️ ${item.views}k</div>
+              <div class="text-muted">last active ${item.lastActive}</div>
+            `;
+          } else if (item.type === 'group') {
+            card.innerHTML = `
+              <i class="bi bi-people-fill fs-1" style="color:#7fc3b0;"></i>
+              <h3>${item.name}</h3>
+              <div class="sf-comm-stats"><i class="bi bi-person"></i> ${item.members} · <i class="bi bi-chat"></i> ${item.topics}</div>
+              <p>${item.description.substring(0,40)}…</p>
+            `;
+          }
+          card.addEventListener('click', () => openModal(item));
+          grid.appendChild(card);
+        });
+      }
+
+      function openModal(item) {
+        trackEvent('modal_open', { type: item.type, id: item.id });
+        let html = '';
+        if (item.type === 'member') {
+          html = `
+            <div class="d-flex gap-4">
+              <img src="${item.img}" style="width:100px;height:100px;border-radius:50%;border:4px solid #7fc3b0;">
+              <div><h2>${item.name}</h2><p>${item.role}</p>
+              <span class="sf-comm-badge">${item.badges.join(' · ')}</span></div>
+            </div>
+            <p>${item.bio}</p>
+            <div class="sf-comm-ai-snip"><i class="bi bi-stars"></i><div>🤖 AI connection: ${item.aiConnect || 'You share similar learning goals.'}</div></div>
+            <div><i class="bi bi-people"></i> ${item.followers} followers · ${item.posts} posts</div>
+            <div class="mt-4 d-flex gap-3">
+              <button class="btn-mist followBtn">➕ Follow</button>
+              <button class="btn-ghost messageBtn">✉️ Message</button>
+              <button class="btn-ghost connectBtn">🔗 Connect</button>
+            </div>
+          `;
+        } else if (item.type === 'topic') {
+          html = `
+            <h2>${item.name}</h2>
+            <p>Started by ${item.starter} · ${item.replies} replies · ${item.views}k views</p>
+            <div class="sf-comm-ai-snip"><i class="bi bi-stars"></i><div>💡 Similar topics: "LLM prompt patterns", "Design system versioning"</div></div>
+            <h5 class="mt-3">Latest posts</h5>
+            <ul><li><i class="bi bi-person-circle"></i> Alina: great point about…</li><li><i class="bi bi-person-circle"></i> Marcus: I'd add that…</li></ul>
+            <button class="btn-mist">View full discussion</button>
+          `;
+        } else if (item.type === 'group') {
+          html = `
+            <h2>${item.name}</h2>
+            <p>${item.description}</p>
+            <div><i class="bi bi-person"></i> ${item.members} members · ${item.topics} discussions</div>
+            <div class="sf-comm-ai-snip"><i class="bi bi-stars"></i><div>✨ AI match: ${item.aiMatch || '80% compatible with your interests'}</div></div>
+            <button class="btn-mist joinGroupBtn">Join group</button>
+            <button class="btn-ghost">Start discussion</button>
+          `;
+        }
+        modalContent.innerHTML = html;
+        modal.classList.add('show');
+
+        // attach event listeners for buttons inside modal (simple tracking)
+        document.querySelectorAll('.followBtn, .messageBtn, .connectBtn, .joinGroupBtn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            trackEvent('modal_action', { action: btn.innerText, item: item.id });
+            if (btn.classList.contains('followBtn')) alert('✨ followed (mock)');
+            else alert('✨ action mock');
+          });
+        });
+      }
+
+      closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+      window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+
+      // initial render
+      renderGrid(communityItems);
+
+      // FILTERING & SEARCH
+      function filterItems() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const type = document.getElementById('typeFilter').value;
+        const sort = document.getElementById('sortFilter').value;
+        const trendingOnly = document.getElementById('trendingOnly').checked;
+        const liveOnly = document.getElementById('liveOnly').checked;
+
+        let filtered = communityItems.filter(item => {
+          if (type !== 'all' && item.type !== type) return false;
+          if (search && !JSON.stringify(item).toLowerCase().includes(search)) return false;
+          if (trendingOnly && item.type === 'topic' && !item.name.includes('🔥')) return false;
+          if (liveOnly && item.type !== 'topic') return false; // simplified
+          return true;
+        });
+
+        // sorting (mock)
+        if (sort === 'popular') filtered.sort((a,b) => (b.views || 0) - (a.views || 0));
+        else if (sort === 'new') filtered.reverse();
+        else if (sort === 'recommended') filtered = filtered.filter(i => i.type === 'member' || i.aiConnect); // dummy
+
+        renderGrid(filtered);
+        trackEvent('filter', { type, search, sort, trendingOnly, liveOnly });
+      }
+
+      document.getElementById('searchInput').addEventListener('input', filterItems);
+      document.getElementById('typeFilter').addEventListener('change', filterItems);
+      document.getElementById('sortFilter').addEventListener('change', filterItems);
+      document.getElementById('trendingOnly').addEventListener('change', filterItems);
+      document.getElementById('liveOnly').addEventListener('change', filterItems);
+
+      // milestone / confetti simulation (click on any badge)
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('sf-comm-badge')) {
+          e.target.classList.add('sf-comm-badge-highlight');
+          setTimeout(() => e.target.classList.remove('sf-comm-badge-highlight'), 800);
+          trackEvent('badge_click', { badge: e.target.innerText });
+        }
+      });
+
+      // hero CTA
+      document.getElementById('joinNowHero').addEventListener('click', (e) => {
+        e.preventDefault();
+        trackEvent('join_now', {});
+        alert('✨ join flow (mock)');
+      });
+    })();
+  </script>
+</body>
+</html>

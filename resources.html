@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary meta tags & SEO -->
+  <title>SkillForge Hub · resource library</title>
+  <meta name="description" content="Discover premium guides, templates, toolkits, and videos. Your curated knowledge center for AI, UX, Data and more.">
+  <!-- Bootstrap grid & icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <style>
+    /* ========== GLOBAL (preserved) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;
+      --fog-mid: #2b5f6b;
+      --fog-soft: #e5f0f5;
+      --mist-green: #7fc3b0;
+      --accent-glow: #ffb347;
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
+    }
+
+    /* ---------- scroll orb ---------- */
+    #orb-scroll {
+      position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
+      border-radius: 50% 20% 50% 50%; background: rgba(127,195,176,0.3);
+      backdrop-filter: blur(16px) saturate(180%); border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; color: white;
+      font-size: 2.2rem; cursor: pointer; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0; visibility: hidden; z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%; background: #7fc3b0; transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+
+    /* ---------- custom navbar (identical) ---------- */
+    .nav-fog {
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(18px); position: fixed; width: 100%; top: 0;
+      z-index: 1000; padding: 0.6rem 2rem; border-bottom: 2px solid rgba(127,195,176,0.3);
+    }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+    .logo-block { display: flex; align-items: center; gap: 8px; }
+    .logo-block img { height: 48px; filter: drop-shadow(0 4px 8px #7fc3b0); }
+    .logo-text { font-size: 1.9rem; font-weight: 800; background: linear-gradient(130deg, #ffffff, #b8e3d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+    .nav-links { display: flex; gap: 0.4rem; list-style: none; margin: 0; }
+    .nav-links a { text-decoration: none; color: rgba(255,255,255,0.85); font-weight: 500; padding: 0.6rem 1.4rem; border-radius: 50px; transition: 0.25s; font-size: 1.05rem; }
+    .nav-links a:hover { background: #7fc3b0; color: #0f2b3c; transform: translateY(-3px); }
+    .nav-cta a { background: white; color: #0f2b3c !important; font-weight: 700; padding: 0.6rem 2rem; border-radius: 60px; border: 2px solid #ffb347; text-decoration: none; }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle { display: none; background: transparent; border: 2px solid #7fc3b0; color: white; font-size: 2rem; border-radius: 40px; padding: 0.2rem 1rem; cursor: pointer; }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links { display: none; flex-direction: column; background: rgba(15,43,60,0.95); backdrop-filter: blur(20px); position: absolute; top: 85px; left: 5%; width: 90%; border-radius: 40px; padding: 2rem; z-index: 999; }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+
+    /* ---------- footer ---------- */
+    .footer-fog { background: #0f2b3c; color: #e5f0f5; padding: 4rem 5% 2rem; border-top: 8px solid #7fc3b0; }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+
+    /* ========== RESOURCES PAGE SPECIFIC ========== prefix: sf-res- */
+
+    /* ----- hero (elegant, with search) ----- */
+    .sf-res-hero {
+      margin-top: 90px;
+      background: linear-gradient(135deg, #e0f0ed, #ffffff);
+      padding: 5rem 5%;
+      text-align: center;
+      position: relative;
+      isolation: isolate;
+    }
+    .sf-res-hero::after {
+      content: '';
+      position: absolute; inset: 0; background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMzAgMTBhMjAgMjAgMCAwIDEgMjAgMjAgMjAgMjAgMCAwIDEtNDAgMCAyMCAyMCAwIDAgMSAyMC0yMHoiIGZpbGw9IiM3ZmMzYjAiIG9wYWNpdHk9IjAuMDYiLz48L3N2Zz4=') repeat;
+      opacity: 0.2; z-index: -1;
+    }
+    .sf-res-hero h1 { font-size: 4rem; font-weight: 700; color: #0f2b3c; margin-bottom: 1rem; }
+    .sf-res-hero p { font-size: 1.3rem; color: #2b5f6b; max-width: 700px; margin: 0 auto 2rem; }
+    .sf-res-search {
+      max-width: 600px; margin: 0 auto; position: relative;
+    }
+    .sf-res-search input {
+      width: 100%; padding: 1.2rem 2rem 1.2rem 3.5rem; border: 2px solid rgba(127,195,176,0.3);
+      border-radius: 80px; background: white; font-size: 1.1rem; box-shadow: 0 15px 30px -15px #7fc3b0;
+    }
+    .sf-res-search i {
+      position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); font-size: 1.4rem; color: #7fc3b0;
+    }
+
+    /* ----- category chips (interactive) ----- */
+    .sf-res-categories {
+      display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 3rem 0 2rem;
+    }
+    .sf-res-category-chip {
+      background: white; padding: 0.8rem 2rem; border-radius: 60px; font-weight: 600;
+      border: 2px solid rgba(127,195,176,0.3); cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 6px 12px -8px rgba(0,0,0,0.1);
+    }
+    .sf-res-category-chip:hover { border-color: #7fc3b0; transform: scale(1.02); }
+    .sf-res-category-chip.active {
+      background: #7fc3b0; color: #0f2b3c; border-color: #0f2b3c; box-shadow: 0 8px 16px -8px #2b5f6b;
+    }
+
+    /* ----- resource cards grid ----- */
+    .sf-res-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;
+      margin: 2rem 0 4rem;
+    }
+    .sf-res-card {
+      background: white; border-radius: 50px; padding: 2rem; box-shadow: 0 20px 30px -15px rgba(0,0,0,0.1);
+      border: 2px solid rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1);
+      cursor: pointer; display: flex; flex-direction: column;
+    }
+    .sf-res-card:hover {
+      transform: translateY(-8px) scale(1.01); box-shadow: 0 40px 60px -20px #0f2b3c, 0 0 0 3px #7fc3b0;
+      background: rgba(255,255,255,0.98);
+    }
+    .sf-res-badge {
+      display: inline-block; background: #e5f0f5; padding: 0.3rem 1.2rem; border-radius: 60px;
+      font-size: 0.8rem; font-weight: 600; align-self: flex-start; margin-bottom: 1rem;
+    }
+    .sf-res-badge.pdf { background: #ffb34720; color: #b45f06; }
+    .sf-res-badge.video { background: #7fc3b020; color: #0f2b3c; }
+    .sf-res-card h3 { font-size: 1.8rem; font-weight: 700; margin: 0.5rem 0; }
+    .sf-res-meta { display: flex; justify-content: space-between; margin: 1.5rem 0 1rem; color: #2b5f6b; }
+    .sf-res-download-btn {
+      background: transparent; border: 2px solid #7fc3b0; border-radius: 60px; padding: 0.6rem 1rem;
+      font-weight: 600; transition: 0.2s; text-align: center; cursor: pointer;
+    }
+    .sf-res-download-btn:hover { background: #7fc3b0; color: #0f2b3c; }
+
+    /* ----- featured carousel (horizontal snap) ----- */
+    .sf-res-carousel {
+      display: flex; overflow-x: auto; gap: 2rem; padding: 1.5rem 0.5rem;
+      scroll-snap-type: x mandatory; scrollbar-width: thin; margin: 3rem 0;
+    }
+    .sf-res-carousel-item {
+      flex: 0 0 300px; background: white; border-radius: 50px; padding: 2rem;
+      scroll-snap-align: start; box-shadow: 0 30px 40px -20px #0f2b3c;
+      border: 2px solid #ffb34740;
+    }
+
+    /* ----- AI recommendation panel ----- */
+    .sf-res-ai-panel {
+      background: rgba(127,195,176,0.1); backdrop-filter: blur(8px); border-radius: 70px;
+      padding: 2.5rem; margin: 4rem 0; border: 2px dashed #7fc3b0;
+    }
+
+    /* ----- skeleton loader (simple) ----- */
+    .sf-res-skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; height: 200px; border-radius: 50px; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ----- modal (resource detail) ----- */
+    .sf-res-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,43,60,0.7); backdrop-filter: blur(12px); align-items: center;
+      justify-content: center; z-index: 10000; opacity: 0; transition: opacity 0.3s;
+    }
+    .sf-res-modal.show { display: flex; opacity: 1; }
+    .sf-res-modal-content {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-radius: 70px;
+      max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 2.5rem;
+      box-shadow: 0 80px 100px -40px #0f2b3c, 0 0 0 2px rgba(127,195,176,0.4) inset;
+      transform: scale(0.96); transition: transform 0.3s;
+    }
+    .sf-res-modal.show .sf-res-modal-content { transform: scale(1); }
+    .sf-res-modal-close { float: right; font-size: 2.5rem; background: none; border: none; cursor: pointer; }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .sf-res-hero h1 { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- scroll orb -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- navbar -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="mentors.html">Mentors</a></li>
+        <li><a href="community.html">Community</a></li>
+        <li><a href="#" style="background: #7fc3b0; color:#0f2b3c;">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="#">Enroll Now</a></div>
+    </div>
+  </nav>
+
+  <!-- HERO (elegant) -->
+  <section class="sf-res-hero" data-aos="fade-down">
+    <h1>Your Learning <span style="color:#7fc3b0;">Resource Library</span></h1>
+    <p>Guides, templates, toolkits, and videos — curated for your journey in AI, UX, Data, and beyond.</p>
+    <div class="sf-res-search">
+      <i class="bi bi-search"></i>
+      <input type="text" id="searchInput" placeholder="Search guides, templates, or tools…">
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- CATEGORY CHIPS -->
+    <div class="sf-res-categories" data-aos="fade-up">
+      <span class="sf-res-category-chip active" data-category="all">All</span>
+      <span class="sf-res-category-chip" data-category="guide">📘 Guides</span>
+      <span class="sf-res-category-chip" data-category="template">📄 Templates</span>
+      <span class="sf-res-category-chip" data-category="toolkit">🧰 Toolkits</span>
+      <span class="sf-res-category-chip" data-category="pdf">📕 Downloads</span>
+      <span class="sf-res-category-chip" data-category="video">🎥 Videos</span>
+      <span class="sf-res-category-chip" data-category="recommended">✨ Recommended</span>
+    </div>
+
+    <!-- FEATURED RESOURCES CAROUSEL -->
+    <h2 class="fw-bold mt-5" data-aos="fade-right">⭐ featured resources</h2>
+    <div class="sf-res-carousel" data-aos="fade-up">
+      <div class="sf-res-carousel-item">
+        <span class="sf-res-badge pdf">📕 PDF</span>
+        <h3>AI Product Handbook</h3>
+        <p>180+ pages of frameworks and case studies.</p>
+        <div class="sf-res-download-btn">Download →</div>
+      </div>
+      <div class="sf-res-carousel-item">
+        <span class="sf-res-badge video">🎥 Video</span>
+        <h3>UX Portfolio Masterclass</h3>
+        <p>2h workshop with Marcus Velez.</p>
+        <div class="sf-res-download-btn">Watch →</div>
+      </div>
+      <div class="sf-res-carousel-item">
+        <span class="sf-res-badge">🧰 Toolkit</span>
+        <h3>Data Storytelling Kit</h3>
+        <p>Excel templates + color palettes.</p>
+        <div class="sf-res-download-btn">Download →</div>
+      </div>
+    </div>
+
+    <!-- AI RECOMMENDATION PANEL -->
+    <section class="sf-res-ai-panel" data-aos="flip-up">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <i class="bi bi-stars fs-1" style="color:#ffb347;"></i>
+        <div>
+          <h3 class="fw-bold">Recommended for you</h3>
+          <p>Based on your interest in AI & UX — these resources will accelerate your learning.</p>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+          <div class="p-3 bg-white rounded-5"><i class="bi bi-file-pdf"></i> <strong>Prompt Engineering Guide</strong> <span class="text-muted d-block">because you explore AI</span></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="p-3 bg-white rounded-5"><i class="bi bi-file-pdf"></i> <strong>Figma UI Kit</strong> <span class="text-muted d-block">UX templates for portfolio</span></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="p-3 bg-white rounded-5"><i class="bi bi-play-circle"></i> <strong>SQL for Analysis</strong> <span class="text-muted d-block">data skill boost</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCE GRID (dynamic) -->
+    <h2 class="fw-bold" data-aos="fade-right">📚 all resources</h2>
+    <div class="sf-res-grid" id="resourceGrid">
+      <!-- skeleton loaders (visible while JS loads, then replaced) -->
+      <div class="sf-res-skeleton"></div><div class="sf-res-skeleton"></div><div class="sf-res-skeleton"></div>
+    </div>
+  </div>
+
+  <!-- RESOURCE DETAIL MODAL -->
+  <div id="resourceModal" class="sf-res-modal">
+    <div class="sf-res-modal-content">
+      <button class="sf-res-modal-close" id="closeModalBtn">&times;</button>
+      <div id="modalResourceContent"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="assets/img/person/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
+        </div>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="#">Paths</a></li><li><a href="#">Courses</a></li><li><a href="#">Mentors</a></li><li><a href="#">Community</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">Blog</a></li><li><a href="#">Research</a></li><li><a href="#">Events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      AOS.init({ duration: 800, once: true });
+
+      // orb
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        orb.classList.toggle('visible', window.scrollY > 500);
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // mobile toggle
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => links.classList.remove('show'));
+      });
+
+      // analytics hook
+      function trackEvent(event, metadata) {
+        console.log('📊 resources |', event, metadata);
+      }
+
+      // ---------- RESOURCE DATA (premium) ----------
+      const resources = [
+        { id: 1, title: 'AI Product Handbook', desc: '180+ pages covering LLM productization, ethics, and metrics.', type: 'pdf', category: 'guide', size: '12 MB', time: '2h read', badge: 'PDF', benefits: ['Frameworks', 'Case studies', 'Worksheets'] },
+        { id: 2, title: 'UX Portfolio Template', desc: 'Figma template with 10+ layouts for your case studies.', type: 'template', category: 'template', size: '4 MB', time: 'editable', badge: 'Template', benefits: ['Editable', 'Print-ready', 'Tips'] },
+        { id: 3, title: 'SQL Cheat Sheet', desc: 'Essential commands, joins, and window functions.', type: 'pdf', category: 'guide', size: '1 MB', time: 'quick ref', badge: 'PDF' },
+        { id: 4, title: 'Data Storytelling Toolkit', desc: 'Color palettes, chart templates, and presentation tips.', type: 'toolkit', category: 'toolkit', size: '22 MB', time: 'various', badge: 'Toolkit' },
+        { id: 5, title: 'Prompt Engineering Video', desc: '1.5h masterclass with Dr. Alina Koh.', type: 'video', category: 'video', size: 'stream', time: '90 min', badge: 'Video' },
+        { id: 6, title: 'Figma UI Kit', desc: '200+ components for dashboards and mobile.', type: 'template', category: 'template', size: '8 MB', time: 'Figma', badge: 'Template' },
+        { id: 7, title: 'MLOps Checklist', desc: 'Production readiness checklist for ML models.', type: 'pdf', category: 'guide', size: '0.8 MB', time: '30 min', badge: 'PDF' },
+        { id: 8, title: 'Career Roadmap Posters', desc: 'Visual guides for AI, UX, Data career paths.', type: 'pdf', category: 'download', size: '5 MB', time: 'posters', badge: 'PDF' },
+      ];
+
+      const grid = document.getElementById('resourceGrid');
+      const modal = document.getElementById('resourceModal');
+      const modalContent = document.getElementById('modalResourceContent');
+      const closeBtn = document.getElementById('closeModalBtn');
+
+      function renderResources(filtered = resources) {
+        grid.innerHTML = '';
+        filtered.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'sf-res-card';
+          card.dataset.id = r.id;
+          card.dataset.category = r.category;
+          card.dataset.title = r.title.toLowerCase();
+          card.innerHTML = `
+            <span class="sf-res-badge ${r.type}">${r.badge}</span>
+            <h3>${r.title}</h3>
+            <p>${r.desc.substring(0,60)}…</p>
+            <div class="sf-res-meta"><span>📄 ${r.size}</span><span>⏱️ ${r.time}</span></div>
+            <div class="sf-res-download-btn view-details">View details</div>
+          `;
+          card.querySelector('.view-details').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openResourceModal(r);
+          });
+          card.addEventListener('click', () => openResourceModal(r));
+          grid.appendChild(card);
+        });
+      }
+
+      function openResourceModal(r) {
+        trackEvent('modal_open', { resource: r.title });
+        let benefitsHtml = '';
+        if (r.benefits) benefitsHtml = '<ul>' + r.benefits.map(b => `<li><i class="bi bi-check-circle-fill me-2" style="color:#7fc3b0;"></i>${b}</li>`).join('') + '</ul>';
+        modalContent.innerHTML = `
+          <h2 class="fw-bold">${r.title}</h2>
+          <span class="sf-res-badge ${r.type}">${r.badge}</span>
+          <p class="mt-3">${r.desc}</p>
+          ${benefitsHtml}
+          <div><strong>Size:</strong> ${r.size} · <strong>Time:</strong> ${r.time}</div>
+          <div class="mt-4 d-flex gap-3">
+            <button class="btn-mist download-action">⬇️ Download now</button>
+            <button class="btn-ghost related-action">🔍 View related</button>
+          </div>
+          <div class="mt-4 p-3" style="background:#f0f9fc; border-radius:40px;"><i class="bi bi-stars"></i> <strong>You might also like:</strong> AI Product Handbook, SQL Cheat Sheet</div>
+        `;
+        modal.classList.add('show');
+
+        // download simulation
+        modalContent.querySelector('.download-action')?.addEventListener('click', function(e) {
+          e.preventDefault();
+          const btn = this;
+          const original = btn.innerText;
+          btn.innerText = '⏳ preparing...';
+          btn.disabled = true;
+          trackEvent('download_start', { resource: r.title });
+          setTimeout(() => {
+            btn.innerText = '✅ downloaded (mock)';
+            setTimeout(() => { btn.innerText = original; btn.disabled = false; }, 1500);
+          }, 1200);
+        });
+      }
+
+      closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+      window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+
+      // filter & search
+      let activeCategory = 'all';
+
+      function filterResources() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        let filtered = resources.filter(r => {
+          const catMatch = activeCategory === 'all' || r.category === activeCategory || (activeCategory === 'recommended' && r.id % 2 === 0); // mock recommended
+          const searchMatch = r.title.toLowerCase().includes(search) || r.desc.toLowerCase().includes(search);
+          return catMatch && searchMatch;
+        });
+        renderResources(filtered);
+        trackEvent('filter', { category: activeCategory, search });
+      }
+
+      document.querySelectorAll('.sf-res-category-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+          document.querySelectorAll('.sf-res-category-chip').forEach(c => c.classList.remove('active'));
+          this.classList.add('active');
+          activeCategory = this.dataset.category;
+          filterResources();
+        });
+      });
+
+      document.getElementById('searchInput').addEventListener('input', filterResources);
+
+      // initial render (remove skeletons)
+      renderResources();
+
+      // carousel download buttons (mock)
+      document.querySelectorAll('.sf-res-carousel-item .sf-res-download-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert('✨ download simulation (featured)');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
