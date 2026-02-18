@@ -7,41 +7,197 @@
   <!-- Bootstrap icons & grid (lightweight) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <!-- fonts -->
+  <!-- fonts & AOS (from paths) -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <!-- Font Awesome (optional extra icons) -->
+  <script src="https://kit.fontawesome.com/1b30ffa950.js" crossorigin="anonymous"></script>
   <!-- canvas confetti library (lightweight) -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
   <style>
-    /* ---------- GLOBAL (calm, premium) ---------- */
+    /* ---------- GLOBAL STYLES (exact copy from paths.html) ---------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Outfit', sans-serif;
       background: #f4f9fc;
       color: #1c2e3f;
       line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-      position: relative;
       overflow-x: hidden;
     }
     :root {
-      --fog-deep: #0f2b3c;
-      --fog-mid: #2b5f6b;
-      --mist-green: #7fc3b0;
-      --accent-glow: #ffb347;
-      --soft-white: rgba(255,255,255,0.9);
-      --border-radius-card: 48px;
-      --border-radius-input: 40px;
-      --box-shadow-elegant: 0 40px 60px -30px rgba(15,43,60,0.3), 0 0 0 1px rgba(127,195,176,0.2) inset;
+      --fog-deep: #0f2b3c;        /* deep navy – trust */
+      --fog-mid: #2b5f6b;          /* tealish blue – calm */
+      --fog-soft: #e5f0f5;         /* background */
+      --mist-green: #7fc3b0;       /* soft green – growth */
+      --accent-glow: #ffb347;       /* warm amber – energy */
+      --card-white: rgba(255,255,255,0.85);
+      --backdrop-blur: blur(12px);
+      --border-radius-lg: 60px;
+      --border-radius-md: 40px;
+      --border-radius-sm: 24px;
+      --box-shadow-light: 0 30px 40px -30px rgba(0,0,0,0.2);
     }
 
-    /* ---------- main container (glass backdrop) ---------- */
+    /* ---------- scroll orb (copied from paths) ---------- */
+    #orb-scroll {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50% 20% 50% 50%;
+      background: rgba(127, 195, 176, 0.3);
+      backdrop-filter: blur(16px) saturate(180%);
+      border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,80,70,0.4), 0 0 0 6px rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.2rem;
+      cursor: pointer;
+      transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 999;
+    }
+    #orb-scroll.visible { opacity: 1; visibility: visible; }
+    #orb-scroll:hover {
+      border-radius: 40% 40% 50% 20%;
+      background: #7fc3b0;
+      transform: rotate(10deg) scale(1.2);
+      border-color: #ffb347;
+    }
+
+    /* ---------- custom navbar (exact copy from paths) ---------- */
+    .nav-fog {
+      background: rgba(15, 43, 60, 0.7);
+      backdrop-filter: blur(18px);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      padding: 0.6rem 2rem;
+      border-bottom: 2px solid rgba(127, 195, 176, 0.3);
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-block img {
+      height: 48px;
+      filter: drop-shadow(0 4px 8px #7fc3b0);
+    }
+    .logo-text {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(130deg, #ffffff, #b8e3d9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 0.4rem;
+      list-style: none;
+      margin: 0;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      transition: 0.25s;
+      font-size: 1.05rem;
+    }
+    .nav-links a:hover {
+      background: #7fc3b0;
+      color: #0f2b3c;
+      transform: translateY(-3px);
+    }
+    .nav-cta a {
+      background: white;
+      color: #0f2b3c !important;
+      font-weight: 700;
+      padding: 0.6rem 2rem;
+      border-radius: 60px;
+      border: 2px solid #ffb347;
+      text-decoration: none;
+    }
+    .nav-cta a:hover { background: #ffb347; color: #0f2b3c !important; border-color: white; }
+    .mobile-toggle {
+      display: none;
+      background: transparent;
+      border: 2px solid #7fc3b0;
+      color: white;
+      font-size: 2rem;
+      border-radius: 40px;
+      padding: 0.2rem 1rem;
+      cursor: pointer;
+    }
+    @media (max-width: 1024px) {
+      .mobile-toggle { display: block; }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background: rgba(15,43,60,0.95);
+        backdrop-filter: blur(20px);
+        position: absolute;
+        top: 85px;
+        left: 5%;
+        width: 90%;
+        border-radius: 40px;
+        padding: 2rem;
+        z-index: 999;
+      }
+      .nav-links.show { display: flex; }
+      .nav-links a { text-align: center; }
+    }
+
+    /* ---------- footer (exact copy from paths) ---------- */
+    .footer-fog {
+      background: #0f2b3c;
+      color: #e5f0f5;
+      padding: 4rem 5% 2rem;
+      border-top: 8px solid #7fc3b0;
+    }
+    .footer-fog a { color: #b0d9cc; text-decoration: none; }
+    .footer-fog a:hover { color: #ffb347; }
+
+    /* ---------- global btn-mist etc (preserved from paths) ---------- */
+    .btn-mist {
+      background: #7fc3b0; border: none; padding: 1rem 2.5rem; border-radius: 60px;
+      font-weight: 700; color: #0f2b3c; text-decoration: none; transition: 0.3s;
+      box-shadow: 0 12px 20px -10px #7fc3b0; display: inline-block;
+    }
+    .btn-mist:hover { background: #ffb347; transform: scale(1.03); }
+
+    /* ---------- main container (glass backdrop) - original enroll-now styles preserved ---------- */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex: 1;
+      margin-top: 120px; /* Account for fixed navbar */
+      padding: 2rem 1rem;
+    }
     .enroll-container {
       max-width: 1000px;
       width: 100%;
+      margin: 0 auto;
       background: rgba(255,255,255,0.6);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -52,12 +208,12 @@
       transition: transform 0.3s ease;
     }
 
-    /* shift slightly when assistant is open (optional, gives breathing) */
+    /* shift slightly when assistant is open */
     body.assistant-open .enroll-container {
       transform: scale(0.98);
     }
 
-    /* ---------- selection cards (initial) ---------- */
+    /* ---------- selection cards (from enroll-now) ---------- */
     .selection-panel {
       text-align: center;
       transition: opacity 0.4s ease, transform 0.4s;
@@ -102,7 +258,7 @@
     .selection-card h3 { font-size: 2rem; font-weight: 700; }
     .selection-card p { color: #2b5f6b; }
 
-    /* ---------- form panels (hidden initially) ---------- */
+    /* ---------- form panels (from enroll-now) ---------- */
     .form-panel {
       display: none;
       opacity: 0;
@@ -113,7 +269,7 @@
       opacity: 1;
     }
 
-    /* ---------- premium form styling ---------- */
+    /* ---------- premium form styling (from enroll-now) ---------- */
     .form-title {
       font-size: 2.4rem;
       font-weight: 700;
@@ -155,7 +311,7 @@
     }
     .input-group-premium textarea { border-radius: 40px; min-height: 120px; }
 
-    /* file upload styling (drag-drop look) */
+    /* file upload styling */
     .file-upload-area {
       border: 2px dashed #7fc3b0;
       border-radius: 60px;
@@ -192,7 +348,7 @@
       font-weight: 400;
     }
 
-    /* password strength (mock) */
+    /* password strength */
     .strength-meter {
       height: 6px; background: #e5f0f5; border-radius: 10px; margin: 0.5rem 0 1rem;
     }
@@ -237,16 +393,7 @@
       cursor: pointer;
     }
 
-    /* success animation */
-    .success-check {
-      animation: pop 0.4s ease;
-    }
-    @keyframes pop {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    /* adaptive hint (fade/slide) */
+    /* adaptive hint */
     .adaptive-hint, .dynamic-field {
       overflow: hidden;
       transition: opacity 0.3s ease, max-height 0.4s ease, margin 0.3s ease;
@@ -300,7 +447,7 @@
     }
     .clear-resume:hover { background: #7fc3b0; color: white; }
 
-    /* login modal (soft overlay) */
+    /* login modal */
     .login-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -338,7 +485,7 @@
       font-weight: 700;
     }
 
-    /* ---------- AI ASSISTANT PANEL (premium, glass) ---------- */
+    /* ---------- AI ASSISTANT PANEL (from enroll-now) ---------- */
     .assistant-toggle {
       position: fixed;
       bottom: 2rem;
@@ -372,7 +519,7 @@
     .assistant-panel {
       position: fixed;
       top: 0;
-      right: -420px; /* hidden */
+      right: -420px;
       width: 380px;
       height: 100vh;
       background: rgba(255,255,255,0.8);
@@ -531,7 +678,6 @@
       background: #ffb347;
     }
 
-    /* focus highlight effect */
     .field-highlight {
       outline: 4px solid rgba(127,195,176,0.4);
       transition: outline 0.2s;
@@ -546,280 +692,332 @@
       .assistant-panel { width: 320px; right: -340px; }
       .assistant-toggle { bottom: 1rem; right: 1rem; }
     }
+
+    /* btn-ghost style from paths */
+    .btn-ghost {
+      background: transparent; border: 2px solid #2b5f6b; color: #1c2e3f; padding: 1rem 2.5rem;
+      border-radius: 60px; font-weight: 600; text-decoration: none; display: inline-block;
+      transition: 0.2s;
+    }
+    .btn-ghost:hover { background: #2b5f6b; color: white; }
   </style>
 </head>
 <body>
-  <div class="enroll-container">
-    <!-- SELECTION PANEL (initial) -->
-    <div id="selectionPanel" class="selection-panel">
-      <h1 class="display-4 fw-bold" style="color: #0f2b3c;">welcome.</h1>
-      <p class="fs-4" style="color: #2b5f6b;">choose your path to join SkillForge Hub</p>
-      <div class="selection-cards">
-        <!-- student card -->
-        <div class="selection-card" id="selectStudent">
-          <i class="bi bi-mortarboard"></i>
-          <h3>Student</h3>
-          <p>Access courses, mentors, and a calm learning community.</p>
-        </div>
-        <!-- instructor card -->
-        <div class="selection-card" id="selectInstructor">
-          <i class="bi bi-easel"></i>
-          <h3>Instructor</h3>
-          <p>Share your expertise, guide learners, and grow your impact.</p>
-        </div>
+  <!-- scroll orb (copied from paths) -->
+  <div id="orb-scroll"><i class="bi bi-arrow-up-short"></i></div>
+
+  <!-- custom navbar (exact copy from paths.html) -->
+  <nav class="nav-fog">
+    <div class="nav-container">
+      <div class="logo-block">
+        <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" alt="SkillForge Hub logo">
+        <span class="logo-text"></span>
       </div>
-      <p class="mt-4 text-muted"><i class="bi bi-shield-lock"></i> your information is secure and never shared</p>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="mentors.html">Mentors</a></li>
+        <li><a href="community.html">Community</a></li>
+        <li><a href="resources.html">Resources</a></li>
+      </ul>
+      <div class="nav-cta"><a href="enroll-now.html" style="background: #7fc3b0; color:#0f2b3c;">Enroll Now</a></div>
     </div>
+  </nav>
 
-    <!-- STUDENT FORM PANEL (hidden initially) -->
-    <div id="studentFormPanel" class="form-panel">
-      <div class="back-link" id="backFromStudent"><i class="bi bi-arrow-left"></i> back to selection</div>
-      <h2 class="form-title">Enroll in Your Dream Course</h2>
-      <p class="form-subtitle">Take the next step in your educational journey. Complete the form below to secure your spot.</p>
-      
-      <!-- resume banner placeholder (dynamic) -->
-      <div id="studentResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearStudentProgress">✕ clear</button></div>
-
-      <form id="studentForm" novalidate>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>First Name *</label>
-              <input type="text" class="required" id="studentFirstName" placeholder="Alex">
-            </div>
+  <!-- MAIN CONTENT (original enroll-now content, adjusted for navbar spacing) -->
+  <main>
+    <div class="enroll-container">
+      <!-- SELECTION PANEL (initial) -->
+      <div id="selectionPanel" class="selection-panel">
+        <h1 class="display-4 fw-bold" style="color: #0f2b3c;">welcome.</h1>
+        <p class="fs-4" style="color: #2b5f6b;">choose your path to join SkillForge Hub</p>
+        <div class="selection-cards">
+          <!-- student card -->
+          <div class="selection-card" id="selectStudent">
+            <i class="bi bi-mortarboard"></i>
+            <h3>Student</h3>
+            <p>Access courses, mentors, and a calm learning community.</p>
           </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Last Name *</label>
-              <input type="text" class="required" id="studentLastName" placeholder="Morgan">
-            </div>
+          <!-- instructor card -->
+          <div class="selection-card" id="selectInstructor">
+            <i class="bi bi-easel"></i>
+            <h3>Instructor</h3>
+            <p>Share your expertise, guide learners, and grow your impact.</p>
           </div>
         </div>
+        <p class="mt-4 text-muted"><i class="bi bi-shield-lock"></i> your information is secure and never shared</p>
+      </div>
 
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Email Address *</label>
-              <input type="email" class="required" id="studentEmail" placeholder="alex@example.com">
+      <!-- STUDENT FORM PANEL (hidden initially) -->
+      <div id="studentFormPanel" class="form-panel">
+        <div class="back-link" id="backFromStudent"><i class="bi bi-arrow-left"></i> back to selection</div>
+        <h2 class="form-title">Enroll in Your Dream Course</h2>
+        <p class="form-subtitle">Take the next step in your educational journey. Complete the form below to secure your spot.</p>
+        
+        <!-- resume banner placeholder (dynamic) -->
+        <div id="studentResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearStudentProgress">✕ clear</button></div>
+
+        <form id="studentForm" novalidate>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>First Name *</label>
+                <input type="text" class="required" id="studentFirstName" placeholder="Alex">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Last Name *</label>
+                <input type="text" class="required" id="studentLastName" placeholder="Morgan">
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Phone Number</label>
-              <input type="tel" id="studentPhone" placeholder="+1 (555) 000-9999">
+
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Email Address *</label>
+                <input type="email" class="required" id="studentEmail" placeholder="alex@example.com">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Phone Number</label>
+                <input type="tel" id="studentPhone" placeholder="+1 (555) 000-9999">
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Password *</label>
-              <input type="password" class="required" id="studentPassword" placeholder="••••••••">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Password *</label>
+                <input type="password" class="required" id="studentPassword" placeholder="••••••••">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Confirm Password *</label>
+                <input type="password" class="required" id="studentConfirmPassword" placeholder="••••••••">
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Confirm Password *</label>
-              <input type="password" class="required" id="studentConfirmPassword" placeholder="••••••••">
+          <!-- password strength mock -->
+          <div class="strength-meter"><div class="strength-fill" id="studentStrength" style="width:60%"></div></div>
+
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Education Level</label>
+                <select id="studentEdu">
+                  <option>Select your education level...</option>
+                  <option>High School</option>
+                  <option>Bachelor's</option>
+                  <option>Master's</option>
+                  <option>PhD</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Experience Level</label>
+                <select id="studentExp">
+                  <option>Select your experience...</option>
+                  <option>Beginner</option>
+                  <option>Intermediate</option>
+                  <option>Advanced</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
-        <!-- password strength mock -->
-        <div class="strength-meter"><div class="strength-fill" id="studentStrength" style="width:60%"></div></div>
 
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Education Level</label>
-              <select id="studentEdu">
-                <option>Select your education level...</option>
-                <option>High School</option>
-                <option>Bachelor's</option>
-                <option>Master's</option>
-                <option>PhD</option>
-              </select>
+          <!-- adaptive hints (dynamic) -->
+          <div id="studentExpHint" class="adaptive-hint"></div>
+          <div id="studentEduHint" class="adaptive-hint"></div>
+
+          <div class="input-group-premium">
+            <label>What are you hoping to learn and improve</label>
+            <textarea id="studentGoals" placeholder="Type your learning goals here..."></textarea>
+          </div>
+          <!-- dynamic field based on goals (example) -->
+          <div id="studentGoalSuggestion" class="dynamic-field"></div>
+
+          <label>Preferred Learning Schedule</label>
+          <div class="radio-group">
+            <label><input type="radio" name="schedule" value="weekdays" checked> Weekdays</label>
+            <label><input type="radio" name="schedule" value="weekends"> Weekends</label>
+            <label><input type="radio" name="schedule" value="flexible"> Flexible</label>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="studentTerms" class="required">
+            <label for="studentTerms">I agree to the Terms of Service and Privacy Policy *</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="studentUpdates">
+            <label for="studentUpdates">I would like to receive course updates and educational content via email</label>
+          </div>
+
+          <!-- trust badge -->
+          <div class="trust-badge">
+            <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
+            <span>Your information is secure and will never be shared with third parties</span>
+          </div>
+
+          <button type="submit" class="btn-premium" id="studentSubmit">Secure enrollment →</button>
+          <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0; font-weight:600;">Sign in</a></p>
+        </form>
+      </div>
+
+      <!-- INSTRUCTOR FORM PANEL -->
+      <div id="instructorFormPanel" class="form-panel">
+        <div class="back-link" id="backFromInstructor"><i class="bi bi-arrow-left"></i> back to selection</div>
+        <h2 class="form-title">Start Your Journey as an Instructor</h2>
+        <p class="form-subtitle">Share your expertise. Complete the form below to apply.</p>
+        
+        <div id="instructorResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearInstructorProgress">✕ clear</button></div>
+
+        <form id="instructorForm" novalidate>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>First Name *</label>
+                <input type="text" class="required" id="instrFirstName">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Last Name *</label>
+                <input type="text" class="required" id="instrLastName">
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Experience Level</label>
-              <select id="studentExp">
-                <option>Select your experience...</option>
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-              </select>
+
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Email Address *</label>
+                <input type="email" class="required" id="instrEmail">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Phone Number</label>
+                <input type="tel" id="instrPhone">
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- adaptive hints (dynamic) -->
-        <div id="studentExpHint" class="adaptive-hint"></div>
-        <div id="studentEduHint" class="adaptive-hint"></div>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Password *</label>
+                <input type="password" class="required" id="instrPassword">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Confirm Password *</label>
+                <input type="password" class="required" id="instrConfirmPassword">
+              </div>
+            </div>
+          </div>
+          <div class="strength-meter"><div class="strength-fill" id="instrStrength" style="width:70%"></div></div>
 
-        <div class="input-group-premium">
-          <label>What are you hoping to learn and improve</label>
-          <textarea id="studentGoals" placeholder="Type your learning goals here..."></textarea>
-        </div>
-        <!-- dynamic field based on goals (example) -->
-        <div id="studentGoalSuggestion" class="dynamic-field"></div>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Education Level</label>
+                <select id="instrEdu">
+                  <option>Select your education level...</option>
+                  <option>Bachelor's</option><option>Master's</option><option>PhD</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group-premium">
+                <label>Experience Level</label>
+                <select id="instrExp">
+                  <option>Select your experience...</option>
+                  <option>Intermediate</option><option>Advanced</option><option>Expert</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- adaptive hints -->
+          <div id="instrExpHint" class="adaptive-hint"></div>
+          <div id="instrEduHint" class="adaptive-hint"></div>
 
-        <label>Preferred Learning Schedule</label>
-        <div class="radio-group">
-          <label><input type="radio" name="schedule" value="weekdays" checked> Weekdays</label>
-          <label><input type="radio" name="schedule" value="weekends"> Weekends</label>
-          <label><input type="radio" name="schedule" value="flexible"> Flexible</label>
-        </div>
+          <div class="input-group-premium">
+            <label>Why do you want to teach in our platform</label>
+            <textarea id="instrWhy" placeholder="Type your answers here..."></textarea>
+          </div>
+          <div id="instrWhySuggestion" class="dynamic-field"></div>
 
-        <div class="checkbox-group">
-          <input type="checkbox" id="studentTerms" class="required">
-          <label for="studentTerms">I agree to the Terms of Service and Privacy Policy *</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="studentUpdates">
-          <label for="studentUpdates">I would like to receive course updates and educational content via email</label>
-        </div>
+          <!-- file uploads (styled) -->
+          <div class="file-upload-area" id="uploadPassportArea">
+            <i class="bi bi-cloud-upload"></i>
+            <p>Upload Passport (click or drag)</p>
+            <div class="filename" id="passportFilename">No file chosen</div>
+            <input type="file" id="passportUpload" hidden>
+          </div>
 
-        <!-- trust badge -->
-        <div class="trust-badge">
-          <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
-          <span>Your information is secure and will never be shared with third parties</span>
-        </div>
+          <div class="file-upload-area mt-3" id="uploadCertArea">
+            <i class="bi bi-cloud-upload"></i>
+            <p>Upload Education Certificate</p>
+            <div class="filename" id="certFilename">No file chosen</div>
+            <input type="file" id="certUpload" hidden>
+          </div>
 
-        <button type="submit" class="btn-premium" id="studentSubmit">Secure enrollment →</button>
-        <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0; font-weight:600;">Sign in</a></p>
-      </form>
+          <label class="mt-4">Preferred Teaching Schedule</label>
+          <div class="radio-group">
+            <label><input type="radio" name="teachSchedule" value="weekdays" checked> Weekdays</label>
+            <label><input type="radio" name="teachSchedule" value="weekends"> Weekends</label>
+            <label><input type="radio" name="teachSchedule" value="flexible"> Flexible</label>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="instrTerms" class="required">
+            <label for="instrTerms">I agree to the Terms of Service and Privacy Policy *</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="instrUpdates">
+            <label for="instrUpdates">I would like to receive course updates and educational content via email</label>
+          </div>
+
+          <div class="trust-badge">
+            <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
+            <span>Your information is secure and will never be shared with third parties</span>
+          </div>
+
+          <button type="submit" class="btn-premium" id="instructorSubmit">Apply as instructor →</button>
+          <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0;">Sign in</a></p>
+        </form>
+      </div>
     </div>
+  </main>
 
-    <!-- INSTRUCTOR FORM PANEL -->
-    <div id="instructorFormPanel" class="form-panel">
-      <div class="back-link" id="backFromInstructor"><i class="bi bi-arrow-left"></i> back to selection</div>
-      <h2 class="form-title">Start Your Journey as an Instructor</h2>
-      <p class="form-subtitle">Share your expertise. Complete the form below to apply.</p>
-      
-      <div id="instructorResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearInstructorProgress">✕ clear</button></div>
-
-      <form id="instructorForm" novalidate>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>First Name *</label>
-              <input type="text" class="required" id="instrFirstName">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Last Name *</label>
-              <input type="text" class="required" id="instrLastName">
-            </div>
-          </div>
+  <!-- FOOTER (exact copy from paths.html) -->
+  <footer class="footer-fog">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="./img/Gemini_Generated_Image_4qm43u4qm43u4qm4-removebg-preview.png" style="height: 60px;" alt="SkillForge Hub logo">
+          <h3 style="color: white;">SkillForge Hub</h3>
+          <p>where focus meets expertise. since 2025.</p>
         </div>
-
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Email Address *</label>
-              <input type="email" class="required" id="instrEmail">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Phone Number</label>
-              <input type="tel" id="instrPhone">
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Password *</label>
-              <input type="password" class="required" id="instrPassword">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Confirm Password *</label>
-              <input type="password" class="required" id="instrConfirmPassword">
-            </div>
-          </div>
-        </div>
-        <div class="strength-meter"><div class="strength-fill" id="instrStrength" style="width:70%"></div></div>
-
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Education Level</label>
-              <select id="instrEdu">
-                <option>Select your education level...</option>
-                <option>Bachelor's</option><option>Master's</option><option>PhD</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="input-group-premium">
-              <label>Experience Level</label>
-              <select id="instrExp">
-                <option>Select your experience...</option>
-                <option>Intermediate</option><option>Advanced</option><option>Expert</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <!-- adaptive hints -->
-        <div id="instrExpHint" class="adaptive-hint"></div>
-        <div id="instrEduHint" class="adaptive-hint"></div>
-
-        <div class="input-group-premium">
-          <label>Why do you want to teach in our platform</label>
-          <textarea id="instrWhy" placeholder="Type your answers here..."></textarea>
-        </div>
-        <div id="instrWhySuggestion" class="dynamic-field"></div>
-
-        <!-- file uploads (styled) -->
-        <div class="file-upload-area" id="uploadPassportArea">
-          <i class="bi bi-cloud-upload"></i>
-          <p>Upload Passport (click or drag)</p>
-          <div class="filename" id="passportFilename">No file chosen</div>
-          <input type="file" id="passportUpload" hidden>
-        </div>
-
-        <div class="file-upload-area mt-3" id="uploadCertArea">
-          <i class="bi bi-cloud-upload"></i>
-          <p>Upload Education Certificate</p>
-          <div class="filename" id="certFilename">No file chosen</div>
-          <input type="file" id="certUpload" hidden>
-        </div>
-
-        <label class="mt-4">Preferred Teaching Schedule</label>
-        <div class="radio-group">
-          <label><input type="radio" name="teachSchedule" value="weekdays" checked> Weekdays</label>
-          <label><input type="radio" name="teachSchedule" value="weekends"> Weekends</label>
-          <label><input type="radio" name="teachSchedule" value="flexible"> Flexible</label>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="instrTerms" class="required">
-          <label for="instrTerms">I agree to the Terms of Service and Privacy Policy *</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="instrUpdates">
-          <label for="instrUpdates">I would like to receive course updates and educational content via email</label>
-        </div>
-
-        <div class="trust-badge">
-          <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
-          <span>Your information is secure and will never be shared with third parties</span>
-        </div>
-
-        <button type="submit" class="btn-premium" id="instructorSubmit">Apply as instructor →</button>
-        <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0;">Sign in</a></p>
-      </form>
+        <div class="col-md-2"><h5>explore</h5><ul class="list-unstyled"><li><a href="paths.html">Paths</a></li><li><a href="#">Courses</a></li><li><a href="#">Mentors</a></li></ul></div>
+        <div class="col-md-2"><h5>insight</h5><ul class="list-unstyled"><li><a href="#">Blog</a></li><li><a href="#">Research</a></li><li><a href="#">Events</a></li></ul></div>
+        <div class="col-md-4"><h5>join fog newsletter</h5><p>get weekly clarity</p><input class="form-control rounded-pill" placeholder="your.email@example.com"></div>
+      </div>
+      <hr style="border-color: #2b5f6b;">
+      <p class="text-center">© SkillForge Hub — crafted for depth, not distraction.</p>
     </div>
-  </div>
+  </footer>
 
-  <!-- AI Assistant toggle & panel -->
+  <!-- AI Assistant toggle & panel (from enroll-now) -->
   <div class="assistant-toggle" id="assistantToggle" aria-label="Open assistant" role="button" tabindex="0"><i class="bi bi-chat-dots"></i></div>
 
   <div class="assistant-panel" id="assistantPanel">
@@ -859,9 +1057,31 @@
     </div>
   </div>
 
+  <!-- scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     (function() {
-      // Existing code preserved, plus AI assistant enhancements
+      // AOS init (from paths)
+      AOS.init({ duration: 800, once: true });
+
+      // scroll orb functionality (from paths)
+      const orb = document.getElementById('orb-scroll');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) orb.classList.add('visible');
+        else orb.classList.remove('visible');
+      });
+      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // mobile toggle (from paths)
+      const toggle = document.getElementById('mobileToggle');
+      const links = document.getElementById('navLinks');
+      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => { if (links.classList.contains('show')) links.classList.remove('show'); });
+      });
+
+      // Original enroll-now functionality preserved below
       const selection = document.getElementById('selectionPanel');
       const studentPanel = document.getElementById('studentFormPanel');
       const instructorPanel = document.getElementById('instructorFormPanel');
@@ -878,7 +1098,7 @@
       const suggestionChips = document.querySelectorAll('.chip');
       const body = document.body;
 
-      let currentMode = 'student'; // default, changes based on selection
+      let currentMode = 'student';
 
       // ---------- PROGRESS MEMORY (localStorage) ----------
       const STORAGE_KEYS = { student: 'skillforge_student', instructor: 'skillforge_instructor' };
@@ -928,7 +1148,7 @@
         else banner.classList.add('hidden');
       }
 
-      // ---------- ADAPTIVE BEHAVIOR (existing) ----------
+      // ---------- ADAPTIVE BEHAVIOR ----------
       function setupAdaptive() {
         // student exp hint
         const studentExp = document.getElementById('studentExp');
@@ -1037,7 +1257,7 @@
         });
       }
 
-      // ---------- EXISTING FORM SUBMIT OVERRIDE ----------
+      // ---------- FORM SUBMIT OVERRIDE ----------
       function enhanceFormSubmit(formId, submitId, panelType) {
         const form = document.getElementById(formId);
         const btn = document.getElementById(submitId);
@@ -1203,20 +1423,113 @@
 
       setupAssistantFieldListeners();
 
-      // assistant awareness of mode
-      function updateAssistantMode() {
-        const welcomeMsg = currentMode === 'student' 
-          ? 'You are in student mode. I can help with course selection, goals, and enrollment.'
-          : 'You are in instructor mode. I can assist with your application, motivation, and documents.';
-        // optionally show a subtle message
-      }
-
       // close login modal
       document.getElementById('closeLoginBtn').addEventListener('click', () => {
         loginOverlay.classList.add('hidden');
         selection.classList.remove('hidden');
       });
     })();
+
+    // Add these storage keys at the top of your script
+const STORAGE_KEYS = {
+  student: 'skillforge_student',
+  instructor: 'skillforge_instructor',
+  auth: 'skillforge_logged_in_user'
+};
+
+// Replace your existing submit button event listener with this:
+document.getElementById('submitEnrollment').addEventListener('click', (e) => {
+  e.preventDefault();
+  
+  // Get all form values
+  const selectedRole = document.querySelector('.role-option.selected')?.dataset.role;
+  const firstName = document.getElementById('firstName')?.value;
+  const lastName = document.getElementById('lastName')?.value;
+  const email = document.getElementById('email')?.value;
+  const password = document.getElementById('password')?.value;
+  
+  // Create base user object
+  const userData = {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    role: selectedRole,
+    stats: {
+      streak: 0,
+      completed: 0
+    },
+    createdAt: new Date().toISOString()
+  };
+
+  // Add role-specific data
+  if (selectedRole === 'student') {
+    // Get student-specific fields
+    const experienceLevel = document.getElementById('experienceLevel')?.value;
+    const learningGoals = document.getElementById('learningGoals')?.value;
+    
+    // Get selected interests
+    const interests = [];
+    document.querySelectorAll('.interest-tag.selected').forEach(tag => {
+      interests.push(tag.dataset.interest);
+    });
+    
+    userData.goals = learningGoals;
+    userData.experience = experienceLevel;
+    userData.interests = interests;
+    userData.enrolledCourses = [];
+    
+    // Save to student storage
+    localStorage.setItem(STORAGE_KEYS.student, JSON.stringify(userData));
+    
+  } else if (selectedRole === 'instructor') {
+    // Get instructor-specific fields
+    const expertise = document.getElementById('expertise')?.value;
+    const instructorBio = document.getElementById('instructorBio')?.value;
+    const linkedin = document.getElementById('linkedin')?.value;
+    
+    userData.expertise = expertise;
+    userData.bio = instructorBio;
+    userData.linkedin = linkedin;
+    userData.coursesCreated = [];
+    userData.stats.students = 0;
+    userData.stats.rating = 0;
+    
+    // Save to instructor storage
+    localStorage.setItem(STORAGE_KEYS.instructor, JSON.stringify(userData));
+  }
+
+  // Save auth data (this is what profile page reads)
+  localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
+
+  // Show success message
+  const globalMsg = document.getElementById('globalMessage');
+  globalMsg.classList.remove('hidden');
+  globalMsg.className = 'global-message success';
+  globalMsg.innerHTML = '<i class="bi bi-check-circle-fill"></i> Account created successfully! Redirecting...';
+
+  // Redirect to profile page
+  setTimeout(() => {
+    window.location.href = 'user-profile.html';
+  }, 1500);
+});
+
+// Add this function to pre-fill form if user is already logged in
+function checkExistingSession() {
+  const existingUser = localStorage.getItem(STORAGE_KEYS.auth);
+  if (existingUser) {
+    const globalMsg = document.getElementById('globalMessage');
+    globalMsg.classList.remove('hidden');
+    globalMsg.className = 'global-message success';
+    globalMsg.innerHTML = '<i class="bi bi-check-circle-fill"></i> You are already logged in. Redirecting...';
+    
+    setTimeout(() => {
+      window.location.href = 'user-profile.html';
+    }, 1500);
+  }
+}
+
+// Call this when page loads
+checkExistingSession();
   </script>
 </body>
 </html>
