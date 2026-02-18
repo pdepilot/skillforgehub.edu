@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillForge · intelligent dashboard</title>
+  <!-- Bootstrap icons & grid -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- GLOBAL (calm, premium) ---------- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4fafd;
+      color: #1c2e3f;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(127,195,176,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+    :root {
+      --fog-deep: #0f2b3c;
+      --fog-mid: #2b5f6b;
+      --mist-green: #7fc3b0;
+      --accent-glow: #ffb347;
+      --soft-white: rgba(255,255,255,0.85);
+      --border-radius-card: 32px;
+      --border-radius-element: 24px;
+    }
+
+    /* ---------- DASHBOARD LAYOUT (preserved) ---------- */
+    .dashboard-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+    }
+
+    .sidebar {
+      flex: 0 0 280px;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 50px;
+      padding: 2rem 1.2rem;
+      box-shadow: 0 30px 50px -30px #1a4b5a, 0 0 0 1px rgba(127,195,176,0.2) inset;
+      border: 1px solid rgba(255,255,255,0.7);
+      height: fit-content;
+      transition: all 0.3s;
+    }
+    .sidebar .brand {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f2f3f;
+      padding-left: 0.5rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .brand i { color: #7fc3b0; font-size: 2rem; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      margin: 0.4rem 0;
+      border-radius: 50px;
+      color: #1a4b5a;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .nav-item i { font-size: 1.4rem; width: 28px; color: #2b5f6b; }
+    .nav-item.active {
+      background: #7fc3b0;
+      color: #0f2f3f;
+      box-shadow: 0 10px 20px -12px #1a4b5a;
+    }
+    .nav-item.active i { color: #0f2f3f; }
+    .nav-item:hover:not(.active) {
+      background: rgba(127,195,176,0.2);
+    }
+
+    .main-content {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    /* profile header (preserved) */
+    .profile-header {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(16px);
+      border-radius: 60px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 30px -20px #1a4b5a, 0 0 0 1px rgba(127,195,176,0.15) inset;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2rem;
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+    .avatar-large {
+      width: 110px;
+      height: 110px;
+      background: linear-gradient(145deg, #7fc3b0, #b3dfd2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.2rem;
+      color: #0f2f3f;
+      border: 4px solid white;
+      box-shadow: 0 15px 25px -15px #1a4b5a;
+    }
+    .profile-info h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .role-badge {
+      background: #7fc3b0;
+      border-radius: 40px;
+      padding: 0.3rem 1.2rem;
+      font-weight: 600;
+      display: inline-block;
+      margin: 0.4rem 0;
+    }
+    .edit-profile-btn {
+      background: white;
+      border: 2px solid #7fc3b0;
+      border-radius: 50px;
+      padding: 0.8rem 2rem;
+      font-weight: 600;
+      transition: 0.2s;
+      margin-left: auto;
+    }
+    .edit-profile-btn:hover {
+      background: #7fc3b0;
+      color: white;
+    }
+
+    /* section titles */
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 2rem 0 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .premium-card {
+      background: white;
+      border-radius: 40px;
+      padding: 1.5rem;
+      box-shadow: 0 15px 30px -20px #1f4b5a;
+      border: 1px solid rgba(127,195,176,0.2);
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+    .premium-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 25px 35px -22px #0f2f3f, 0 0 0 2px #7fc3b0 inset;
+    }
+    .progress { height: 10px; border-radius: 20px; background: #e3f0ec; margin: 1rem 0; }
+    .progress-bar { background: #7fc3b0; border-radius: 20px; }
+
+    .notif-badge {
+      background: #ffb347;
+      color: #0f2f3f;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+    }
+
+    /* edit modal */
+    .edit-modal {
+      background: white;
+      border-radius: 60px;
+      padding: 2rem;
+      box-shadow: 0 40px 60px -25px #0f2b3c;
+      border: 1px solid #7fc3b0;
+      max-width: 500px;
+      margin: 2rem auto;
+      position: fixed;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      z-index: 2000;
+      width: 90%;
+    }
+
+    .message-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(127,195,176,0.2);
+    }
+
+    /* new enhanced components */
+    .insight-card {
+      background: linear-gradient(135deg, rgba(127,195,176,0.1), rgba(255,255,255,0.5));
+      border-radius: 50px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #7fc3b0;
+      box-shadow: 0 10px 20px -15px #1a4b5a;
+      animation: softGlow 3s infinite alternate;
+    }
+    @keyframes softGlow {
+      0% { box-shadow: 0 0 0 0 rgba(127,195,176,0.3); }
+      100% { box-shadow: 0 0 15px 5px rgba(127,195,176,0.2); }
+    }
+    .insight-text { font-size: 1.3rem; font-weight: 500; }
+
+    .badge-icon {
+      width: 50px; height: 50px; border-radius: 50%;
+      background: #f0f9f5; display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; color: #7fc3b0; border: 2px solid #7fc3b0;
+      transition: 0.2s;
+    }
+    .badge-item:hover .badge-icon { transform: scale(1.1); background: #7fc3b0; color: white; }
+
+    .completion-ring { width: 70px; height: 70px; border-radius: 50%; background: conic-gradient(#7fc3b0 0deg 288deg, #e3f0ec 288deg 360deg); display: flex; align-items: center; justify-content: center; background-color: #e3f0ec; }
+    .ring-inner { width: 55px; height: 55px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+    .hidden { display: none !important; }
+    .text-accent { color: #7fc3b0; }
+
+    @media (max-width: 992px) {
+      .dashboard-container { flex-direction: column; }
+      .sidebar { flex: auto; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- SIDEBAR (preserved) -->
+    <aside class="sidebar">
+      <div class="brand"><i class="bi bi-shield-fill"></i> SkillForge</div>
+      <nav>
+        <div class="nav-item active" data-section="overview"><i class="bi bi-house-door"></i> Overview</div>
+        <div class="nav-item" data-section="courses"><i class="bi bi-book"></i> My Courses</div>
+        <div class="nav-item" data-section="messages"><i class="bi bi-chat-dots"></i> Messages <span class="notif-badge" id="messageBadge">3</span></div>
+        <div class="nav-item" data-section="certificates"><i class="bi bi-patch-check"></i> Certificates</div>
+        <div class="nav-item" data-section="payments"><i class="bi bi-credit-card"></i> Billing</div>
+        <div class="nav-item" data-section="settings"><i class="bi bi-gear"></i> Settings</div>
+        <div class="nav-item" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Log out</div>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+      <!-- profile header -->
+      <div class="profile-header" id="profileHeader">
+        <div class="avatar-large" id="avatar">👤</div>
+        <div class="profile-info">
+          <h2 id="displayName">Alex Morgan</h2>
+          <div><span class="role-badge" id="roleBadge">Student</span></div>
+          <div id="displayEmail">alex@example.com</div>
+        </div>
+        <button class="edit-profile-btn" id="openEditProfileBtn"><i class="bi bi-pencil-square"></i> Edit profile</button>
+      </div>
+
+      <!-- AI INSIGHTS PANEL (new) -->
+      <div class="insight-card" id="insightCard">
+        <i class="bi bi-stars fs-1" style="color:#7fc3b0;"></i>
+        <span class="insight-text" id="insightMessage">Analyzing your progress...</span>
+      </div>
+
+      <!-- sections (preserved structure, extended) -->
+      <div id="overviewSection" class="section-panel">
+        <div class="section-title"><i class="bi bi-graph-up"></i> Overview</div>
+        <div id="overviewContent"></div>
+
+        <!-- new widgets inside overview -->
+        <div class="section-title mt-5"><i class="bi bi-trophy"></i> Achievements & Badges</div>
+        <div id="achievementsGrid" class="card-grid"></div>
+
+        <div class="section-title mt-5"><i class="bi bi-clock-history"></i> Productivity Analytics</div>
+        <div id="analyticsContent" class="premium-card"></div>
+
+        <div class="section-title mt-5"><i class="bi bi-calendar-check"></i> Smart Reminders</div>
+        <div id="remindersContent" class="premium-card"></div>
+
+        <div class="section-title mt-5"><i class="bi bi-people"></i> Mentor Suggestions</div>
+        <div id="mentorGrid" class="card-grid"></div>
+
+        <div class="section-title mt-5"><i class="bi bi-lightbulb"></i> Recommended for you</div>
+        <div id="recommendationsGrid" class="card-grid"></div>
+      </div>
+
+      <!-- other panels (hidden by default) -->
+      <div id="coursesSection" class="section-panel hidden"><div class="section-title"><i class="bi bi-book"></i> My Courses</div><div id="coursesContent" class="card-grid"></div></div>
+      <div id="messagesSection" class="section-panel hidden"><div class="section-title"><i class="bi bi-chat-dots"></i> Messages</div><div id="messagesContent" class="premium-card"></div></div>
+      <div id="certificatesSection" class="section-panel hidden"><div class="section-title"><i class="bi bi-patch-check"></i> Certificates</div><div id="certificatesContent" class="card-grid"></div></div>
+      <div id="paymentsSection" class="section-panel hidden"><div class="section-title"><i class="bi bi-credit-card"></i> Billing & payments</div><div id="paymentsContent"></div></div>
+      <div id="settingsSection" class="section-panel hidden"><div class="section-title"><i class="bi bi-gear"></i> Account Settings</div><div class="premium-card" id="settingsCard"></div></div>
+    </main>
+  </div>
+
+  <!-- edit modal (preserved) -->
+  <div id="editProfileModal" class="edit-modal hidden">
+    <h3 class="mb-4">Edit profile</h3>
+    <form id="editProfileForm">
+      <div class="mb-3"><label>Full name</label><input type="text" class="form-control rounded-pill" id="editName"></div>
+      <div class="mb-3"><label>Email</label><input type="email" class="form-control rounded-pill" id="editEmail"></div>
+      <div class="mb-3" id="studentGoalField"><label>Learning goals</label><textarea class="form-control rounded-4" id="editGoals" rows="2"></textarea></div>
+      <div class="mb-3" id="instructorBioField"><label>Bio / expertise</label><textarea class="form-control rounded-4" id="editBio" rows="2"></textarea></div>
+      <div class="mb-3"><label>New password (optional)</label><input type="password" class="form-control rounded-pill" id="editPassword" placeholder="Leave blank"></div>
+      <div class="d-flex gap-3"><button type="submit" class="btn btn-premium flex-grow-1" style="background:#7fc3b0; border-radius:60px; padding:0.8rem;">Save changes</button><button type="button" class="btn btn-outline-secondary rounded-pill px-4" id="cancelEdit">Cancel</button></div>
+    </form>
+  </div>
+  <div id="modalBackdrop" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.2); backdrop-filter:blur(4px); z-index:1999;"></div>
+
+  <script>
+    (function() {
+      // ---------- DATA SIMULATION (extended) ----------
+      const STORAGE_KEYS = { student: 'skillforge_student', instructor: 'skillforge_instructor', auth: 'skillforge_logged_in_user' };
+      let currentUser = null, userRole = 'student';
+
+      function loadUser() {
+        const auth = localStorage.getItem(STORAGE_KEYS.auth);
+        if (auth) { try { currentUser = JSON.parse(auth); userRole = currentUser.role || 'student'; } catch { fallback(); } } 
+        else fallback();
+      }
+      function fallback() {
+        currentUser = { firstName: 'Alex', lastName: 'Morgan', email: 'alex.m@example.com', role: 'student', goals: 'Master frontend', bio: '', stats: { streak: 12, completed: 4 } };
+        userRole = 'student';
+        localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(currentUser));
+      }
+      loadUser();
+
+      // enrich from signup if exists
+      const studentData = localStorage.getItem(STORAGE_KEYS.student);
+      if (studentData) { try { const p = JSON.parse(studentData); currentUser = { firstName: p.studentFirstName || 'Alex', lastName: p.studentLastName || 'M', email: p.studentEmail || 'a@a.com', role: 'student', goals: p.studentGoals || 'Learning', bio: '' }; userRole='student'; } catch(e){} }
+      else { const instrData = localStorage.getItem(STORAGE_KEYS.instructor); if(instrData){ try{ const p=JSON.parse(instrData); currentUser={firstName:p.instrFirstName||'Jamie', lastName:p.instrLastName||'S', email:p.instrEmail||'j@j.com', role:'instructor', goals:'', bio:p.instrWhy||'Teaching'}; userRole='instructor'; }catch(e){} } }
+
+      // DOM elements
+      const navItems = document.querySelectorAll('.nav-item[data-section]');
+      const sections = { overview:document.getElementById('overviewSection'), courses:document.getElementById('coursesSection'), messages:document.getElementById('messagesSection'), certificates:document.getElementById('certificatesSection'), payments:document.getElementById('paymentsSection'), settings:document.getElementById('settingsSection') };
+      const displayName = document.getElementById('displayName'), roleBadge = document.getElementById('roleBadge'), displayEmail = document.getElementById('displayEmail'), avatar = document.getElementById('avatar');
+      const overviewContent = document.getElementById('overviewContent');
+      const coursesContent = document.getElementById('coursesContent');
+      const messagesContent = document.getElementById('messagesContent');
+      const certificatesContent = document.getElementById('certificatesContent');
+      const paymentsContent = document.getElementById('paymentsContent');
+      const settingsCard = document.getElementById('settingsCard');
+      const achievementsGrid = document.getElementById('achievementsGrid');
+      const analyticsContent = document.getElementById('analyticsContent');
+      const remindersContent = document.getElementById('remindersContent');
+      const mentorGrid = document.getElementById('mentorGrid');
+      const recommendationsGrid = document.getElementById('recommendationsGrid');
+      const insightMessage = document.getElementById('insightMessage');
+
+      function updateHeader() {
+        const full = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'User';
+        displayName.innerText = full; roleBadge.innerText = userRole==='student'?'Student':'Instructor'; displayEmail.innerText = currentUser.email||'user@example.com';
+        avatar.innerHTML = `<i class="bi bi-person-circle"></i>`; if(userRole==='instructor') avatar.innerHTML = `<i class="bi bi-easel"></i>`;
+      }
+
+      // AI insights rotating
+      const insights = [
+        "✨ You're making great progress — 2 lessons completed this week.",
+        "🏆 You're close to earning 'React Master' certificate!",
+        "📈 Your engagement has increased 30% this month.",
+        "💡 Students like you often continue with TypeScript next.",
+        "🎯 You've completed 75% of your current learning goal."
+      ];
+      let insightIndex = 0;
+      setInterval(() => { insightIndex = (insightIndex+1)%insights.length; insightMessage.innerText = insights[insightIndex]; }, 6000);
+
+      // render overview with all new widgets
+      function renderOverview() {
+        // overview stats
+        if(userRole==='student') overviewContent.innerHTML = `<div class="card-grid"><div class="premium-card"><i class="bi bi-lightning-charge fs-1 text-accent"></i><h4>Learning streak</h4><p class="fw-bold fs-3">${currentUser.stats?.streak||12} days</p></div><div class="premium-card"><i class="bi bi-trophy fs-1 text-accent"></i><h4>Courses completed</h4><p class="fw-bold fs-3">${currentUser.stats?.completed||4}</p></div><div class="premium-card"><i class="bi bi-clock-history fs-1 text-accent"></i><h4>Next milestone</h4><p>Advanced React</p></div></div>`;
+        else overviewContent.innerHTML = `<div class="card-grid"><div class="premium-card"><i class="bi bi-people fs-1 text-accent"></i><h4>Students</h4><p class="fw-bold fs-3">187</p></div><div class="premium-card"><i class="bi bi-star fs-1 text-accent"></i><h4>Rating</h4><p class="fw-bold fs-3">4.8</p></div><div class="premium-card"><i class="bi bi-play-circle fs-1 text-accent"></i><h4>Courses</h4><p class="fw-bold fs-3">3</p></div></div>`;
+
+        // achievements
+        let badges = '';
+        if(userRole==='student') badges = `
+          <div class="premium-card badge-item"><div class="badge-icon"><i class="bi bi-award"></i></div><h6>First Course</h6><small>Completed JS intro</small></div>
+          <div class="premium-card badge-item"><div class="badge-icon"><i class="bi bi-fire"></i></div><h6>14-day streak</h6><small>🔥🔥🔥</small><div class="progress mt-2"><div class="progress-bar" style="width:80%"></div></div></div>
+          <div class="premium-card badge-item"><div class="badge-icon"><i class="bi bi-cup-hot"></i></div><h6>Top learner</h6><small>Top 10% this month</small></div>
+        `; else badges = `
+          <div class="premium-card badge-item"><div class="badge-icon"><i class="bi bi-mic"></i></div><h6>Rising instructor</h6><small>50+ students</small></div>
+          <div class="premium-card badge-item"><div class="badge-icon"><i class="bi bi-star"></i></div><h6>5-star rating</h6><small>Consistent excellence</small></div>
+        `;
+        achievementsGrid.innerHTML = badges;
+
+        // productivity analytics
+        analyticsContent.innerHTML = `
+          <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+            <div><i class="bi bi-clock"></i> Weekly study: 4.2h <span class="text-accent">↑12%</span></div>
+            <div><i class="bi bi-bar-chart"></i> Lessons finished: 18</div>
+            <div><i class="bi bi-graph-up"></i> Engagement trend: <span class="text-accent">positive</span></div>
+          </div>
+          <div class="progress mt-3"><div class="progress-bar" style="width:68%"></div></div>
+          <p class="mt-2">68% toward weekly goal</p>
+        `;
+
+        // reminders
+        remindersContent.innerHTML = `
+          <div><i class="bi bi-exclamation-circle"></i> Continue "JavaScript Deep Dive" — 1 lesson left</div>
+          <div class="mt-2"><i class="bi bi-chat"></i> 2 messages from mentor</div>
+          <div class="mt-2"><i class="bi bi-calendar"></i> Study session scheduled tomorrow 4pm</div>
+          <button class="btn btn-sm btn-outline-success rounded-pill mt-3" id="dismissReminder">Dismiss</button>
+        `;
+        document.getElementById('dismissReminder')?.addEventListener('click', (e) => e.target.parentElement.style.opacity='0.5');
+
+        // mentor suggestions
+        mentorGrid.innerHTML = `
+          <div class="premium-card"><i class="bi bi-person-circle fs-1"></i><h5>Sarah Chen</h5><p>React expert · 98% match</p><button class="btn btn-sm btn-outline-primary rounded-pill">Connect</button></div>
+          <div class="premium-card"><i class="bi bi-person-circle fs-1"></i><h5>Marcus Lee</h5><p>UI/UX designer · 85% match</p><button class="btn btn-sm btn-outline-primary rounded-pill">Connect</button></div>
+        `;
+
+        // recommendations
+        recommendationsGrid.innerHTML = `
+          <div class="premium-card"><h5>TypeScript Deep Dive</h5><p class="text-muted">Recommended: you finished JS</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div></div>
+          <div class="premium-card"><h5>Next.js Masterclass</h5><p class="text-muted">Popular with your level</p></div>
+        `;
+      }
+
+      // render courses
+      function renderCourses() {
+        if(userRole==='student') coursesContent.innerHTML = `<div class="premium-card"><h5>JavaScript Mastery</h5><p>75%</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><button class="btn btn-sm btn-outline-success rounded-pill mt-3">Continue</button></div><div class="premium-card"><h5>React & Next.js</h5><p>42%</p><div class="progress"><div class="progress-bar" style="width:42%"></div></div><button class="btn btn-sm btn-outline-success rounded-pill mt-3">Continue</button></div>`;
+        else coursesContent.innerHTML = `<div class="premium-card"><h5>Intro to Python</h5><p>Enrolled: 64 · Rating 4.7</p><span class="badge bg-success">Published</span></div>`;
+      }
+      function renderMessages() {
+        messagesContent.innerHTML = userRole==='student' ? `<div class="message-item"><i class="bi bi-person-circle"></i><div><b>Mentor Sarah</b><p>Great progress!</p></div></div>` : `<div class="message-item"><i class="bi bi-person-circle"></i><div><b>Student Alex</b><p>Question about project</p></div></div>`;
+      }
+      function renderCertificates() {
+        certificatesContent.innerHTML = userRole==='student' ? `<div class="premium-card"><i class="bi bi-award fs-1"></i><h5>Frontend Bootcamp</h5><p>Issued Dec 2025</p><button class="btn btn-sm btn-outline-primary">Download</button></div>` : `<p>Certificates you awarded appear here.</p>`;
+      }
+      function renderPayments() {
+        paymentsContent.innerHTML = `
+          <div class="premium-card"><h5>Total paid</h5><p class="fs-2">$347.00</p></div>
+          <div class="premium-card"><h5>Courses purchased</h5><ul><li>JS Mastery - $129 (Jan 2026)</li><li>React Deep - $218 (Feb 2026)</li></ul></div>
+          <div class="premium-card"><h5>Invoices</h5><p>INV-001 · $129 · 2026-01-15 <button class="btn btn-sm btn-outline-secondary">PDF</button></p></div>
+        `;
+      }
+      function renderSettings() {
+        settingsCard.innerHTML = `<h5>Profile</h5><p>${currentUser.firstName} ${currentUser.lastName}</p><p>${currentUser.email}</p><button class="btn btn-premium rounded-pill" id="inlineEditBtn">Edit profile</button><hr><h6>Security</h6><p>Last login: today · <i class="bi bi-shield"></i> active</p>`;
+        document.getElementById('inlineEditBtn')?.addEventListener('click', openEditModal);
+      }
+
+      function showSection(section) {
+        Object.values(sections).forEach(s => s.classList.add('hidden')); sections[section]?.classList.remove('hidden');
+        navItems.forEach(n => n.classList.remove('active')); document.querySelector(`.nav-item[data-section="${section}"]`)?.classList.add('active');
+        if(section==='overview') renderOverview();
+        if(section==='courses') renderCourses();
+        if(section==='messages') renderMessages();
+        if(section==='certificates') renderCertificates();
+        if(section==='payments') renderPayments();
+        if(section==='settings') renderSettings();
+      }
+
+      navItems.forEach(item => item.addEventListener('click', () => showSection(item.getAttribute('data-section'))));
+
+      // edit modal (preserved)
+      const editModal = document.getElementById('editProfileModal'), backdrop = document.getElementById('modalBackdrop'), openEditBtn = document.getElementById('openEditProfileBtn'), cancelEdit = document.getElementById('cancelEdit'), editForm = document.getElementById('editProfileForm'), editName = document.getElementById('editName'), editEmail = document.getElementById('editEmail'), editGoals = document.getElementById('editGoals'), editBio = document.getElementById('editBio');
+      function openEditModal() {
+        editName.value = `${currentUser.firstName||''} ${currentUser.lastName||''}`.trim(); editEmail.value = currentUser.email||'';
+        if(userRole==='student') { document.getElementById('studentGoalField').classList.remove('hidden'); document.getElementById('instructorBioField').classList.add('hidden'); editGoals.value = currentUser.goals||''; }
+        else { document.getElementById('studentGoalField').classList.add('hidden'); document.getElementById('instructorBioField').classList.remove('hidden'); editBio.value = currentUser.bio||''; }
+        editModal.classList.remove('hidden'); backdrop.classList.remove('hidden');
+      }
+      openEditBtn.addEventListener('click', openEditModal);
+      cancelEdit.addEventListener('click', ()=>{ editModal.classList.add('hidden'); backdrop.classList.add('hidden'); });
+      backdrop.addEventListener('click', ()=>{ editModal.classList.add('hidden'); backdrop.classList.add('hidden'); });
+      editForm.addEventListener('submit', (e)=>{
+        e.preventDefault(); const parts = editName.value.trim().split(' '); currentUser.firstName = parts[0]||''; currentUser.lastName = parts.slice(1).join(' ')||''; currentUser.email = editEmail.value;
+        if(userRole==='student') currentUser.goals = editGoals.value; else currentUser.bio = editBio.value;
+        localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(currentUser)); updateHeader(); renderOverview(); renderSettings(); editModal.classList.add('hidden'); backdrop.classList.add('hidden');
+      });
+
+      // logout
+      document.getElementById('logoutBtn').addEventListener('click', ()=>{ localStorage.removeItem(STORAGE_KEYS.auth); window.location.href='sign-in.html'; });
+
+      // initial render
+      updateHeader(); renderOverview(); showSection('overview');
+      insightMessage.innerText = insights[0];
+    })();
+  </script>
+</body>
+</html>

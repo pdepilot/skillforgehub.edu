@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillForge Hub · enroll now</title>
+  <!-- Bootstrap icons & grid (lightweight) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- canvas confetti library (lightweight) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+  <style>
+    /* ---------- GLOBAL (calm, premium) ---------- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f9fc;
+      color: #1c2e3f;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+    :root {
+      --fog-deep: #0f2b3c;
+      --fog-mid: #2b5f6b;
+      --mist-green: #7fc3b0;
+      --accent-glow: #ffb347;
+      --soft-white: rgba(255,255,255,0.9);
+      --border-radius-card: 48px;
+      --border-radius-input: 40px;
+      --box-shadow-elegant: 0 40px 60px -30px rgba(15,43,60,0.3), 0 0 0 1px rgba(127,195,176,0.2) inset;
+    }
+
+    /* ---------- main container (glass backdrop) ---------- */
+    .enroll-container {
+      max-width: 1000px;
+      width: 100%;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 80px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 60px 80px -40px #0f2b3c, 0 0 0 2px rgba(255,255,255,0.6) inset;
+      border: 1px solid rgba(127,195,176,0.3);
+      transition: transform 0.3s ease;
+    }
+
+    /* shift slightly when assistant is open (optional, gives breathing) */
+    body.assistant-open .enroll-container {
+      transform: scale(0.98);
+    }
+
+    /* ---------- selection cards (initial) ---------- */
+    .selection-panel {
+      text-align: center;
+      transition: opacity 0.4s ease, transform 0.4s;
+    }
+    .selection-panel.hidden {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+      display: none;
+    }
+    .selection-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin: 3rem 0 1rem;
+    }
+    .selection-card {
+      background: white;
+      border-radius: 70px;
+      padding: 2.5rem 2rem;
+      flex: 1 1 280px;
+      max-width: 350px;
+      cursor: pointer;
+      box-shadow: 0 30px 40px -20px rgba(0,0,0,0.2);
+      border: 2px solid transparent;
+      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1);
+      text-align: center;
+    }
+    .selection-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 50px 70px -25px #0f2b3c, 0 0 0 3px #7fc3b0;
+    }
+    .selection-card i {
+      font-size: 3.5rem;
+      color: #7fc3b0;
+      background: rgba(127,195,176,0.1);
+      padding: 1rem;
+      border-radius: 60px;
+      margin-bottom: 1.5rem;
+    }
+    .selection-card h3 { font-size: 2rem; font-weight: 700; }
+    .selection-card p { color: #2b5f6b; }
+
+    /* ---------- form panels (hidden initially) ---------- */
+    .form-panel {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .form-panel.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ---------- premium form styling ---------- */
+    .form-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #0f2b3c;
+      margin-bottom: 0.25rem;
+    }
+    .form-subtitle {
+      color: #2b5f6b;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+    .input-group-premium {
+      margin-bottom: 1.8rem;
+      position: relative;
+    }
+    .input-group-premium label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #0f2b3c;
+    }
+    .input-group-premium input, 
+    .input-group-premium select, 
+    .input-group-premium textarea {
+      width: 100%;
+      padding: 1rem 1.8rem;
+      border: 2px solid rgba(127,195,176,0.3);
+      border-radius: 60px;
+      font-size: 1rem;
+      background: white;
+      transition: 0.2s;
+    }
+    .input-group-premium input:focus, 
+    .input-group-premium select:focus, 
+    .input-group-premium textarea:focus {
+      outline: none;
+      border-color: #7fc3b0;
+      box-shadow: 0 0 0 5px rgba(127,195,176,0.2);
+    }
+    .input-group-premium textarea { border-radius: 40px; min-height: 120px; }
+
+    /* file upload styling (drag-drop look) */
+    .file-upload-area {
+      border: 2px dashed #7fc3b0;
+      border-radius: 60px;
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(127,195,176,0.05);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .file-upload-area:hover { background: rgba(127,195,176,0.1); }
+    .file-upload-area i { font-size: 2rem; color: #7fc3b0; }
+    .file-upload-area .filename { color: #2b5f6b; margin-top: 0.5rem; }
+
+    /* checkbox & radio groups */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 1.5rem; height: 1.5rem; accent-color: #7fc3b0;
+    }
+    .radio-group {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 400;
+    }
+
+    /* password strength (mock) */
+    .strength-meter {
+      height: 6px; background: #e5f0f5; border-radius: 10px; margin: 0.5rem 0 1rem;
+    }
+    .strength-fill {
+      height: 100%; width: 0%; background: #ffb347; border-radius: 10px;
+      transition: width 0.3s;
+    }
+
+    /* trust badge */
+    .trust-badge {
+      background: rgba(127,195,176,0.1);
+      border-radius: 60px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0 1rem;
+    }
+
+    /* buttons */
+    .btn-premium {
+      background: #7fc3b0;
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 60px;
+      font-weight: 700;
+      color: #0f2b3c;
+      width: 100%;
+      font-size: 1.3rem;
+      transition: 0.2s;
+      box-shadow: 0 15px 25px -12px #7fc3b0;
+    }
+    .btn-premium:hover { background: #ffb347; transform: scale(1.02); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #2b5f6b;
+      text-decoration: none;
+      margin-bottom: 2rem;
+      cursor: pointer;
+    }
+
+    /* success animation */
+    .success-check {
+      animation: pop 0.4s ease;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* adaptive hint (fade/slide) */
+    .adaptive-hint, .dynamic-field {
+      overflow: hidden;
+      transition: opacity 0.3s ease, max-height 0.4s ease, margin 0.3s ease;
+      max-height: 0;
+      opacity: 0;
+      margin: 0;
+    }
+    .adaptive-hint.show, .dynamic-field.show {
+      max-height: 150px;
+      opacity: 1;
+      margin: 0.5rem 0 1.5rem;
+    }
+    .dynamic-field.show {
+      max-height: 300px;
+    }
+    .hint-badge {
+      background: #eaf3f0;
+      border-radius: 40px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.95rem;
+      color: #0f2b3c;
+      border-left: 6px solid #7fc3b0;
+    }
+
+    /* resume banner */
+    .resume-banner {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(4px);
+      border-radius: 60px;
+      padding: 0.8rem 1.8rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #7fc3b0;
+      font-weight: 500;
+      animation: slideDown 0.3s;
+    }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .clear-resume {
+      background: none;
+      border: 2px solid #7fc3b0;
+      border-radius: 40px;
+      padding: 0.3rem 1rem;
+      color: #0f2b3c;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .clear-resume:hover { background: #7fc3b0; color: white; }
+
+    /* login modal (soft overlay) */
+    .login-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,43,60,0.2);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+    .login-card {
+      background: white;
+      border-radius: 80px;
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 60px 80px -30px #0f2b3c;
+      text-align: center;
+    }
+    .login-card h2 { font-weight: 700; color: #0f2b3c; }
+    .login-email-display {
+      background: #f0f9f5;
+      border-radius: 60px;
+      padding: 1rem;
+      font-weight: 500;
+      margin: 1.5rem 0;
+    }
+    .btn-login-close {
+      background: #7fc3b0;
+      border: none;
+      border-radius: 60px;
+      padding: 1rem;
+      width: 100%;
+      font-weight: 700;
+    }
+
+    /* ---------- AI ASSISTANT PANEL (premium, glass) ---------- */
+    .assistant-toggle {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #7fc3b0;
+      border: 3px solid white;
+      box-shadow: 0 10px 25px rgba(15,43,60,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #0f2b3c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1001;
+      animation: softPulse 2s infinite;
+    }
+    .assistant-toggle:hover {
+      transform: scale(1.1);
+      background: #ffb347;
+    }
+    @keyframes softPulse {
+      0% { box-shadow: 0 0 0 0 rgba(127,195,176,0.5); }
+      70% { box-shadow: 0 0 0 15px rgba(127,195,176,0); }
+      100% { box-shadow: 0 0 0 0 rgba(127,195,176,0); }
+    }
+
+    .assistant-panel {
+      position: fixed;
+      top: 0;
+      right: -420px; /* hidden */
+      width: 380px;
+      height: 100vh;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: -10px 0 40px -15px #0f2b3c;
+      border-left: 2px solid rgba(127,195,176,0.4);
+      padding: 2rem 1.5rem;
+      transition: right 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+      z-index: 1002;
+      display: flex;
+      flex-direction: column;
+      border-radius: 40px 0 0 40px;
+    }
+    .assistant-panel.open {
+      right: 0;
+    }
+
+    .assistant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+    }
+    .assistant-header h3 {
+      font-weight: 700;
+      color: #0f2b3c;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .assistant-header i {
+      color: #7fc3b0;
+      font-size: 2rem;
+    }
+    .close-assistant {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #2b5f6b;
+      cursor: pointer;
+      padding: 0 0.5rem;
+    }
+
+    .assistant-chat {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-right: 0.3rem;
+      margin-bottom: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 0.8rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      animation: messageAppear 0.3s ease;
+    }
+    @keyframes messageAppear {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .assistant-message {
+      align-self: flex-start;
+      background: #eaf3f0;
+      border-bottom-left-radius: 10px;
+      color: #0f2b3c;
+    }
+    .user-message {
+      align-self: flex-end;
+      background: #7fc3b0;
+      color: white;
+      border-bottom-right-radius: 10px;
+    }
+    .typing-indicator {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.8rem 1.2rem;
+      background: #eaf3f0;
+      border-radius: 30px;
+      width: fit-content;
+    }
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: #2b5f6b;
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-8px); }
+    }
+
+    .suggestions-area {
+      background: rgba(127,195,176,0.1);
+      border-radius: 30px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .suggestions-title {
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      color: #0f2b3c;
+    }
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .chip {
+      background: white;
+      border: 1.5px solid #7fc3b0;
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #0f2b3c;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .chip:hover {
+      background: #7fc3b0;
+      color: white;
+    }
+
+    .assistant-input-area {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .assistant-input-area input {
+      flex: 1;
+      border: 2px solid rgba(127,195,176,0.4);
+      border-radius: 50px;
+      padding: 0.8rem 1.2rem;
+      font-family: 'Outfit', sans-serif;
+    }
+    .assistant-input-area button {
+      background: #7fc3b0;
+      border: none;
+      border-radius: 50px;
+      width: 50px;
+      height: 50px;
+      font-size: 1.3rem;
+      color: #0f2b3c;
+      transition: 0.2s;
+    }
+    .assistant-input-area button:hover {
+      background: #ffb347;
+    }
+
+    /* focus highlight effect */
+    .field-highlight {
+      outline: 4px solid rgba(127,195,176,0.4);
+      transition: outline 0.2s;
+    }
+
+    .hidden { display: none; }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .enroll-container { padding: 1.5rem; border-radius: 50px; }
+      .selection-card { padding: 1.8rem; }
+      .assistant-panel { width: 320px; right: -340px; }
+      .assistant-toggle { bottom: 1rem; right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="enroll-container">
+    <!-- SELECTION PANEL (initial) -->
+    <div id="selectionPanel" class="selection-panel">
+      <h1 class="display-4 fw-bold" style="color: #0f2b3c;">welcome.</h1>
+      <p class="fs-4" style="color: #2b5f6b;">choose your path to join SkillForge Hub</p>
+      <div class="selection-cards">
+        <!-- student card -->
+        <div class="selection-card" id="selectStudent">
+          <i class="bi bi-mortarboard"></i>
+          <h3>Student</h3>
+          <p>Access courses, mentors, and a calm learning community.</p>
+        </div>
+        <!-- instructor card -->
+        <div class="selection-card" id="selectInstructor">
+          <i class="bi bi-easel"></i>
+          <h3>Instructor</h3>
+          <p>Share your expertise, guide learners, and grow your impact.</p>
+        </div>
+      </div>
+      <p class="mt-4 text-muted"><i class="bi bi-shield-lock"></i> your information is secure and never shared</p>
+    </div>
+
+    <!-- STUDENT FORM PANEL (hidden initially) -->
+    <div id="studentFormPanel" class="form-panel">
+      <div class="back-link" id="backFromStudent"><i class="bi bi-arrow-left"></i> back to selection</div>
+      <h2 class="form-title">Enroll in Your Dream Course</h2>
+      <p class="form-subtitle">Take the next step in your educational journey. Complete the form below to secure your spot.</p>
+      
+      <!-- resume banner placeholder (dynamic) -->
+      <div id="studentResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearStudentProgress">✕ clear</button></div>
+
+      <form id="studentForm" novalidate>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>First Name *</label>
+              <input type="text" class="required" id="studentFirstName" placeholder="Alex">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Last Name *</label>
+              <input type="text" class="required" id="studentLastName" placeholder="Morgan">
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Email Address *</label>
+              <input type="email" class="required" id="studentEmail" placeholder="alex@example.com">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Phone Number</label>
+              <input type="tel" id="studentPhone" placeholder="+1 (555) 000-9999">
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Password *</label>
+              <input type="password" class="required" id="studentPassword" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Confirm Password *</label>
+              <input type="password" class="required" id="studentConfirmPassword" placeholder="••••••••">
+            </div>
+          </div>
+        </div>
+        <!-- password strength mock -->
+        <div class="strength-meter"><div class="strength-fill" id="studentStrength" style="width:60%"></div></div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Education Level</label>
+              <select id="studentEdu">
+                <option>Select your education level...</option>
+                <option>High School</option>
+                <option>Bachelor's</option>
+                <option>Master's</option>
+                <option>PhD</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Experience Level</label>
+              <select id="studentExp">
+                <option>Select your experience...</option>
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- adaptive hints (dynamic) -->
+        <div id="studentExpHint" class="adaptive-hint"></div>
+        <div id="studentEduHint" class="adaptive-hint"></div>
+
+        <div class="input-group-premium">
+          <label>What are you hoping to learn and improve</label>
+          <textarea id="studentGoals" placeholder="Type your learning goals here..."></textarea>
+        </div>
+        <!-- dynamic field based on goals (example) -->
+        <div id="studentGoalSuggestion" class="dynamic-field"></div>
+
+        <label>Preferred Learning Schedule</label>
+        <div class="radio-group">
+          <label><input type="radio" name="schedule" value="weekdays" checked> Weekdays</label>
+          <label><input type="radio" name="schedule" value="weekends"> Weekends</label>
+          <label><input type="radio" name="schedule" value="flexible"> Flexible</label>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="studentTerms" class="required">
+          <label for="studentTerms">I agree to the Terms of Service and Privacy Policy *</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="studentUpdates">
+          <label for="studentUpdates">I would like to receive course updates and educational content via email</label>
+        </div>
+
+        <!-- trust badge -->
+        <div class="trust-badge">
+          <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
+          <span>Your information is secure and will never be shared with third parties</span>
+        </div>
+
+        <button type="submit" class="btn-premium" id="studentSubmit">Secure enrollment →</button>
+        <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0; font-weight:600;">Sign in</a></p>
+      </form>
+    </div>
+
+    <!-- INSTRUCTOR FORM PANEL -->
+    <div id="instructorFormPanel" class="form-panel">
+      <div class="back-link" id="backFromInstructor"><i class="bi bi-arrow-left"></i> back to selection</div>
+      <h2 class="form-title">Start Your Journey as an Instructor</h2>
+      <p class="form-subtitle">Share your expertise. Complete the form below to apply.</p>
+      
+      <div id="instructorResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearInstructorProgress">✕ clear</button></div>
+
+      <form id="instructorForm" novalidate>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>First Name *</label>
+              <input type="text" class="required" id="instrFirstName">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Last Name *</label>
+              <input type="text" class="required" id="instrLastName">
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Email Address *</label>
+              <input type="email" class="required" id="instrEmail">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Phone Number</label>
+              <input type="tel" id="instrPhone">
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Password *</label>
+              <input type="password" class="required" id="instrPassword">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Confirm Password *</label>
+              <input type="password" class="required" id="instrConfirmPassword">
+            </div>
+          </div>
+        </div>
+        <div class="strength-meter"><div class="strength-fill" id="instrStrength" style="width:70%"></div></div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Education Level</label>
+              <select id="instrEdu">
+                <option>Select your education level...</option>
+                <option>Bachelor's</option><option>Master's</option><option>PhD</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group-premium">
+              <label>Experience Level</label>
+              <select id="instrExp">
+                <option>Select your experience...</option>
+                <option>Intermediate</option><option>Advanced</option><option>Expert</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- adaptive hints -->
+        <div id="instrExpHint" class="adaptive-hint"></div>
+        <div id="instrEduHint" class="adaptive-hint"></div>
+
+        <div class="input-group-premium">
+          <label>Why do you want to teach in our platform</label>
+          <textarea id="instrWhy" placeholder="Type your answers here..."></textarea>
+        </div>
+        <div id="instrWhySuggestion" class="dynamic-field"></div>
+
+        <!-- file uploads (styled) -->
+        <div class="file-upload-area" id="uploadPassportArea">
+          <i class="bi bi-cloud-upload"></i>
+          <p>Upload Passport (click or drag)</p>
+          <div class="filename" id="passportFilename">No file chosen</div>
+          <input type="file" id="passportUpload" hidden>
+        </div>
+
+        <div class="file-upload-area mt-3" id="uploadCertArea">
+          <i class="bi bi-cloud-upload"></i>
+          <p>Upload Education Certificate</p>
+          <div class="filename" id="certFilename">No file chosen</div>
+          <input type="file" id="certUpload" hidden>
+        </div>
+
+        <label class="mt-4">Preferred Teaching Schedule</label>
+        <div class="radio-group">
+          <label><input type="radio" name="teachSchedule" value="weekdays" checked> Weekdays</label>
+          <label><input type="radio" name="teachSchedule" value="weekends"> Weekends</label>
+          <label><input type="radio" name="teachSchedule" value="flexible"> Flexible</label>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="instrTerms" class="required">
+          <label for="instrTerms">I agree to the Terms of Service and Privacy Policy *</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="instrUpdates">
+          <label for="instrUpdates">I would like to receive course updates and educational content via email</label>
+        </div>
+
+        <div class="trust-badge">
+          <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
+          <span>Your information is secure and will never be shared with third parties</span>
+        </div>
+
+        <button type="submit" class="btn-premium" id="instructorSubmit">Apply as instructor →</button>
+        <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0;">Sign in</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- AI Assistant toggle & panel -->
+  <div class="assistant-toggle" id="assistantToggle" aria-label="Open assistant" role="button" tabindex="0"><i class="bi bi-chat-dots"></i></div>
+
+  <div class="assistant-panel" id="assistantPanel">
+    <div class="assistant-header">
+      <h3><i class="bi bi-robot"></i> SkillGuide AI</h3>
+      <button class="close-assistant" id="closeAssistant" aria-label="Close assistant"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="assistant-chat" id="assistantChat">
+      <!-- messages injected via js -->
+      <div class="message assistant-message">👋 Hi there! I'm your onboarding assistant. Feel free to ask me anything or click suggestions.</div>
+    </div>
+
+    <div class="suggestions-area" id="suggestionsArea">
+      <div class="suggestions-title">✨ Suggestions</div>
+      <div class="suggestion-chips" id="suggestionChips">
+        <span class="chip" data-suggestion="What should I write for goals?">Goals ideas</span>
+        <span class="chip" data-suggestion="How to create a strong password?">Strong password</span>
+        <span class="chip" data-suggestion="Why become an instructor?">Teach benefits</span>
+      </div>
+    </div>
+
+    <div class="assistant-input-area">
+      <input type="text" id="assistantInput" placeholder="Ask me anything...">
+      <button id="sendAssistantMsg"><i class="bi bi-send"></i></button>
+    </div>
+  </div>
+
+  <!-- login overlay (hidden initially) -->
+  <div id="loginOverlay" class="login-overlay hidden">
+    <div class="login-card">
+      <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #7fc3b0;"></i>
+      <h2 class="mt-3">Welcome aboard!</h2>
+      <p>Your account has been created. Please log in.</p>
+      <div class="login-email-display" id="loginEmailDisplay"></div>
+      <button class="btn-login-close" id="closeLoginBtn">Continue to login</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Existing code preserved, plus AI assistant enhancements
+      const selection = document.getElementById('selectionPanel');
+      const studentPanel = document.getElementById('studentFormPanel');
+      const instructorPanel = document.getElementById('instructorFormPanel');
+      const loginOverlay = document.getElementById('loginOverlay');
+      const loginEmailDisplay = document.getElementById('loginEmailDisplay');
+
+      // Assistant elements
+      const assistantToggle = document.getElementById('assistantToggle');
+      const assistantPanel = document.getElementById('assistantPanel');
+      const closeAssistant = document.getElementById('closeAssistant');
+      const assistantChat = document.getElementById('assistantChat');
+      const assistantInput = document.getElementById('assistantInput');
+      const sendBtn = document.getElementById('sendAssistantMsg');
+      const suggestionChips = document.querySelectorAll('.chip');
+      const body = document.body;
+
+      let currentMode = 'student'; // default, changes based on selection
+
+      // ---------- PROGRESS MEMORY (localStorage) ----------
+      const STORAGE_KEYS = { student: 'skillforge_student', instructor: 'skillforge_instructor' };
+
+      function saveProgress(panelType) {
+        const form = panelType === 'student' ? document.getElementById('studentForm') : document.getElementById('instructorForm');
+        if (!form) return;
+        const data = {};
+        form.querySelectorAll('input, select, textarea').forEach(el => {
+          if (el.type === 'radio') {
+            if (el.checked) data[el.name] = el.value;
+          } else if (el.type === 'checkbox') {
+            data[el.id] = el.checked ? 'true' : 'false';
+          } else {
+            data[el.id] = el.value;
+          }
+        });
+        localStorage.setItem(STORAGE_KEYS[panelType], JSON.stringify(data));
+      }
+
+      function restoreProgress(panelType) {
+        const saved = localStorage.getItem(STORAGE_KEYS[panelType]);
+        if (!saved) return false;
+        try {
+          const data = JSON.parse(saved);
+          const form = panelType === 'student' ? document.getElementById('studentForm') : document.getElementById('instructorForm');
+          form.querySelectorAll('input, select, textarea').forEach(el => {
+            if (el.type === 'radio' && data[el.name] === el.value) el.checked = true;
+            else if (el.type === 'checkbox') el.checked = (data[el.id] === 'true');
+            else if (data[el.id] !== undefined) el.value = data[el.id];
+          });
+          return true;
+        } catch { return false; }
+      }
+
+      function clearProgress(panelType) {
+        localStorage.removeItem(STORAGE_KEYS[panelType]);
+        const form = panelType === 'student' ? document.getElementById('studentForm') : document.getElementById('instructorForm');
+        form.reset();
+      }
+
+      function updateResumeBanner(panelType) {
+        const bannerId = panelType === 'student' ? 'studentResumeBanner' : 'instructorResumeBanner';
+        const banner = document.getElementById(bannerId);
+        const hasSaved = localStorage.getItem(STORAGE_KEYS[panelType]) !== null;
+        if (hasSaved) banner.classList.remove('hidden');
+        else banner.classList.add('hidden');
+      }
+
+      // ---------- ADAPTIVE BEHAVIOR (existing) ----------
+      function setupAdaptive() {
+        // student exp hint
+        const studentExp = document.getElementById('studentExp');
+        const studentExpHint = document.getElementById('studentExpHint');
+        studentExp?.addEventListener('change', () => {
+          if (studentExp.value === 'Beginner') studentExpHint.innerHTML = '<div class="hint-badge"><i class="bi bi-lightbulb"></i> Start with foundational courses — we recommend "Programming 101"</div>';
+          else if (studentExp.value === 'Advanced') studentExpHint.innerHTML = '<div class="hint-badge"><i class="bi bi-stars"></i> Check our specialization tracks for experts</div>';
+          else studentExpHint.innerHTML = '';
+          studentExpHint.classList.toggle('show', !!studentExpHint.innerHTML);
+        });
+
+        const studentEdu = document.getElementById('studentEdu');
+        const studentEduHint = document.getElementById('studentEduHint');
+        studentEdu?.addEventListener('change', () => {
+          if (studentEdu.value.includes('Master') || studentEdu.value.includes('PhD')) studentEduHint.innerHTML = '<div class="hint-badge">📘 Consider our research assistant opportunities</div>';
+          else studentEduHint.innerHTML = '';
+          studentEduHint.classList.toggle('show', !!studentEduHint.innerHTML);
+        });
+
+        const studentGoals = document.getElementById('studentGoals');
+        const goalSuggestion = document.getElementById('studentGoalSuggestion');
+        studentGoals?.addEventListener('input', () => {
+          const txt = studentGoals.value.toLowerCase();
+          if (txt.includes('python') || txt.includes('coding')) goalSuggestion.innerHTML = '<div class="hint-badge">🐍 We have a Python bootcamp starting next week!</div>';
+          else if (txt.includes('design')) goalSuggestion.innerHTML = '<div class="hint-badge">🎨 UI/UX track with live mentor sessions available</div>';
+          else goalSuggestion.innerHTML = '';
+          goalSuggestion.classList.toggle('show', !!goalSuggestion.innerHTML);
+        });
+
+        const instrExp = document.getElementById('instrExp');
+        const instrExpHint = document.getElementById('instrExpHint');
+        instrExp?.addEventListener('change', () => {
+          if (instrExp.value === 'Intermediate') instrExpHint.innerHTML = '<div class="hint-badge">🧑‍🏫 Great! Consider co-teaching with a senior instructor</div>';
+          else if (instrExp.value === 'Expert') instrExpHint.innerHTML = '<div class="hint-badge">🏆 You can lead a masterclass — we\'ll feature your profile</div>';
+          else instrExpHint.innerHTML = '';
+          instrExpHint.classList.toggle('show', !!instrExpHint.innerHTML);
+        });
+
+        const instrEdu = document.getElementById('instrEdu');
+        const instrEduHint = document.getElementById('instrEduHint');
+        instrEdu?.addEventListener('change', () => {
+          if (instrEdu.value === 'PhD') instrEduHint.innerHTML = '<div class="hint-badge">🔬 PhD holders often mentor capstone projects</div>';
+          else instrEduHint.innerHTML = '';
+          instrEduHint.classList.toggle('show', !!instrEduHint.innerHTML);
+        });
+
+        const instrWhy = document.getElementById('instrWhy');
+        const whySuggestion = document.getElementById('instrWhySuggestion');
+        instrWhy?.addEventListener('input', () => {
+          const txt = instrWhy.value.toLowerCase();
+          if (txt.includes('passion') || txt.includes('love')) whySuggestion.innerHTML = '<div class="hint-badge">❤️ We value passion — check our "inspire" grant</div>';
+          else if (txt.includes('career')) whySuggestion.innerHTML = '<div class="hint-badge">📈 Teaching accelerates career growth — we support you</div>';
+          else whySuggestion.innerHTML = '';
+          whySuggestion.classList.toggle('show', !!whySuggestion.innerHTML);
+        });
+      }
+
+      // ---------- ASSISTANT CORE FUNCTIONS ----------
+      function addMessage(text, sender = 'assistant') {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender === 'assistant' ? 'assistant-message' : 'user-message');
+        msgDiv.textContent = text;
+        assistantChat.appendChild(msgDiv);
+        assistantChat.scrollTop = assistantChat.scrollHeight;
+      }
+
+      function showTypingThenMessage(message, delay = 1200) {
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('typing-indicator');
+        typingDiv.innerHTML = '<span></span><span></span><span></span>';
+        assistantChat.appendChild(typingDiv);
+        assistantChat.scrollTop = assistantChat.scrollHeight;
+
+        setTimeout(() => {
+          assistantChat.removeChild(typingDiv);
+          addMessage(message, 'assistant');
+        }, delay);
+      }
+
+      function handleSuggestion(text) {
+        addMessage(text, 'user');
+        if (text.includes('goals')) showTypingThenMessage('Think about skills you want to build or projects you dream of. For example: "master React" or "launch my startup".');
+        else if (text.includes('password')) showTypingThenMessage('Use at least 8 characters, mix letters, numbers, and symbols. Avoid common words.');
+        else if (text.includes('instructor')) showTypingThenMessage('Sharing knowledge is rewarding! You can inspire others and grow your network.');
+        else showTypingThenMessage('Got it! Let me know if you need more help.');
+      }
+
+      // field focus assistant tips
+      function setupAssistantFieldListeners() {
+        const fields = [
+          { id: 'studentFirstName', tip: 'Your first name as it appears on official ID.' },
+          { id: 'studentEmail', tip: 'We’ll send course updates and login info here.' },
+          { id: 'studentPassword', tip: 'Make it strong: 8+ chars, with numbers and symbols.' },
+          { id: 'studentGoals', tip: 'Be specific! Example: "learn data science for my job".' },
+          { id: 'instrWhy', tip: 'Tell us what excites you about teaching. Passion shines through!' }
+        ];
+        fields.forEach(f => {
+          const el = document.getElementById(f.id);
+          if (el) {
+            el.addEventListener('focus', () => {
+              if (assistantPanel.classList.contains('open')) {
+                // optionally show quick tip in chat
+              }
+            });
+          }
+        });
+      }
+
+      // ---------- EXISTING FORM SUBMIT OVERRIDE ----------
+      function enhanceFormSubmit(formId, submitId, panelType) {
+        const form = document.getElementById(formId);
+        const btn = document.getElementById(submitId);
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const required = form.querySelectorAll('.required');
+          let valid = true;
+          required.forEach(field => {
+            if (!field.value.trim()) { field.style.borderColor = '#ff4444'; valid = false; }
+            else field.style.borderColor = '';
+          });
+          if (formId === 'studentForm') {
+            const pwd = document.getElementById('studentPassword').value;
+            const cpwd = document.getElementById('studentConfirmPassword').value;
+            if (pwd !== cpwd) { alert('Passwords do not match'); valid = false; }
+          }
+          if (formId === 'instructorForm') {
+            const pwd = document.getElementById('instrPassword').value;
+            const cpwd = document.getElementById('instrConfirmPassword').value;
+            if (pwd !== cpwd) { alert('Passwords do not match'); valid = false; }
+          }
+          if (!valid) return;
+
+          btn.innerText = '⏳ processing...';
+          btn.disabled = true;
+
+          confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 }, startVelocity: 20, colors: ['#7fc3b0', '#ffb347'] });
+          setTimeout(() => confetti({ particleCount: 40, spread: 40, origin: { y: 0.5, x: 0.2 }, colors: ['#0f2b3c'] }), 150);
+
+          localStorage.removeItem(STORAGE_KEYS[panelType]);
+
+          const emailField = document.getElementById(panelType === 'student' ? 'studentEmail' : 'instrEmail');
+          const email = emailField ? emailField.value : '';
+
+          setTimeout(() => {
+            btn.innerText = panelType === 'student' ? 'Secure enrollment →' : 'Apply as instructor →';
+            btn.disabled = false;
+            studentPanel.classList.remove('active');
+            instructorPanel.classList.remove('active');
+            selection.classList.add('hidden');
+            loginEmailDisplay.innerText = email ? `✉️ ${email}` : 'Your account is ready';
+            loginOverlay.classList.remove('hidden');
+          }, 1200);
+        });
+      }
+
+      // ---------- INITIALIZE ----------
+      document.getElementById('selectStudent').addEventListener('click', () => {
+        selection.classList.add('hidden');
+        studentPanel.classList.add('active');
+        instructorPanel.classList.remove('active');
+        currentMode = 'student';
+        restoreProgress('student');
+        updateResumeBanner('student');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      document.getElementById('selectInstructor').addEventListener('click', () => {
+        selection.classList.add('hidden');
+        instructorPanel.classList.add('active');
+        studentPanel.classList.remove('active');
+        currentMode = 'instructor';
+        restoreProgress('instructor');
+        updateResumeBanner('instructor');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.getElementById('backFromStudent').addEventListener('click', () => {
+        studentPanel.classList.remove('active');
+        selection.classList.remove('hidden');
+      });
+      document.getElementById('backFromInstructor').addEventListener('click', () => {
+        instructorPanel.classList.remove('active');
+        selection.classList.remove('hidden');
+      });
+
+      // file upload simulation
+      function setupFileUpload(areaId, inputId, displayId) {
+        const area = document.getElementById(areaId);
+        const input = document.getElementById(inputId);
+        const display = document.getElementById(displayId);
+        area.addEventListener('click', () => input.click());
+        input.addEventListener('change', () => {
+          if (input.files.length) display.innerText = input.files[0].name;
+          else display.innerText = 'No file chosen';
+        });
+        area.addEventListener('dragover', (e) => e.preventDefault());
+        area.addEventListener('drop', (e) => {
+          e.preventDefault();
+          if (e.dataTransfer.files.length) {
+            input.files = e.dataTransfer.files;
+            display.innerText = e.dataTransfer.files[0].name;
+          }
+        });
+      }
+      setupFileUpload('uploadPassportArea', 'passportUpload', 'passportFilename');
+      setupFileUpload('uploadCertArea', 'certUpload', 'certFilename');
+
+      // password strength
+      document.getElementById('studentPassword')?.addEventListener('input', (e) => {
+        const fill = Math.min(100, e.target.value.length * 20);
+        document.getElementById('studentStrength').style.width = fill + '%';
+      });
+      document.getElementById('instrPassword')?.addEventListener('input', (e) => {
+        const fill = Math.min(100, e.target.value.length * 20);
+        document.getElementById('instrStrength').style.width = fill + '%';
+      });
+
+      setupAdaptive();
+      enhanceFormSubmit('studentForm', 'studentSubmit', 'student');
+      enhanceFormSubmit('instructorForm', 'instructorSubmit', 'instructor');
+
+      ['studentForm', 'instructorForm'].forEach(formId => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+        form.addEventListener('input', () => {
+          const panel = formId === 'studentForm' ? 'student' : 'instructor';
+          saveProgress(panel);
+          updateResumeBanner(panel);
+        });
+      });
+
+      document.getElementById('clearStudentProgress')?.addEventListener('click', () => {
+        clearProgress('student');
+        updateResumeBanner('student');
+      });
+      document.getElementById('clearInstructorProgress')?.addEventListener('click', () => {
+        clearProgress('instructor');
+        updateResumeBanner('instructor');
+      });
+
+      document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('focus', () => el.parentElement?.classList.add('focused'));
+        el.addEventListener('blur', () => el.parentElement?.classList.remove('focused'));
+      });
+
+      // ---------- ASSISTANT UI ----------
+      assistantToggle.addEventListener('click', () => {
+        assistantPanel.classList.add('open');
+        body.classList.add('assistant-open');
+      });
+      closeAssistant.addEventListener('click', () => {
+        assistantPanel.classList.remove('open');
+        body.classList.remove('assistant-open');
+      });
+
+      sendBtn.addEventListener('click', () => {
+        const text = assistantInput.value.trim();
+        if (!text) return;
+        addMessage(text, 'user');
+        assistantInput.value = '';
+        showTypingThenMessage('Thanks for your question! Our team will have more details soon. 😊');
+      });
+
+      assistantInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendBtn.click();
+      });
+
+      suggestionChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          handleSuggestion(chip.getAttribute('data-suggestion'));
+        });
+      });
+
+      setupAssistantFieldListeners();
+
+      // assistant awareness of mode
+      function updateAssistantMode() {
+        const welcomeMsg = currentMode === 'student' 
+          ? 'You are in student mode. I can help with course selection, goals, and enrollment.'
+          : 'You are in instructor mode. I can assist with your application, motivation, and documents.';
+        // optionally show a subtle message
+      }
+
+      // close login modal
+      document.getElementById('closeLoginBtn').addEventListener('click', () => {
+        loginOverlay.classList.add('hidden');
+        selection.classList.remove('hidden');
+      });
+    })();
+  </script>
+</body>
+</html>
