@@ -705,7 +705,7 @@
       </div>
 
       <div class="signup-redirect">
-        New to SkillForge? <a href="#" id="signupLink">Create an account</a>
+        New to SkillForge? <a href="enroll-now.html" id="signupLink">Create an account</a>
       </div>
     </form>
   </div>
@@ -762,6 +762,7 @@
       const forgotLink = document.getElementById('forgotLink');
       const strengthFill = document.getElementById('strengthFill');
       const deviceBadge = document.getElementById('deviceBadge');
+      const signupLink = document.getElementById('signupLink');
 
       // Assistant elements
       const assistantToggle = document.getElementById('assistantToggle');
@@ -880,9 +881,16 @@
         addAssistantMessage('I’ve simulated a reset email. Check your inbox (demo).', 'assistant');
       });
 
-      document.getElementById('signupLink').addEventListener('click', (e) => {
+      // FIXED: Create account link now properly redirects to enroll-now.html
+      signupLink.addEventListener('click', (e) => {
+        // Show a brief message before redirecting
         e.preventDefault();
-        showGlobalMessage('Redirect to signup (demo)', 'success');
+        showGlobalMessage('Redirecting to enrollment...', 'success');
+        
+        // Redirect to enroll-now.html after a short delay
+        setTimeout(() => {
+          window.location.href = 'enroll-now.html';
+        }, 800);
       });
 
       function showGlobalMessage(text, type = 'error') {
