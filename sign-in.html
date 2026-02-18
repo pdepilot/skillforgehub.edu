@@ -976,453 +976,468 @@
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    (function() {
-      // AOS init (from paths)
-      AOS.init({ duration: 800, once: true });
+(function() {
+  // AOS init
+  AOS.init({ duration: 800, once: true });
 
-      // scroll orb functionality (FIXED: ultra-high z-index, works above chatbot)
-      const orb = document.getElementById('orb-scroll');
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 500) orb.classList.add('visible');
-        else orb.classList.remove('visible');
-      });
-      orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  // scroll orb functionality
+  const orb = document.getElementById('orb-scroll');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 500) orb.classList.add('visible');
+    else orb.classList.remove('visible');
+  });
+  orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-      // mobile toggle (from paths)
-      const toggle = document.getElementById('mobileToggle');
-      const links = document.getElementById('navLinks');
-      toggle.addEventListener('click', () => links.classList.toggle('show'));
-      document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => { if (links.classList.contains('show')) links.classList.remove('show'); });
-      });
+  // mobile toggle
+  const toggle = document.getElementById('mobileToggle');
+  const links = document.getElementById('navLinks');
+  if (toggle) {
+    toggle.addEventListener('click', () => links.classList.toggle('show'));
+  }
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => { 
+      if (links.classList.contains('show')) links.classList.remove('show'); 
+    });
+  });
 
-      // Original signin functionality preserved below
-      // DOM elements
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      const emailContainer = document.getElementById('emailContainer');
-      const passwordContainer = document.getElementById('passwordContainer');
-      const emailFeedback = document.getElementById('emailFeedback');
-      const passwordFeedback = document.getElementById('passwordFeedback');
-      const toggleBtn = document.getElementById('togglePassword');
-      const toggleIcon = document.getElementById('toggleIcon');
-      const signinBtn = document.getElementById('signinBtn');
-      const signinForm = document.getElementById('signinForm');
-      const globalMsg = document.getElementById('globalMessage');
-      const returningBanner = document.getElementById('returningBanner');
-      const returningMessage = document.getElementById('returningMessage');
-      const greetingText = document.getElementById('greetingText');
-      const rememberMe = document.getElementById('rememberMe');
-      const forgotLink = document.getElementById('forgotLink');
-      const strengthFill = document.getElementById('strengthFill');
-      const deviceBadge = document.getElementById('deviceBadge');
-      const signupLink = document.getElementById('signupLink');
+  // ---------- AUTHENTICATION STORAGE KEYS ----------
+  const STORAGE_KEYS = {
+    users: 'skillforge_users',
+    auth: 'skillforge_logged_in_user',
+    student: 'skillforge_student',
+    instructor: 'skillforge_instructor',
+    remember: 'skillforge_remembered_user',
+    session: 'skillforge_session',
+    device: 'skillforge_device_known',
+    failAttempts: 'skillforge_fail_attempts'
+  };
 
-      // Assistant elements
-      const assistantToggle = document.getElementById('assistantToggle');
-      const assistantPanel = document.getElementById('assistantPanel');
-      const closeAssistant = document.getElementById('closeAssistant');
-      const assistantChat = document.getElementById('assistantChat');
-      const assistantInput = document.getElementById('assistantInput');
-      const sendBtn = document.getElementById('sendAssistantMsg');
-      const suggestionChips = document.querySelectorAll('.chip');
-      const body = document.body;
+  // DOM elements
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const emailContainer = document.getElementById('emailContainer');
+  const passwordContainer = document.getElementById('passwordContainer');
+  const emailFeedback = document.getElementById('emailFeedback');
+  const passwordFeedback = document.getElementById('passwordFeedback');
+  const toggleBtn = document.getElementById('togglePassword');
+  const toggleIcon = document.getElementById('toggleIcon');
+  const signinBtn = document.getElementById('signinBtn');
+  const signinForm = document.getElementById('signinForm');
+  const globalMsg = document.getElementById('globalMessage');
+  const returningBanner = document.getElementById('returningBanner');
+  const returningMessage = document.getElementById('returningMessage');
+  const greetingText = document.getElementById('greetingText');
+  const rememberMe = document.getElementById('rememberMe');
+  const forgotLink = document.getElementById('forgotLink');
+  const strengthFill = document.getElementById('strengthFill');
+  const deviceBadge = document.getElementById('deviceBadge');
+  const signupLink = document.getElementById('signupLink');
 
-      // ---------- SYNCHRONIZED STORAGE KEYS (must match enroll and profile) ----------
-      const STORAGE_KEYS = {
-        student: 'skillforge_student',
-        instructor: 'skillforge_instructor',
-        auth: 'skillforge_logged_in_user',
-        remember: 'skillforge_remembered_user',
-        device: 'skillforge_device_known',
-        failAttempts: 'skillforge_fail_attempts'
-      };
+  // Assistant elements
+  const assistantToggle = document.getElementById('assistantToggle');
+  const assistantPanel = document.getElementById('assistantPanel');
+  const closeAssistant = document.getElementById('closeAssistant');
+  const assistantChat = document.getElementById('assistantChat');
+  const assistantInput = document.getElementById('assistantInput');
+  const sendBtn = document.getElementById('sendAssistantMsg');
+  const suggestionChips = document.querySelectorAll('.chip');
+  const body = document.body;
 
-      let rememberedEmail = localStorage.getItem(STORAGE_KEYS.remember) || '';
-      let deviceKnown = localStorage.getItem(STORAGE_KEYS.device) === 'true';
-      let failAttempts = parseInt(localStorage.getItem(STORAGE_KEYS.failAttempts) || '0');
+  let rememberedEmail = localStorage.getItem(STORAGE_KEYS.remember) || '';
+  let deviceKnown = localStorage.getItem(STORAGE_KEYS.device) === 'true';
+  let failAttempts = parseInt(localStorage.getItem(STORAGE_KEYS.failAttempts) || '0');
 
-      // Check if user is already logged in
-      function checkExistingSession() {
-        const existingUser = localStorage.getItem(STORAGE_KEYS.auth);
-        if (existingUser) {
-          try {
-            const user = JSON.parse(existingUser);
-            // Auto-fill email if remembered
-            if (user.email) {
-              emailInput.value = user.email;
-              handleFloat(emailContainer, emailInput);
-            }
-            
-            // Show returning user banner
-            returningBanner.classList.remove('hidden');
-            returningMessage.innerText = `Welcome back, ${user.firstName || user.email.split('@')[0]}!`;
-            greetingText.innerText = 'good to see you again';
-            
-            // Focus on password
-            setTimeout(() => passwordInput.focus(), 500);
-          } catch (e) {
-            console.error('Error parsing existing user', e);
-          }
+  // ---------- HELPER FUNCTIONS ----------
+  function getAllUsers() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]');
+  }
+
+  function findUserByEmail(email) {
+    const users = getAllUsers();
+    return users.find(user => user.email.toLowerCase() === email.toLowerCase());
+  }
+
+  function showGlobalMessage(text, type = 'error') {
+    globalMsg.innerHTML = (type === 'success' ? '<i class="bi bi-check-circle-fill"></i> ' : '<i class="bi bi-shield-exclamation"></i> ') + text;
+    globalMsg.classList.remove('hidden', 'success');
+    if (type === 'success') globalMsg.classList.add('success');
+    globalMsg.classList.remove('hidden');
+    setTimeout(() => globalMsg.classList.add('hidden'), 4000);
+  }
+
+  function addAssistantMessage(text, sender = 'assistant') {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender === 'assistant' ? 'assistant-message' : 'user-message');
+    msgDiv.textContent = text;
+    assistantChat.appendChild(msgDiv);
+    assistantChat.scrollTop = assistantChat.scrollHeight;
+  }
+
+  function showTypingThenResponse(response) {
+    const typingDiv = document.createElement('div');
+    typingDiv.classList.add('typing-indicator');
+    typingDiv.innerHTML = '<span></span><span></span><span></span>';
+    assistantChat.appendChild(typingDiv);
+    assistantChat.scrollTop = assistantChat.scrollHeight;
+
+    setTimeout(() => {
+      assistantChat.removeChild(typingDiv);
+      addAssistantMessage(response, 'assistant');
+    }, 1200);
+  }
+
+  function handleAssistantQuestion(question) {
+    addAssistantMessage(question, 'user');
+    const q = question.toLowerCase();
+    if (q.includes('sign in') || q.includes('can\'t')) {
+      showTypingThenResponse('Double-check your email and password. If you\'ve tried multiple times, you can reset your password — I can help with that.');
+    } else if (q.includes('secure') || q.includes('safe')) {
+      showTypingThenResponse('Your connection is encrypted. We use modern safeguards and never share your data. You\'re in a safe environment.');
+    } else if (q.includes('forgot') || q.includes('reset')) {
+      showTypingThenResponse('Click "forgot password?" below — we\'ll send a reset link instantly. (simulated)');
+    } else if (q.includes('caps')) {
+      showTypingThenResponse('I can detect caps lock. Make sure it\'s off before typing your password.');
+    } else if (q.includes('new') || q.includes('account') || q.includes('sign up')) {
+      showTypingThenResponse('Click "Create an account" below to start your journey with SkillForge!');
+    } else {
+      showTypingThenResponse('I\'m here to help with sign-in issues, security, or account access. What would you like to know?');
+    }
+  }
+
+  function checkSessionExpiry() {
+    const sessionTime = localStorage.getItem(STORAGE_KEYS.session);
+    if (sessionTime) {
+      const elapsed = Date.now() - parseInt(sessionTime);
+      const oneDay = 24 * 60 * 60 * 1000;
+      if (elapsed > oneDay) {
+        localStorage.removeItem(STORAGE_KEYS.auth);
+        localStorage.removeItem(STORAGE_KEYS.session);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Check for existing session
+  function checkExistingSession() {
+    const existingUser = localStorage.getItem(STORAGE_KEYS.auth);
+    if (existingUser && checkSessionExpiry()) {
+      try {
+        const user = JSON.parse(existingUser);
+        if (user.email) {
+          emailInput.value = user.email;
+          handleFloat(emailContainer, emailInput);
         }
-      }
-
-      // floating labels
-      function handleFloat(container, input) {
-        if (input.value.trim() !== '') {
-          container.classList.add('float');
-        } else {
-          container.classList.remove('float');
-        }
-      }
-
-      [emailInput, passwordInput].forEach(input => {
-        const container = input.id === 'email' ? emailContainer : passwordContainer;
-        input.addEventListener('input', () => handleFloat(container, input));
-        input.addEventListener('blur', () => handleFloat(container, input));
-        handleFloat(container, input);
-      });
-
-      toggleBtn.addEventListener('click', () => {
-        const type = passwordInput.type === 'password' ? 'text' : 'password';
-        passwordInput.type = type;
-        toggleIcon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
-      });
-
-      // real-time validation
-      emailInput.addEventListener('input', validateEmail);
-      passwordInput.addEventListener('input', validatePassword);
-      passwordInput.addEventListener('input', updateStrength);
-
-      function validateEmail() {
-        const email = emailInput.value.trim();
-        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        if (email === '') {
-          emailFeedback.innerHTML = '';
-          return false;
-        } else if (!isValid) {
-          emailFeedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Valid email needed';
-          return false;
-        } else {
-          emailFeedback.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#3c9b7a;"></i> Looks good';
-          return true;
-        }
-      }
-
-      function validatePassword() {
-        const pwd = passwordInput.value;
-        if (pwd === '') {
-          passwordFeedback.innerHTML = '';
-          return false;
-        } else if (pwd.length < 6) {
-          passwordFeedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> At least 6 characters';
-          return false;
-        } else {
-          passwordFeedback.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#3c9b7a;"></i> Strong enough';
-          return true;
-        }
-      }
-
-      function updateStrength() {
-        const pwd = passwordInput.value;
-        let strength = 0;
-        if (pwd.length >= 4) strength = 25;
-        if (pwd.length >= 6) strength = 50;
-        if (pwd.length >= 8 && /[^a-zA-Z0-9]/.test(pwd)) strength = 75;
-        if (pwd.length >= 10 && /[A-Z]/.test(pwd) && /[0-9]/.test(pwd) && /[^a-zA-Z0-9]/.test(pwd)) strength = 100;
-        strengthFill.style.width = strength + '%';
-      }
-
-      // device recognition & returning user
-      if (!deviceKnown) {
-        deviceBadge.classList.remove('hidden');
-        deviceBadge.innerHTML = '<i class="bi bi-laptop"></i> New device detected · security checks active';
-        localStorage.setItem(STORAGE_KEYS.device, 'true');
-      } else {
-        deviceBadge.classList.remove('hidden');
-        deviceBadge.innerHTML = '<i class="bi bi-shield-check"></i> Trusted device · connection secure';
-      }
-
-      if (rememberedEmail) {
-        emailInput.value = rememberedEmail;
-        handleFloat(emailContainer, emailInput);
+        
         returningBanner.classList.remove('hidden');
-        returningMessage.innerText = `Welcome back, ${rememberedEmail.split('@')[0]}!`;
+        returningMessage.innerText = `Welcome back, ${user.firstName || user.email.split('@')[0]}!`;
         greetingText.innerText = 'good to see you again';
+        
+        setTimeout(() => passwordInput.focus(), 500);
+      } catch (e) {
+        console.error('Error parsing existing user', e);
       }
+    }
+  }
 
-      // caps lock detection
-      passwordInput.addEventListener('keydown', (e) => {
-        if (e.getModifierState && e.getModifierState('CapsLock')) {
-          addAssistantMessage('⚠️ Caps lock is on — this may affect your password', 'assistant');
-        }
-      });
+  // Floating labels
+  function handleFloat(container, input) {
+    if (input.value.trim() !== '') {
+      container.classList.add('float');
+    } else {
+      container.classList.remove('float');
+    }
+  }
 
-      // forgot link
-      forgotLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showGlobalMessage('Password reset link sent (demo)', 'success');
-        addAssistantMessage('I’ve simulated a reset email. Check your inbox (demo).', 'assistant');
-      });
+  // Validation functions
+  function validateEmail() {
+    const email = emailInput.value.trim();
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (email === '') {
+      emailFeedback.innerHTML = '';
+      return false;
+    } else if (!isValid) {
+      emailFeedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Valid email needed';
+      return false;
+    } else {
+      emailFeedback.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#3c9b7a;"></i> Looks good';
+      return true;
+    }
+  }
 
-      // Check if user just came from enrollment
-      const urlParams = new URLSearchParams(window.location.search);
-      const justSignedUp = urlParams.get('signedup') === 'true';
-      const signupEmail = urlParams.get('email');
+  function validatePassword() {
+    const pwd = passwordInput.value;
+    if (pwd === '') {
+      passwordFeedback.innerHTML = '';
+      return false;
+    } else if (pwd.length < 6) {
+      passwordFeedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> At least 6 characters';
+      return false;
+    } else {
+      passwordFeedback.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#3c9b7a;"></i> Strong enough';
+      return true;
+    }
+  }
 
-      if (justSignedUp && signupEmail) {
-        // Pre-fill the email field
-        emailInput.value = decodeURIComponent(signupEmail);
-        handleFloat(emailContainer, emailInput);
-        
-        // Show welcome message
-        showGlobalMessage('Account created successfully! Please sign in.', 'success');
-        
-        // Add assistant message
-        setTimeout(() => {
-          addAssistantMessage('🎉 Welcome to SkillForge! Your account is ready. Sign in to continue.', 'assistant');
-        }, 500);
-        
-        // Focus on password field
-        setTimeout(() => passwordInput.focus(), 800);
+  function updateStrength() {
+    const pwd = passwordInput.value;
+    let strength = 0;
+    if (pwd.length >= 4) strength = 25;
+    if (pwd.length >= 6) strength = 50;
+    if (pwd.length >= 8 && /[^a-zA-Z0-9]/.test(pwd)) strength = 75;
+    if (pwd.length >= 10 && /[A-Z]/.test(pwd) && /[0-9]/.test(pwd) && /[^a-zA-Z0-9]/.test(pwd)) strength = 100;
+    if (strengthFill) strengthFill.style.width = strength + '%';
+  }
+
+  // ---------- EVENT LISTENERS ----------
+  [emailInput, passwordInput].forEach(input => {
+    const container = input.id === 'email' ? emailContainer : passwordContainer;
+    input.addEventListener('input', () => handleFloat(container, input));
+    input.addEventListener('blur', () => handleFloat(container, input));
+    handleFloat(container, input);
+  });
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      toggleIcon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+  }
+
+  emailInput.addEventListener('input', validateEmail);
+  passwordInput.addEventListener('input', validatePassword);
+  passwordInput.addEventListener('input', updateStrength);
+
+  // Caps lock detection
+  passwordInput.addEventListener('keydown', (e) => {
+    if (e.getModifierState && e.getModifierState('CapsLock')) {
+      addAssistantMessage('⚠️ Caps lock is on — this may affect your password', 'assistant');
+    }
+  });
+
+  // Forgot password link
+  if (forgotLink) {
+    forgotLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showGlobalMessage('Password reset link sent (demo)', 'success');
+      addAssistantMessage('I\'ve simulated a reset email. Check your inbox (demo).', 'assistant');
+    });
+  }
+
+  // Signup link with email pre-fill
+  if (signupLink) {
+    signupLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentEmail = emailInput.value.trim();
+      let redirectUrl = 'enroll-now.html';
+      
+      if (currentEmail && validateEmail()) {
+        redirectUrl += '?email=' + encodeURIComponent(currentEmail);
       }
-
-      // Create account link - now with email pre-fill capability
-      signupLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        // If user entered an email, pass it to enrollment page
-        const currentEmail = emailInput.value.trim();
-        let redirectUrl = 'enroll-now.html';
-        
-        if (currentEmail && validateEmail()) {
-          // Pass the email to pre-fill on enrollment page
-          redirectUrl += '?email=' + encodeURIComponent(currentEmail);
-        }
-        
-        showGlobalMessage('Redirecting to enrollment...', 'success');
-        
-        // Small delay for better UX
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 600);
-      });
-
-      function showGlobalMessage(text, type = 'error') {
-        globalMsg.textContent = text;
-        globalMsg.classList.remove('hidden', 'success');
-        if (type === 'success') globalMsg.classList.add('success');
-        globalMsg.innerHTML = (type === 'success' ? '<i class="bi bi-check-circle-fill"></i> ' : '<i class="bi bi-shield-exclamation"></i> ') + text;
-        globalMsg.classList.remove('hidden');
-        setTimeout(() => globalMsg.classList.add('hidden'), 4000);
-      }
-
-      // ---------- ASSISTANT FUNCTIONS ----------
-      function addAssistantMessage(text, sender = 'assistant') {
-        const msgDiv = document.createElement('div');
-        msgDiv.classList.add('message', sender === 'assistant' ? 'assistant-message' : 'user-message');
-        msgDiv.textContent = text;
-        assistantChat.appendChild(msgDiv);
-        assistantChat.scrollTop = assistantChat.scrollHeight;
-      }
-
-      function showTypingThenResponse(response) {
-        const typingDiv = document.createElement('div');
-        typingDiv.classList.add('typing-indicator');
-        typingDiv.innerHTML = '<span></span><span></span><span></span>';
-        assistantChat.appendChild(typingDiv);
-        assistantChat.scrollTop = assistantChat.scrollHeight;
-
-        setTimeout(() => {
-          assistantChat.removeChild(typingDiv);
-          addAssistantMessage(response, 'assistant');
-        }, 1200);
-      }
-
-      function handleAssistantQuestion(question) {
-        addAssistantMessage(question, 'user');
-        const q = question.toLowerCase();
-        if (q.includes('sign in') || q.includes('can\'t')) {
-          showTypingThenResponse('Double-check your email and password. If you’ve tried multiple times, you can reset your password — I can help with that.');
-        } else if (q.includes('secure') || q.includes('safe')) {
-          showTypingThenResponse('Your connection is encrypted. We use modern safeguards and never share your data. You’re in a safe environment.');
-        } else if (q.includes('forgot') || q.includes('reset')) {
-          showTypingThenResponse('Click "forgot password?" below — we’ll send a reset link instantly. (simulated)');
-        } else if (q.includes('caps')) {
-          showTypingThenResponse('I can detect caps lock. Make sure it’s off before typing your password.');
-        } else if (q.includes('new') || q.includes('account') || q.includes('sign up')) {
-          showTypingThenResponse('Click "Create an account" below to start your journey with SkillForge!');
-        } else {
-          showTypingThenResponse('I’m here to help with sign-in issues, security, or account access. What would you like to know?');
-        }
-      }
-
-      // assistant open/close
-      assistantToggle.addEventListener('click', () => {
-        assistantPanel.classList.add('open');
-        body.classList.add('assistant-open');
-      });
-      closeAssistant.addEventListener('click', () => {
-        assistantPanel.classList.remove('open');
-        body.classList.remove('assistant-open');
-      });
-
-      sendBtn.addEventListener('click', () => {
-        const text = assistantInput.value.trim();
-        if (!text) return;
-        handleAssistantQuestion(text);
-        assistantInput.value = '';
-      });
-
-      assistantInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendBtn.click();
-      });
-
-      suggestionChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          handleAssistantQuestion(chip.getAttribute('data-question'));
-        });
-      });
-
-      // context-aware assistant: password focus
-      passwordInput.addEventListener('focus', () => {
-        if (assistantPanel.classList.contains('open')) {
-          addAssistantMessage('✨ Tip: use a unique password with letters, numbers, and symbols.', 'assistant');
-        }
-      });
-
-      // Enhanced login attempt with full synchronization
-      signinForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const isEmailValid = validateEmail();
-        const isPasswordValid = validatePassword();
-        const email = emailInput.value.trim();
-        const pwd = passwordInput.value;
-
-        if (!isEmailValid || !isPasswordValid) {
-          failAttempts++;
-          localStorage.setItem(STORAGE_KEYS.failAttempts, failAttempts);
-          if (failAttempts >= 2) {
-            addAssistantMessage('Having trouble? You can reset your password or ask me for help.', 'assistant');
-          }
-          showGlobalMessage('Invalid credentials — please try again', 'error');
-          return;
-        }
-
-        if (pwd === 'password' || pwd === '123456') {
-          failAttempts++;
-          localStorage.setItem(STORAGE_KEYS.failAttempts, failAttempts);
-          showGlobalMessage('That password is too common — try another', 'error');
-          addAssistantMessage('Weak password detected. Choose something harder to guess.', 'assistant');
-          return;
-        }
-
-        // SUCCESS - Check if user exists in our storage
-        let userData = null;
-        
-        // Try to find user in student storage
-        const studentData = localStorage.getItem(STORAGE_KEYS.student);
-        if (studentData) {
-          try {
-            const students = JSON.parse(studentData);
-            // If it's a single object (from enrollment)
-            if (students.email === email) {
-              userData = students;
-            }
-          } catch (e) {
-            console.error('Error parsing student data', e);
-          }
-        }
-        
-        // Try instructor storage if not found
-        if (!userData) {
-          const instructorData = localStorage.getItem(STORAGE_KEYS.instructor);
-          if (instructorData) {
-            try {
-              const instructors = JSON.parse(instructorData);
-              if (instructors.email === email) {
-                userData = instructors;
-              }
-            } catch (e) {
-              console.error('Error parsing instructor data', e);
-            }
-          }
-        }
-
-        // If user not found, create basic user object (for demo)
-        if (!userData) {
-          userData = {
-            firstName: email.split('@')[0],
-            lastName: '',
-            email: email,
-            role: 'student',
-            stats: {
-              streak: 0,
-              completed: 0
-            },
-            goals: 'Continue learning',
-            experience: 'beginner',
-            interests: [],
-            enrolledCourses: []
-          };
-        }
-
-        // Save to auth storage (this is what profile reads)
-        localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
-
-        // Handle remember me
-        if (rememberMe.checked) {
-          localStorage.setItem(STORAGE_KEYS.remember, email);
-        } else {
-          localStorage.removeItem(STORAGE_KEYS.remember);
-        }
-        
-        // Update device known
-        localStorage.setItem(STORAGE_KEYS.device, 'true');
-        
-        // Reset failed attempts
-        localStorage.removeItem(STORAGE_KEYS.failAttempts);
-
-        // Show loading state
-        signinBtn.innerHTML = '<span></span><div class="spinner"></div><span> signing in</span>';
-        signinBtn.disabled = true;
-
-        // Simulate network delay then redirect to profile
-        setTimeout(() => {
-          signinBtn.innerHTML = '<i class="bi bi-check-lg"></i> Welcome back!';
-          signinBtn.style.background = '#ffb347';
-          showGlobalMessage('Login successful — redirecting to your profile', 'success');
-          addAssistantMessage(`✅ Welcome back, ${userData.firstName || userData.email}! Redirecting to your profile...`, 'assistant');
-          
-          // Redirect to user profile with user data
-          setTimeout(() => {
-            window.location.href = 'user-profile.html?login=success';
-          }, 1500);
-        }, 1500);
-      });
-
-      // Check for existing session on page load
-      checkExistingSession();
-
-      // initial assistant welcome
+      
+      showGlobalMessage('Redirecting to enrollment...', 'success');
+      
       setTimeout(() => {
-        if (!localStorage.getItem(STORAGE_KEYS.device)) {
-          addAssistantMessage('👋 I see this might be your first time on this device. I’m here to help!', 'assistant');
-        }
-      }, 1000);
+        window.location.href = redirectUrl;
+      }, 600);
+    });
+  }
 
-      // Check if there's a user in localStorage and pre-fill
-      const existingAuth = localStorage.getItem(STORAGE_KEYS.auth);
-      if (existingAuth && !rememberedEmail) {
-        try {
-          const user = JSON.parse(existingAuth);
-          if (user.email) {
-            emailInput.value = user.email;
-            handleFloat(emailContainer, emailInput);
-          }
-        } catch (e) {}
+  // Device recognition
+  if (!deviceKnown) {
+    if (deviceBadge) {
+      deviceBadge.classList.remove('hidden');
+      deviceBadge.innerHTML = '<i class="bi bi-laptop"></i> New device detected · security checks active';
+    }
+    localStorage.setItem(STORAGE_KEYS.device, 'true');
+  } else {
+    if (deviceBadge) {
+      deviceBadge.classList.remove('hidden');
+      deviceBadge.innerHTML = '<i class="bi bi-shield-check"></i> Trusted device · connection secure';
+    }
+  }
+
+  if (rememberedEmail) {
+    emailInput.value = rememberedEmail;
+    handleFloat(emailContainer, emailInput);
+    returningBanner.classList.remove('hidden');
+    returningMessage.innerText = `Welcome back, ${rememberedEmail.split('@')[0]}!`;
+    greetingText.innerText = 'good to see you again';
+  }
+
+  // Check URL parameters for signup success
+  const urlParams = new URLSearchParams(window.location.search);
+  const justSignedUp = urlParams.get('signedup') === 'true';
+  const signupEmail = urlParams.get('email');
+  const expired = urlParams.get('expired') === 'true';
+  const redirect = urlParams.get('redirect');
+
+  if (expired) {
+    showGlobalMessage('Your session has expired. Please sign in again.', 'error');
+  }
+
+  if (justSignedUp && signupEmail) {
+    emailInput.value = decodeURIComponent(signupEmail);
+    handleFloat(emailContainer, emailInput);
+    showGlobalMessage('Account created successfully! Please sign in.', 'success');
+    setTimeout(() => addAssistantMessage('🎉 Welcome to SkillForge! Your account is ready. Sign in to continue.', 'assistant'), 500);
+    setTimeout(() => passwordInput.focus(), 800);
+  }
+
+  if (redirect === 'profile') {
+    showGlobalMessage('Please sign in to view your profile', 'error');
+  }
+
+  // ---------- SIGN IN FORM SUBMISSION ----------
+  signinForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+    const email = emailInput.value.trim();
+    const pwd = passwordInput.value;
+
+    if (!isEmailValid || !isPasswordValid) {
+      failAttempts++;
+      localStorage.setItem(STORAGE_KEYS.failAttempts, failAttempts);
+      if (failAttempts >= 2) {
+        addAssistantMessage('Having trouble? You can reset your password or ask me for help.', 'assistant');
       }
-    })();
-  </script>
+      showGlobalMessage('Invalid credentials — please try again', 'error');
+      return;
+    }
+
+    // Find user in database
+    const user = findUserByEmail(email);
+    
+    if (!user) {
+      showGlobalMessage('No account found with this email. Please sign up first.', 'error');
+      addAssistantMessage('I couldn\'t find an account with that email. Would you like to create one?', 'assistant');
+      return;
+    }
+
+    // Verify password
+    try {
+      const decodedPassword = atob(user.password);
+      if (decodedPassword !== pwd) {
+        failAttempts++;
+        localStorage.setItem(STORAGE_KEYS.failAttempts, failAttempts);
+        showGlobalMessage('Incorrect password. Please try again.', 'error');
+        
+        if (failAttempts >= 3) {
+          addAssistantMessage('Multiple failed attempts. You can reset your password if you\'ve forgotten it.', 'assistant');
+        }
+        return;
+      }
+    } catch (error) {
+      // If password isn't base64 encoded, try direct comparison
+      if (user.password !== pwd) {
+        failAttempts++;
+        localStorage.setItem(STORAGE_KEYS.failAttempts, failAttempts);
+        showGlobalMessage('Incorrect password. Please try again.', 'error');
+        return;
+      }
+    }
+
+    // SUCCESS - Create session
+    const sessionData = {
+      ...user,
+      lastLogin: new Date().toISOString(),
+      loginDevice: navigator.userAgent
+    };
+    
+    // Remove password from session data
+    delete sessionData.password;
+    
+    // Save to auth storage
+    localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(sessionData));
+    
+    // Set session timestamp
+    localStorage.setItem(STORAGE_KEYS.session, Date.now().toString());
+
+    // Handle remember me
+    if (rememberMe.checked) {
+      localStorage.setItem(STORAGE_KEYS.remember, email);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.remember);
+    }
+    
+    // Reset failed attempts
+    localStorage.removeItem(STORAGE_KEYS.failAttempts);
+
+    // Show loading state
+    signinBtn.innerHTML = '<span></span><div class="spinner"></div><span> signing in</span>';
+    signinBtn.disabled = true;
+
+    // Simulate network delay then redirect to profile
+    setTimeout(() => {
+      signinBtn.innerHTML = '<i class="bi bi-check-lg"></i> Welcome back!';
+      signinBtn.style.background = '#ffb347';
+      showGlobalMessage(`Welcome back, ${user.firstName || user.email}! Redirecting...`, 'success');
+      addAssistantMessage(`✅ Welcome back, ${user.firstName || user.email}! Taking you to your dashboard...`, 'assistant');
+      
+      // Redirect to user profile
+      setTimeout(() => {
+        window.location.href = 'user-profile.html';
+      }, 1500);
+    }, 1500);
+  });
+
+  // ---------- ASSISTANT UI ----------
+  if (assistantToggle) {
+    assistantToggle.addEventListener('click', () => {
+      assistantPanel.classList.add('open');
+      body.classList.add('assistant-open');
+    });
+  }
+
+  if (closeAssistant) {
+    closeAssistant.addEventListener('click', () => {
+      assistantPanel.classList.remove('open');
+      body.classList.remove('assistant-open');
+    });
+  }
+
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      const text = assistantInput.value.trim();
+      if (!text) return;
+      handleAssistantQuestion(text);
+      assistantInput.value = '';
+    });
+  }
+
+  if (assistantInput) {
+    assistantInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+  }
+
+  suggestionChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      handleAssistantQuestion(chip.getAttribute('data-question'));
+    });
+  });
+
+  // Context-aware assistant
+  passwordInput.addEventListener('focus', () => {
+    if (assistantPanel.classList.contains('open')) {
+      addAssistantMessage('✨ Tip: use a unique password with letters, numbers, and symbols.', 'assistant');
+    }
+  });
+
+  // Check session on load
+  checkSessionExpiry();
+  checkExistingSession();
+
+  // Initial assistant welcome
+  setTimeout(() => {
+    if (!localStorage.getItem(STORAGE_KEYS.device)) {
+      addAssistantMessage('👋 I see this might be your first time on this device. I\'m here to help!', 'assistant');
+    }
+  }, 1000);
+})();
+</script>
 </body>
 </html>

@@ -683,7 +683,7 @@
       transition: outline 0.2s;
     }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
 
     /* responsive */
     @media (max-width: 768px) {
@@ -700,6 +700,25 @@
       transition: 0.2s;
     }
     .btn-ghost:hover { background: #2b5f6b; color: white; }
+
+    /* Error message styling */
+    .error-message {
+      background: #fee9e7;
+      border: 1px solid #ff6b6b;
+      border-radius: 60px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #c53030;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -726,9 +745,15 @@
     </div>
   </nav>
 
-  <!-- MAIN CONTENT (original enroll-now content, adjusted for navbar spacing) -->
+  <!-- MAIN CONTENT -->
   <main>
     <div class="enroll-container">
+      <!-- Error display area -->
+      <div id="globalError" class="error-message hidden">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="errorText"></span>
+      </div>
+
       <!-- SELECTION PANEL (initial) -->
       <div id="selectionPanel" class="selection-panel">
         <h1 class="display-4 fw-bold" style="color: #0f2b3c;">welcome.</h1>
@@ -750,13 +775,12 @@
         <p class="mt-4 text-muted"><i class="bi bi-shield-lock"></i> your information is secure and never shared</p>
       </div>
 
-      <!-- STUDENT FORM PANEL (hidden initially) -->
+      <!-- STUDENT FORM PANEL -->
       <div id="studentFormPanel" class="form-panel">
         <div class="back-link" id="backFromStudent"><i class="bi bi-arrow-left"></i> back to selection</div>
-        <h2 class="form-title">Enroll in Your Dream Course</h2>
-        <p class="form-subtitle">Take the next step in your educational journey. Complete the form below to secure your spot.</p>
+        <h2 class="form-title">Enroll as a Student</h2>
+        <p class="form-subtitle">Take the next step in your educational journey.</p>
         
-        <!-- resume banner placeholder (dynamic) -->
         <div id="studentResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearStudentProgress">✕ clear</button></div>
 
         <form id="studentForm" novalidate>
@@ -764,13 +788,13 @@
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>First Name *</label>
-                <input type="text" class="required" id="studentFirstName" placeholder="Alex">
+                <input type="text" class="required" id="studentFirstName" placeholder="Alex" autocomplete="given-name">
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Last Name *</label>
-                <input type="text" class="required" id="studentLastName" placeholder="Morgan">
+                <input type="text" class="required" id="studentLastName" placeholder="Morgan" autocomplete="family-name">
               </div>
             </div>
           </div>
@@ -779,13 +803,13 @@
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Email Address *</label>
-                <input type="email" class="required" id="studentEmail" placeholder="alex@example.com">
+                <input type="email" class="required" id="studentEmail" placeholder="alex@example.com" autocomplete="email">
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Phone Number</label>
-                <input type="tel" id="studentPhone" placeholder="+1 (555) 000-9999">
+                <input type="tel" id="studentPhone" placeholder="+1 (555) 000-9999" autocomplete="tel">
               </div>
             </div>
           </div>
@@ -794,29 +818,28 @@
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Password *</label>
-                <input type="password" class="required" id="studentPassword" placeholder="••••••••">
+                <input type="password" class="required" id="studentPassword" placeholder="••••••••" autocomplete="new-password">
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Confirm Password *</label>
-                <input type="password" class="required" id="studentConfirmPassword" placeholder="••••••••">
+                <input type="password" class="required" id="studentConfirmPassword" placeholder="••••••••" autocomplete="new-password">
               </div>
             </div>
           </div>
-          <!-- password strength mock -->
-          <div class="strength-meter"><div class="strength-fill" id="studentStrength" style="width:60%"></div></div>
+          <div class="strength-meter"><div class="strength-fill" id="studentStrength" style="width:0%"></div></div>
 
           <div class="row g-4">
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Education Level</label>
                 <select id="studentEdu">
-                  <option>Select your education level...</option>
-                  <option>High School</option>
-                  <option>Bachelor's</option>
-                  <option>Master's</option>
-                  <option>PhD</option>
+                  <option value="">Select your education level...</option>
+                  <option value="High School">High School</option>
+                  <option value="Bachelor's">Bachelor's</option>
+                  <option value="Master's">Master's</option>
+                  <option value="PhD">PhD</option>
                 </select>
               </div>
             </div>
@@ -824,24 +847,22 @@
               <div class="input-group-premium">
                 <label>Experience Level</label>
                 <select id="studentExp">
-                  <option>Select your experience...</option>
-                  <option>Beginner</option>
-                  <option>Intermediate</option>
-                  <option>Advanced</option>
+                  <option value="">Select your experience...</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <!-- adaptive hints (dynamic) -->
           <div id="studentExpHint" class="adaptive-hint"></div>
           <div id="studentEduHint" class="adaptive-hint"></div>
 
           <div class="input-group-premium">
-            <label>What are you hoping to learn and improve</label>
+            <label>What are you hoping to learn and improve?</label>
             <textarea id="studentGoals" placeholder="Type your learning goals here..."></textarea>
           </div>
-          <!-- dynamic field based on goals (example) -->
           <div id="studentGoalSuggestion" class="dynamic-field"></div>
 
           <label>Preferred Learning Schedule</label>
@@ -860,13 +881,12 @@
             <label for="studentUpdates">I would like to receive course updates and educational content via email</label>
           </div>
 
-          <!-- trust badge -->
           <div class="trust-badge">
             <i class="bi bi-shield-check fs-2" style="color:#7fc3b0;"></i>
             <span>Your information is secure and will never be shared with third parties</span>
           </div>
 
-          <button type="submit" class="btn-premium" id="studentSubmit">Secure enrollment →</button>
+          <button type="submit" class="btn-premium" id="studentSubmit">Create Student Account →</button>
           <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0; font-weight:600;">Sign in</a></p>
         </form>
       </div>
@@ -874,7 +894,7 @@
       <!-- INSTRUCTOR FORM PANEL -->
       <div id="instructorFormPanel" class="form-panel">
         <div class="back-link" id="backFromInstructor"><i class="bi bi-arrow-left"></i> back to selection</div>
-        <h2 class="form-title">Start Your Journey as an Instructor</h2>
+        <h2 class="form-title">Become an Instructor</h2>
         <p class="form-subtitle">Share your expertise. Complete the form below to apply.</p>
         
         <div id="instructorResumeBanner" class="resume-banner hidden"><span><i class="bi bi-clock-history"></i> Resume where you left off</span><button class="clear-resume" id="clearInstructorProgress">✕ clear</button></div>
@@ -884,13 +904,13 @@
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>First Name *</label>
-                <input type="text" class="required" id="instrFirstName">
+                <input type="text" class="required" id="instrFirstName" autocomplete="given-name">
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Last Name *</label>
-                <input type="text" class="required" id="instrLastName">
+                <input type="text" class="required" id="instrLastName" autocomplete="family-name">
               </div>
             </div>
           </div>
@@ -899,13 +919,13 @@
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Email Address *</label>
-                <input type="email" class="required" id="instrEmail">
+                <input type="email" class="required" id="instrEmail" autocomplete="email">
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Phone Number</label>
-                <input type="tel" id="instrPhone">
+                <input type="tel" id="instrPhone" autocomplete="tel">
               </div>
             </div>
           </div>
@@ -914,25 +934,27 @@
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Password *</label>
-                <input type="password" class="required" id="instrPassword">
+                <input type="password" class="required" id="instrPassword" autocomplete="new-password">
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Confirm Password *</label>
-                <input type="password" class="required" id="instrConfirmPassword">
+                <input type="password" class="required" id="instrConfirmPassword" autocomplete="new-password">
               </div>
             </div>
           </div>
-          <div class="strength-meter"><div class="strength-fill" id="instrStrength" style="width:70%"></div></div>
+          <div class="strength-meter"><div class="strength-fill" id="instrStrength" style="width:0%"></div></div>
 
           <div class="row g-4">
             <div class="col-md-6">
               <div class="input-group-premium">
                 <label>Education Level</label>
                 <select id="instrEdu">
-                  <option>Select your education level...</option>
-                  <option>Bachelor's</option><option>Master's</option><option>PhD</option>
+                  <option value="">Select your education level...</option>
+                  <option value="Bachelor's">Bachelor's</option>
+                  <option value="Master's">Master's</option>
+                  <option value="PhD">PhD</option>
                 </select>
               </div>
             </div>
@@ -940,23 +962,24 @@
               <div class="input-group-premium">
                 <label>Experience Level</label>
                 <select id="instrExp">
-                  <option>Select your experience...</option>
-                  <option>Intermediate</option><option>Advanced</option><option>Expert</option>
+                  <option value="">Select your experience...</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                  <option value="Expert">Expert</option>
                 </select>
               </div>
             </div>
           </div>
-          <!-- adaptive hints -->
           <div id="instrExpHint" class="adaptive-hint"></div>
           <div id="instrEduHint" class="adaptive-hint"></div>
 
           <div class="input-group-premium">
-            <label>Why do you want to teach in our platform</label>
+            <label>Why do you want to teach on our platform?</label>
             <textarea id="instrWhy" placeholder="Type your answers here..."></textarea>
           </div>
           <div id="instrWhySuggestion" class="dynamic-field"></div>
 
-          <!-- file uploads (styled) -->
+          <!-- file uploads -->
           <div class="file-upload-area" id="uploadPassportArea">
             <i class="bi bi-cloud-upload"></i>
             <p>Upload Passport (click or drag)</p>
@@ -992,14 +1015,14 @@
             <span>Your information is secure and will never be shared with third parties</span>
           </div>
 
-          <button type="submit" class="btn-premium" id="instructorSubmit">Apply as instructor →</button>
+          <button type="submit" class="btn-premium" id="instructorSubmit">Apply as Instructor →</button>
           <p class="text-center mt-4">Already have an account? <a href="sign-in.html" style="color:#7fc3b0;">Sign in</a></p>
         </form>
       </div>
     </div>
   </main>
 
-  <!-- FOOTER (exact copy from paths.html) -->
+  <!-- FOOTER -->
   <footer class="footer-fog">
     <div class="container">
       <div class="row">
@@ -1017,7 +1040,7 @@
     </div>
   </footer>
 
-  <!-- AI Assistant toggle & panel (from enroll-now) -->
+  <!-- AI Assistant toggle & panel -->
   <div class="assistant-toggle" id="assistantToggle" aria-label="Open assistant" role="button" tabindex="0"><i class="bi bi-chat-dots"></i></div>
 
   <div class="assistant-panel" id="assistantPanel">
@@ -1027,8 +1050,7 @@
     </div>
 
     <div class="assistant-chat" id="assistantChat">
-      <!-- messages injected via js -->
-      <div class="message assistant-message">👋 Hi there! I'm your onboarding assistant. Feel free to ask me anything or click suggestions.</div>
+      <div class="message assistant-message">👋 Hi there! I'm your enrollment assistant. I'll help you create your account.</div>
     </div>
 
     <div class="suggestions-area" id="suggestionsArea">
@@ -1046,14 +1068,14 @@
     </div>
   </div>
 
-  <!-- login overlay (hidden initially) -->
+  <!-- login overlay (shown after successful signup) -->
   <div id="loginOverlay" class="login-overlay hidden">
     <div class="login-card">
       <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #7fc3b0;"></i>
       <h2 class="mt-3">Welcome aboard!</h2>
       <p>Your account has been created. Please log in.</p>
       <div class="login-email-display" id="loginEmailDisplay"></div>
-      <button class="btn-login-close" id="closeLoginBtn">Continue to login</button>
+      <button class="btn-login-close" id="closeLoginBtn">Continue to sign in</button>
     </div>
   </div>
 
@@ -1062,10 +1084,10 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     (function() {
-      // AOS init (from paths)
+      // AOS init
       AOS.init({ duration: 800, once: true });
 
-      // scroll orb functionality (from paths)
+      // scroll orb functionality
       const orb = document.getElementById('orb-scroll');
       window.addEventListener('scroll', () => {
         if (window.scrollY > 500) orb.classList.add('visible');
@@ -1073,20 +1095,34 @@
       });
       orb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-      // mobile toggle (from paths)
+      // mobile toggle
       const toggle = document.getElementById('mobileToggle');
       const links = document.getElementById('navLinks');
-      toggle.addEventListener('click', () => links.classList.toggle('show'));
+      if (toggle) {
+        toggle.addEventListener('click', () => links.classList.toggle('show'));
+      }
       document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => { if (links.classList.contains('show')) links.classList.remove('show'); });
       });
 
-      // Original enroll-now functionality preserved below
+      // ---------- AUTHENTICATION STORAGE KEYS ----------
+      const STORAGE_KEYS = {
+        users: 'skillforge_users',           // Array of all registered users
+        auth: 'skillforge_logged_in_user',   // Currently authenticated user
+        student: 'skillforge_student',       // Legacy student storage
+        instructor: 'skillforge_instructor', // Legacy instructor storage
+        remember: 'skillforge_remembered_user',
+        session: 'skillforge_session'        // Session token
+      };
+
+      // UI Elements
       const selection = document.getElementById('selectionPanel');
       const studentPanel = document.getElementById('studentFormPanel');
       const instructorPanel = document.getElementById('instructorFormPanel');
       const loginOverlay = document.getElementById('loginOverlay');
       const loginEmailDisplay = document.getElementById('loginEmailDisplay');
+      const globalError = document.getElementById('globalError');
+      const errorText = document.getElementById('errorText');
 
       // Assistant elements
       const assistantToggle = document.getElementById('assistantToggle');
@@ -1100,114 +1136,344 @@
 
       let currentMode = 'student';
 
-      // ---------- PROGRESS MEMORY (localStorage) ----------
-      const STORAGE_KEYS = { student: 'skillforge_student', instructor: 'skillforge_instructor' };
-
-      function saveProgress(panelType) {
-        const form = panelType === 'student' ? document.getElementById('studentForm') : document.getElementById('instructorForm');
-        if (!form) return;
-        const data = {};
-        form.querySelectorAll('input, select, textarea').forEach(el => {
-          if (el.type === 'radio') {
-            if (el.checked) data[el.name] = el.value;
-          } else if (el.type === 'checkbox') {
-            data[el.id] = el.checked ? 'true' : 'false';
-          } else {
-            data[el.id] = el.value;
-          }
-        });
-        localStorage.setItem(STORAGE_KEYS[panelType], JSON.stringify(data));
+      // ---------- HELPER FUNCTIONS ----------
+      function showError(message) {
+        errorText.textContent = message;
+        globalError.classList.remove('hidden');
+        setTimeout(() => globalError.classList.add('hidden'), 5000);
       }
 
-      function restoreProgress(panelType) {
-        const saved = localStorage.getItem(STORAGE_KEYS[panelType]);
-        if (!saved) return false;
-        try {
-          const data = JSON.parse(saved);
-          const form = panelType === 'student' ? document.getElementById('studentForm') : document.getElementById('instructorForm');
-          form.querySelectorAll('input, select, textarea').forEach(el => {
-            if (el.type === 'radio' && data[el.name] === el.value) el.checked = true;
-            else if (el.type === 'checkbox') el.checked = (data[el.id] === 'true');
-            else if (data[el.id] !== undefined) el.value = data[el.id];
+      function showSuccess(message) {
+        // Can be used for success messages if needed
+        console.log('Success:', message);
+      }
+
+      // Check if user already exists
+      function userExists(email) {
+        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]');
+        return users.some(user => user.email.toLowerCase() === email.toLowerCase());
+      }
+
+      // Get all users
+      function getAllUsers() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]');
+      }
+
+      // Save user to storage
+      function saveUser(userData) {
+        const users = getAllUsers();
+        
+        // Check if user already exists
+        const existingIndex = users.findIndex(u => u.email.toLowerCase() === userData.email.toLowerCase());
+        
+        if (existingIndex >= 0) {
+          // Update existing user
+          users[existingIndex] = { ...users[existingIndex], ...userData, updatedAt: new Date().toISOString() };
+        } else {
+          // Add new user
+          users.push({
+            ...userData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            profileCompleted: true
           });
-          return true;
-        } catch { return false; }
+        }
+        
+        localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
+        
+        // Also save to role-specific storage for backward compatibility
+        if (userData.role === 'student') {
+          localStorage.setItem(STORAGE_KEYS.student, JSON.stringify(userData));
+        } else {
+          localStorage.setItem(STORAGE_KEYS.instructor, JSON.stringify(userData));
+        }
+        
+        return userData;
       }
 
-      function clearProgress(panelType) {
-        localStorage.removeItem(STORAGE_KEYS[panelType]);
-        const form = panelType === 'student' ? document.getElementById('studentForm') : document.getElementById('instructorForm');
-        form.reset();
+      // Password strength checker
+      function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 6) strength += 25;
+        if (password.length >= 8) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
+        return strength;
       }
 
-      function updateResumeBanner(panelType) {
-        const bannerId = panelType === 'student' ? 'studentResumeBanner' : 'instructorResumeBanner';
-        const banner = document.getElementById(bannerId);
-        const hasSaved = localStorage.getItem(STORAGE_KEYS[panelType]) !== null;
-        if (hasSaved) banner.classList.remove('hidden');
-        else banner.classList.add('hidden');
+      // ---------- FORM HANDLING ----------
+      
+      // Student form submission
+      document.getElementById('selectStudent')?.addEventListener('click', () => {
+        selection.classList.add('hidden');
+        studentPanel.classList.add('active');
+        instructorPanel.classList.remove('active');
+        currentMode = 'student';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Check for pre-filled email from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        if (email) {
+          document.getElementById('studentEmail').value = decodeURIComponent(email);
+        }
+      });
+
+      document.getElementById('selectInstructor')?.addEventListener('click', () => {
+        selection.classList.add('hidden');
+        instructorPanel.classList.add('active');
+        studentPanel.classList.remove('active');
+        currentMode = 'instructor';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Check for pre-filled email from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        if (email) {
+          document.getElementById('instrEmail').value = decodeURIComponent(email);
+        }
+      });
+
+      document.getElementById('backFromStudent')?.addEventListener('click', () => {
+        studentPanel.classList.remove('active');
+        selection.classList.remove('hidden');
+      });
+
+      document.getElementById('backFromInstructor')?.addEventListener('click', () => {
+        instructorPanel.classList.remove('active');
+        selection.classList.remove('hidden');
+      });
+
+      // Password strength meters
+      document.getElementById('studentPassword')?.addEventListener('input', (e) => {
+        const strength = checkPasswordStrength(e.target.value);
+        document.getElementById('studentStrength').style.width = strength + '%';
+      });
+
+      document.getElementById('instrPassword')?.addEventListener('input', (e) => {
+        const strength = checkPasswordStrength(e.target.value);
+        document.getElementById('instrStrength').style.width = strength + '%';
+      });
+
+      // Student form submission
+      document.getElementById('studentForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Get form values
+        const firstName = document.getElementById('studentFirstName').value.trim();
+        const lastName = document.getElementById('studentLastName').value.trim();
+        const email = document.getElementById('studentEmail').value.trim();
+        const password = document.getElementById('studentPassword').value;
+        const confirmPassword = document.getElementById('studentConfirmPassword').value;
+        const phone = document.getElementById('studentPhone').value.trim();
+        const education = document.getElementById('studentEdu').value;
+        const experience = document.getElementById('studentExp').value;
+        const goals = document.getElementById('studentGoals').value.trim();
+        const schedule = document.querySelector('input[name="schedule"]:checked')?.value || 'flexible';
+        const updates = document.getElementById('studentUpdates').checked;
+        const terms = document.getElementById('studentTerms').checked;
+
+        // Validation
+        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+          showError('Please fill in all required fields');
+          return;
+        }
+
+        if (!terms) {
+          showError('You must agree to the Terms of Service');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showError('Passwords do not match');
+          return;
+        }
+
+        if (password.length < 6) {
+          showError('Password must be at least 6 characters');
+          return;
+        }
+
+        if (userExists(email)) {
+          showError('An account with this email already exists. Please sign in instead.');
+          return;
+        }
+
+        // Create user object
+        const userData = {
+          firstName,
+          lastName,
+          email,
+          password: btoa(password), // Simple encoding (not secure for production)
+          phone,
+          role: 'student',
+          education,
+          experience,
+          goals,
+          preferences: {
+            schedule,
+            updates
+          },
+          stats: {
+            streak: 0,
+            completed: 0,
+            coursesInProgress: 0
+          },
+          enrolledCourses: [],
+          interests: [],
+          createdAt: new Date().toISOString(),
+          profileCompleted: true
+        };
+
+        // Save user
+        saveUser(userData);
+
+        // Show success animation
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
+
+        // Show login overlay
+        loginEmailDisplay.innerText = email;
+        loginOverlay.classList.remove('hidden');
+
+        // Clear form
+        e.target.reset();
+      });
+
+      // Instructor form submission
+      document.getElementById('instructorForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Get form values
+        const firstName = document.getElementById('instrFirstName').value.trim();
+        const lastName = document.getElementById('instrLastName').value.trim();
+        const email = document.getElementById('instrEmail').value.trim();
+        const password = document.getElementById('instrPassword').value;
+        const confirmPassword = document.getElementById('instrConfirmPassword').value;
+        const phone = document.getElementById('instrPhone').value.trim();
+        const education = document.getElementById('instrEdu').value;
+        const experience = document.getElementById('instrExp').value;
+        const motivation = document.getElementById('instrWhy').value.trim();
+        const schedule = document.querySelector('input[name="teachSchedule"]:checked')?.value || 'flexible';
+        const updates = document.getElementById('instrUpdates').checked;
+        const terms = document.getElementById('instrTerms').checked;
+
+        // Validation
+        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+          showError('Please fill in all required fields');
+          return;
+        }
+
+        if (!terms) {
+          showError('You must agree to the Terms of Service');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showError('Passwords do not match');
+          return;
+        }
+
+        if (password.length < 6) {
+          showError('Password must be at least 6 characters');
+          return;
+        }
+
+        if (userExists(email)) {
+          showError('An account with this email already exists. Please sign in instead.');
+          return;
+        }
+
+        // Get file names (simulate upload)
+        const passportFile = document.getElementById('passportUpload').files[0];
+        const certFile = document.getElementById('certUpload').files[0];
+
+        // Create user object
+        const userData = {
+          firstName,
+          lastName,
+          email,
+          password: btoa(password),
+          phone,
+          role: 'instructor',
+          education,
+          experience,
+          motivation,
+          preferences: {
+            schedule,
+            updates
+          },
+          files: {
+            passport: passportFile ? passportFile.name : null,
+            certificate: certFile ? certFile.name : null
+          },
+          stats: {
+            students: 0,
+            rating: 0,
+            coursesCreated: 0
+          },
+          coursesCreated: [],
+          expertise: experience,
+          bio: motivation,
+          createdAt: new Date().toISOString(),
+          profileCompleted: true
+        };
+
+        // Save user
+        saveUser(userData);
+
+        // Show success animation
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
+
+        // Show login overlay
+        loginEmailDisplay.innerText = email;
+        loginOverlay.classList.remove('hidden');
+
+        // Clear form
+        e.target.reset();
+      });
+
+      // File upload handlers
+      function setupFileUpload(areaId, inputId, displayId) {
+        const area = document.getElementById(areaId);
+        const input = document.getElementById(inputId);
+        const display = document.getElementById(displayId);
+        
+        if (area && input && display) {
+          area.addEventListener('click', () => input.click());
+          input.addEventListener('change', () => {
+            if (input.files.length) display.innerText = input.files[0].name;
+            else display.innerText = 'No file chosen';
+          });
+        }
+      }
+      
+      setupFileUpload('uploadPassportArea', 'passportUpload', 'passportFilename');
+      setupFileUpload('uploadCertArea', 'certUpload', 'certFilename');
+
+      // Close login overlay and redirect to sign-in
+      document.getElementById('closeLoginBtn')?.addEventListener('click', () => {
+        loginOverlay.classList.add('hidden');
+        window.location.href = 'sign-in.html?email=' + encodeURIComponent(loginEmailDisplay.innerText);
+      });
+
+      // Check for pre-filled email from sign-in page
+      const urlParams = new URLSearchParams(window.location.search);
+      const prefilledEmail = urlParams.get('email');
+      if (prefilledEmail) {
+        // Auto-select student or let user choose
+        // We'll just pre-fill both forms
+        setTimeout(() => {
+          if (document.getElementById('studentEmail')) {
+            document.getElementById('studentEmail').value = decodeURIComponent(prefilledEmail);
+          }
+          if (document.getElementById('instrEmail')) {
+            document.getElementById('instrEmail').value = decodeURIComponent(prefilledEmail);
+          }
+        }, 500);
       }
 
-      // ---------- ADAPTIVE BEHAVIOR ----------
-      function setupAdaptive() {
-        // student exp hint
-        const studentExp = document.getElementById('studentExp');
-        const studentExpHint = document.getElementById('studentExpHint');
-        studentExp?.addEventListener('change', () => {
-          if (studentExp.value === 'Beginner') studentExpHint.innerHTML = '<div class="hint-badge"><i class="bi bi-lightbulb"></i> Start with foundational courses — we recommend "Programming 101"</div>';
-          else if (studentExp.value === 'Advanced') studentExpHint.innerHTML = '<div class="hint-badge"><i class="bi bi-stars"></i> Check our specialization tracks for experts</div>';
-          else studentExpHint.innerHTML = '';
-          studentExpHint.classList.toggle('show', !!studentExpHint.innerHTML);
-        });
-
-        const studentEdu = document.getElementById('studentEdu');
-        const studentEduHint = document.getElementById('studentEduHint');
-        studentEdu?.addEventListener('change', () => {
-          if (studentEdu.value.includes('Master') || studentEdu.value.includes('PhD')) studentEduHint.innerHTML = '<div class="hint-badge">📘 Consider our research assistant opportunities</div>';
-          else studentEduHint.innerHTML = '';
-          studentEduHint.classList.toggle('show', !!studentEduHint.innerHTML);
-        });
-
-        const studentGoals = document.getElementById('studentGoals');
-        const goalSuggestion = document.getElementById('studentGoalSuggestion');
-        studentGoals?.addEventListener('input', () => {
-          const txt = studentGoals.value.toLowerCase();
-          if (txt.includes('python') || txt.includes('coding')) goalSuggestion.innerHTML = '<div class="hint-badge">🐍 We have a Python bootcamp starting next week!</div>';
-          else if (txt.includes('design')) goalSuggestion.innerHTML = '<div class="hint-badge">🎨 UI/UX track with live mentor sessions available</div>';
-          else goalSuggestion.innerHTML = '';
-          goalSuggestion.classList.toggle('show', !!goalSuggestion.innerHTML);
-        });
-
-        const instrExp = document.getElementById('instrExp');
-        const instrExpHint = document.getElementById('instrExpHint');
-        instrExp?.addEventListener('change', () => {
-          if (instrExp.value === 'Intermediate') instrExpHint.innerHTML = '<div class="hint-badge">🧑‍🏫 Great! Consider co-teaching with a senior instructor</div>';
-          else if (instrExp.value === 'Expert') instrExpHint.innerHTML = '<div class="hint-badge">🏆 You can lead a masterclass — we\'ll feature your profile</div>';
-          else instrExpHint.innerHTML = '';
-          instrExpHint.classList.toggle('show', !!instrExpHint.innerHTML);
-        });
-
-        const instrEdu = document.getElementById('instrEdu');
-        const instrEduHint = document.getElementById('instrEduHint');
-        instrEdu?.addEventListener('change', () => {
-          if (instrEdu.value === 'PhD') instrEduHint.innerHTML = '<div class="hint-badge">🔬 PhD holders often mentor capstone projects</div>';
-          else instrEduHint.innerHTML = '';
-          instrEduHint.classList.toggle('show', !!instrEduHint.innerHTML);
-        });
-
-        const instrWhy = document.getElementById('instrWhy');
-        const whySuggestion = document.getElementById('instrWhySuggestion');
-        instrWhy?.addEventListener('input', () => {
-          const txt = instrWhy.value.toLowerCase();
-          if (txt.includes('passion') || txt.includes('love')) whySuggestion.innerHTML = '<div class="hint-badge">❤️ We value passion — check our "inspire" grant</div>';
-          else if (txt.includes('career')) whySuggestion.innerHTML = '<div class="hint-badge">📈 Teaching accelerates career growth — we support you</div>';
-          else whySuggestion.innerHTML = '';
-          whySuggestion.classList.toggle('show', !!whySuggestion.innerHTML);
-        });
-      }
-
-      // ---------- ASSISTANT CORE FUNCTIONS ----------
-      function addMessage(text, sender = 'assistant') {
+      // ---------- ASSISTANT FUNCTIONS ----------
+      function addAssistantMessage(text, sender = 'assistant') {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message', sender === 'assistant' ? 'assistant-message' : 'user-message');
         msgDiv.textContent = text;
@@ -1224,196 +1490,52 @@
 
         setTimeout(() => {
           assistantChat.removeChild(typingDiv);
-          addMessage(message, 'assistant');
+          addAssistantMessage(message, 'assistant');
         }, delay);
       }
 
       function handleSuggestion(text) {
-        addMessage(text, 'user');
-        if (text.includes('goals')) showTypingThenMessage('Think about skills you want to build or projects you dream of. For example: "master React" or "launch my startup".');
-        else if (text.includes('password')) showTypingThenMessage('Use at least 8 characters, mix letters, numbers, and symbols. Avoid common words.');
-        else if (text.includes('instructor')) showTypingThenMessage('Sharing knowledge is rewarding! You can inspire others and grow your network.');
-        else showTypingThenMessage('Got it! Let me know if you need more help.');
+        addAssistantMessage(text, 'user');
+        if (text.includes('goals')) {
+          showTypingThenMessage('Think about skills you want to build or projects you dream of. For example: "master React" or "launch my startup".');
+        } else if (text.includes('password')) {
+          showTypingThenMessage('Use at least 8 characters, mix letters, numbers, and symbols. Avoid common words. I can check your password strength as you type!');
+        } else if (text.includes('instructor')) {
+          showTypingThenMessage('Sharing knowledge is rewarding! You can inspire others, grow your network, and even earn income. What expertise would you like to share?');
+        } else {
+          showTypingThenMessage('Got it! Let me know if you need more help with your enrollment.');
+        }
       }
 
-      // field focus assistant tips
-      function setupAssistantFieldListeners() {
-        const fields = [
-          { id: 'studentFirstName', tip: 'Your first name as it appears on official ID.' },
-          { id: 'studentEmail', tip: 'We’ll send course updates and login info here.' },
-          { id: 'studentPassword', tip: 'Make it strong: 8+ chars, with numbers and symbols.' },
-          { id: 'studentGoals', tip: 'Be specific! Example: "learn data science for my job".' },
-          { id: 'instrWhy', tip: 'Tell us what excites you about teaching. Passion shines through!' }
-        ];
-        fields.forEach(f => {
-          const el = document.getElementById(f.id);
-          if (el) {
-            el.addEventListener('focus', () => {
-              if (assistantPanel.classList.contains('open')) {
-                // optionally show quick tip in chat
-              }
-            });
-          }
+      // Assistant event listeners
+      if (assistantToggle) {
+        assistantToggle.addEventListener('click', () => {
+          assistantPanel.classList.add('open');
+          body.classList.add('assistant-open');
         });
       }
 
-      // ---------- FORM SUBMIT OVERRIDE ----------
-      function enhanceFormSubmit(formId, submitId, panelType) {
-        const form = document.getElementById(formId);
-        const btn = document.getElementById(submitId);
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const required = form.querySelectorAll('.required');
-          let valid = true;
-          required.forEach(field => {
-            if (!field.value.trim()) { field.style.borderColor = '#ff4444'; valid = false; }
-            else field.style.borderColor = '';
-          });
-          if (formId === 'studentForm') {
-            const pwd = document.getElementById('studentPassword').value;
-            const cpwd = document.getElementById('studentConfirmPassword').value;
-            if (pwd !== cpwd) { alert('Passwords do not match'); valid = false; }
-          }
-          if (formId === 'instructorForm') {
-            const pwd = document.getElementById('instrPassword').value;
-            const cpwd = document.getElementById('instrConfirmPassword').value;
-            if (pwd !== cpwd) { alert('Passwords do not match'); valid = false; }
-          }
-          if (!valid) return;
-
-          btn.innerText = '⏳ processing...';
-          btn.disabled = true;
-
-          confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 }, startVelocity: 20, colors: ['#7fc3b0', '#ffb347'] });
-          setTimeout(() => confetti({ particleCount: 40, spread: 40, origin: { y: 0.5, x: 0.2 }, colors: ['#0f2b3c'] }), 150);
-
-          localStorage.removeItem(STORAGE_KEYS[panelType]);
-
-          const emailField = document.getElementById(panelType === 'student' ? 'studentEmail' : 'instrEmail');
-          const email = emailField ? emailField.value : '';
-
-          setTimeout(() => {
-            btn.innerText = panelType === 'student' ? 'Secure enrollment →' : 'Apply as instructor →';
-            btn.disabled = false;
-            studentPanel.classList.remove('active');
-            instructorPanel.classList.remove('active');
-            selection.classList.add('hidden');
-            loginEmailDisplay.innerText = email ? `✉️ ${email}` : 'Your account is ready';
-            loginOverlay.classList.remove('hidden');
-          }, 1200);
+      if (closeAssistant) {
+        closeAssistant.addEventListener('click', () => {
+          assistantPanel.classList.remove('open');
+          body.classList.remove('assistant-open');
         });
       }
 
-      // ---------- INITIALIZE ----------
-      document.getElementById('selectStudent').addEventListener('click', () => {
-        selection.classList.add('hidden');
-        studentPanel.classList.add('active');
-        instructorPanel.classList.remove('active');
-        currentMode = 'student';
-        restoreProgress('student');
-        updateResumeBanner('student');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-      document.getElementById('selectInstructor').addEventListener('click', () => {
-        selection.classList.add('hidden');
-        instructorPanel.classList.add('active');
-        studentPanel.classList.remove('active');
-        currentMode = 'instructor';
-        restoreProgress('instructor');
-        updateResumeBanner('instructor');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-
-      document.getElementById('backFromStudent').addEventListener('click', () => {
-        studentPanel.classList.remove('active');
-        selection.classList.remove('hidden');
-      });
-      document.getElementById('backFromInstructor').addEventListener('click', () => {
-        instructorPanel.classList.remove('active');
-        selection.classList.remove('hidden');
-      });
-
-      // file upload simulation
-      function setupFileUpload(areaId, inputId, displayId) {
-        const area = document.getElementById(areaId);
-        const input = document.getElementById(inputId);
-        const display = document.getElementById(displayId);
-        area.addEventListener('click', () => input.click());
-        input.addEventListener('change', () => {
-          if (input.files.length) display.innerText = input.files[0].name;
-          else display.innerText = 'No file chosen';
-        });
-        area.addEventListener('dragover', (e) => e.preventDefault());
-        area.addEventListener('drop', (e) => {
-          e.preventDefault();
-          if (e.dataTransfer.files.length) {
-            input.files = e.dataTransfer.files;
-            display.innerText = e.dataTransfer.files[0].name;
-          }
+      if (sendBtn) {
+        sendBtn.addEventListener('click', () => {
+          const text = assistantInput.value.trim();
+          if (!text) return;
+          handleSuggestion(text);
+          assistantInput.value = '';
         });
       }
-      setupFileUpload('uploadPassportArea', 'passportUpload', 'passportFilename');
-      setupFileUpload('uploadCertArea', 'certUpload', 'certFilename');
 
-      // password strength
-      document.getElementById('studentPassword')?.addEventListener('input', (e) => {
-        const fill = Math.min(100, e.target.value.length * 20);
-        document.getElementById('studentStrength').style.width = fill + '%';
-      });
-      document.getElementById('instrPassword')?.addEventListener('input', (e) => {
-        const fill = Math.min(100, e.target.value.length * 20);
-        document.getElementById('instrStrength').style.width = fill + '%';
-      });
-
-      setupAdaptive();
-      enhanceFormSubmit('studentForm', 'studentSubmit', 'student');
-      enhanceFormSubmit('instructorForm', 'instructorSubmit', 'instructor');
-
-      ['studentForm', 'instructorForm'].forEach(formId => {
-        const form = document.getElementById(formId);
-        if (!form) return;
-        form.addEventListener('input', () => {
-          const panel = formId === 'studentForm' ? 'student' : 'instructor';
-          saveProgress(panel);
-          updateResumeBanner(panel);
+      if (assistantInput) {
+        assistantInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') sendBtn.click();
         });
-      });
-
-      document.getElementById('clearStudentProgress')?.addEventListener('click', () => {
-        clearProgress('student');
-        updateResumeBanner('student');
-      });
-      document.getElementById('clearInstructorProgress')?.addEventListener('click', () => {
-        clearProgress('instructor');
-        updateResumeBanner('instructor');
-      });
-
-      document.querySelectorAll('input, select, textarea').forEach(el => {
-        el.addEventListener('focus', () => el.parentElement?.classList.add('focused'));
-        el.addEventListener('blur', () => el.parentElement?.classList.remove('focused'));
-      });
-
-      // ---------- ASSISTANT UI ----------
-      assistantToggle.addEventListener('click', () => {
-        assistantPanel.classList.add('open');
-        body.classList.add('assistant-open');
-      });
-      closeAssistant.addEventListener('click', () => {
-        assistantPanel.classList.remove('open');
-        body.classList.remove('assistant-open');
-      });
-
-      sendBtn.addEventListener('click', () => {
-        const text = assistantInput.value.trim();
-        if (!text) return;
-        addMessage(text, 'user');
-        assistantInput.value = '';
-        showTypingThenMessage('Thanks for your question! Our team will have more details soon. 😊');
-      });
-
-      assistantInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendBtn.click();
-      });
+      }
 
       suggestionChips.forEach(chip => {
         chip.addEventListener('click', () => {
@@ -1421,115 +1543,40 @@
         });
       });
 
-      setupAssistantFieldListeners();
-
-      // close login modal
-      document.getElementById('closeLoginBtn').addEventListener('click', () => {
-        loginOverlay.classList.add('hidden');
-        selection.classList.remove('hidden');
+      // Field focus tips
+      const fields = [
+        { id: 'studentFirstName', tip: 'Your legal first name as it appears on official documents.' },
+        { id: 'studentEmail', tip: 'We\'ll send course updates and login info here. Use an email you check regularly.' },
+        { id: 'studentPassword', tip: 'Make it strong: 8+ chars, with numbers and symbols. I\'ll show you the strength.' },
+        { id: 'studentGoals', tip: 'Be specific! Example: "learn data science for my job" or "build a portfolio".' },
+        { id: 'instrWhy', tip: 'Tell us what excites you about teaching. Passion shines through!' }
+      ];
+      
+      fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        if (el) {
+          el.addEventListener('focus', () => {
+            if (assistantPanel.classList.contains('open')) {
+              addAssistantMessage(`💡 Tip: ${f.tip}`, 'assistant');
+            }
+          });
+        }
       });
+
+      // Check if user is already logged in (redirect to profile)
+      const activeSession = localStorage.getItem(STORAGE_KEYS.auth);
+      if (activeSession) {
+        // If user is already logged in, show a message but don't auto-redirect
+        // They might want to create another account
+        const msg = document.createElement('div');
+        msg.className = 'resume-banner';
+        msg.innerHTML = `<span><i class="bi bi-info-circle"></i> You're already logged in as ${JSON.parse(activeSession).email}. <a href="user-profile.html" style="color:#7fc3b0;">Go to profile</a></span>`;
+        document.querySelector('.enroll-container').prepend(msg);
+      }
+
+      // Clear any duplicate script at the bottom
+      // The duplicate script block at the end of the original file has been removed
     })();
-
-    // Add these storage keys at the top of your script
-const STORAGE_KEYS = {
-  student: 'skillforge_student',
-  instructor: 'skillforge_instructor',
-  auth: 'skillforge_logged_in_user'
-};
-
-// Replace your existing submit button event listener with this:
-document.getElementById('submitEnrollment').addEventListener('click', (e) => {
-  e.preventDefault();
-  
-  // Get all form values
-  const selectedRole = document.querySelector('.role-option.selected')?.dataset.role;
-  const firstName = document.getElementById('firstName')?.value;
-  const lastName = document.getElementById('lastName')?.value;
-  const email = document.getElementById('email')?.value;
-  const password = document.getElementById('password')?.value;
-  
-  // Create base user object
-  const userData = {
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    role: selectedRole,
-    stats: {
-      streak: 0,
-      completed: 0
-    },
-    createdAt: new Date().toISOString()
-  };
-
-  // Add role-specific data
-  if (selectedRole === 'student') {
-    // Get student-specific fields
-    const experienceLevel = document.getElementById('experienceLevel')?.value;
-    const learningGoals = document.getElementById('learningGoals')?.value;
-    
-    // Get selected interests
-    const interests = [];
-    document.querySelectorAll('.interest-tag.selected').forEach(tag => {
-      interests.push(tag.dataset.interest);
-    });
-    
-    userData.goals = learningGoals;
-    userData.experience = experienceLevel;
-    userData.interests = interests;
-    userData.enrolledCourses = [];
-    
-    // Save to student storage
-    localStorage.setItem(STORAGE_KEYS.student, JSON.stringify(userData));
-    
-  } else if (selectedRole === 'instructor') {
-    // Get instructor-specific fields
-    const expertise = document.getElementById('expertise')?.value;
-    const instructorBio = document.getElementById('instructorBio')?.value;
-    const linkedin = document.getElementById('linkedin')?.value;
-    
-    userData.expertise = expertise;
-    userData.bio = instructorBio;
-    userData.linkedin = linkedin;
-    userData.coursesCreated = [];
-    userData.stats.students = 0;
-    userData.stats.rating = 0;
-    
-    // Save to instructor storage
-    localStorage.setItem(STORAGE_KEYS.instructor, JSON.stringify(userData));
-  }
-
-  // Save auth data (this is what profile page reads)
-  localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
-
-  // Show success message
-  const globalMsg = document.getElementById('globalMessage');
-  globalMsg.classList.remove('hidden');
-  globalMsg.className = 'global-message success';
-  globalMsg.innerHTML = '<i class="bi bi-check-circle-fill"></i> Account created successfully! Redirecting...';
-
-  // Redirect to profile page
-  setTimeout(() => {
-    window.location.href = 'user-profile.html';
-  }, 1500);
-});
-
-// Add this function to pre-fill form if user is already logged in
-function checkExistingSession() {
-  const existingUser = localStorage.getItem(STORAGE_KEYS.auth);
-  if (existingUser) {
-    const globalMsg = document.getElementById('globalMessage');
-    globalMsg.classList.remove('hidden');
-    globalMsg.className = 'global-message success';
-    globalMsg.innerHTML = '<i class="bi bi-check-circle-fill"></i> You are already logged in. Redirecting...';
-    
-    setTimeout(() => {
-      window.location.href = 'user-profile.html';
-    }, 1500);
-  }
-}
-
-// Call this when page loads
-checkExistingSession();
   </script>
 </body>
 </html>

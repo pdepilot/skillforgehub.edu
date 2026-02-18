@@ -326,539 +326,608 @@
   </div>
   <div id="modalBackdrop" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.2); backdrop-filter:blur(4px); z-index:1999;"></div>
 
-  <script>
-    (function() {
-      // ---------- STORAGE KEYS (must match enroll page) ----------
-      const STORAGE_KEYS = {
-        student: 'skillforge_student',
-        instructor: 'skillforge_instructor',
-        auth: 'skillforge_logged_in_user'
+<script>
+(function() {
+  // ---------- STORAGE KEYS ----------
+  const STORAGE_KEYS = {
+    users: 'skillforge_users',
+    auth: 'skillforge_logged_in_user',
+    student: 'skillforge_student',
+    instructor: 'skillforge_instructor',
+    session: 'skillforge_session'
+  };
+  
+  let currentUser = null;
+  let userRole = 'student';
+
+  // DOM elements
+  const navItems = document.querySelectorAll('.nav-item[data-section]');
+  const sections = {
+    overview: document.getElementById('overviewSection'),
+    courses: document.getElementById('coursesSection'),
+    messages: document.getElementById('messagesSection'),
+    certificates: document.getElementById('certificatesSection'),
+    payments: document.getElementById('paymentsSection'),
+    settings: document.getElementById('settingsSection')
+  };
+  
+  const displayName = document.getElementById('displayName');
+  const roleBadge = document.getElementById('roleBadge');
+  const displayEmail = document.getElementById('displayEmail');
+  const avatar = document.getElementById('avatar');
+  
+  const overviewContent = document.getElementById('overviewContent');
+  const coursesContent = document.getElementById('coursesContent');
+  const messagesContent = document.getElementById('messagesContent');
+  const certificatesContent = document.getElementById('certificatesContent');
+  const paymentsContent = document.getElementById('paymentsContent');
+  const settingsCard = document.getElementById('settingsCard');
+  
+  const achievementsGrid = document.getElementById('achievementsGrid');
+  const analyticsContent = document.getElementById('analyticsContent');
+  const remindersContent = document.getElementById('remindersContent');
+  const mentorGrid = document.getElementById('mentorGrid');
+  const recommendationsGrid = document.getElementById('recommendationsGrid');
+  const insightMessage = document.getElementById('insightMessage');
+
+  // Edit modal elements
+  const editModal = document.getElementById('editProfileModal');
+  const backdrop = document.getElementById('modalBackdrop');
+  const openEditBtn = document.getElementById('openEditProfileBtn');
+  const cancelEdit = document.getElementById('cancelEdit');
+  const editForm = document.getElementById('editProfileForm');
+  const editName = document.getElementById('editName');
+  const editEmail = document.getElementById('editEmail');
+  const editGoals = document.getElementById('editGoals');
+  const editBio = document.getElementById('editBio');
+
+  // ---------- HELPER FUNCTIONS ----------
+  function getAllUsers() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]');
+  }
+
+  function showGlobalMessage(text, type = 'success') {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `global-message ${type}`;
+    msgDiv.style.position = 'fixed';
+    msgDiv.style.top = '1rem';
+    msgDiv.style.left = '50%';
+    msgDiv.style.transform = 'translateX(-50%)';
+    msgDiv.style.zIndex = '3000';
+    msgDiv.style.minWidth = '300px';
+    msgDiv.style.textAlign = 'center';
+    msgDiv.style.padding = '1rem 2rem';
+    msgDiv.style.borderRadius = '60px';
+    msgDiv.style.background = type === 'success' ? '#e0f2e9' : '#fee9e7';
+    msgDiv.style.color = type === 'success' ? '#1f6e4f' : '#c53030';
+    msgDiv.style.borderLeft = type === 'success' ? '8px solid #3c9b7a' : '8px solid #ff6b6b';
+    msgDiv.innerHTML = (type === 'success' ? '<i class="bi bi-check-circle-fill"></i> ' : '<i class="bi bi-exclamation-triangle-fill"></i> ') + text;
+    document.body.appendChild(msgDiv);
+    
+    setTimeout(() => {
+      msgDiv.remove();
+    }, 3000);
+  }
+
+  // Check authentication
+  function checkAuth() {
+    const session = localStorage.getItem(STORAGE_KEYS.auth);
+    const sessionTime = localStorage.getItem(STORAGE_KEYS.session);
+    
+    if (!session || !sessionTime) {
+      window.location.href = 'sign-in.html?redirect=profile';
+      return null;
+    }
+    
+    // Check session expiry (24 hours)
+    const elapsed = Date.now() - parseInt(sessionTime);
+    if (elapsed > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(STORAGE_KEYS.auth);
+      localStorage.removeItem(STORAGE_KEYS.session);
+      window.location.href = 'sign-in.html?expired=true';
+      return null;
+    }
+    
+    return JSON.parse(session);
+  }
+
+  // Update user data in all storage locations
+  function updateUserData(updatedUser) {
+    // Update auth storage
+    localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(updatedUser));
+    
+    // Update in users array
+    const users = getAllUsers();
+    const userIndex = users.findIndex(u => u.email.toLowerCase() === updatedUser.email.toLowerCase());
+    
+    if (userIndex >= 0) {
+      users[userIndex] = { ...users[userIndex], ...updatedUser, updatedAt: new Date().toISOString() };
+      localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
+    }
+    
+    // Update role-specific storage for backward compatibility
+    if (updatedUser.role === 'student') {
+      localStorage.setItem(STORAGE_KEYS.student, JSON.stringify(updatedUser));
+    } else {
+      localStorage.setItem(STORAGE_KEYS.instructor, JSON.stringify(updatedUser));
+    }
+    
+    return updatedUser;
+  }
+
+  // Load user data
+  function loadUser() {
+    const authUser = checkAuth();
+    if (!authUser) return false;
+    
+    currentUser = authUser;
+    userRole = currentUser.role || 'student';
+    
+    // Ensure user has all required fields
+    if (!currentUser.stats) {
+      currentUser.stats = { 
+        streak: 0, 
+        completed: 0, 
+        coursesInProgress: 0,
+        ...(userRole === 'instructor' ? { students: 0, rating: 0 } : {})
       };
-      
-      let currentUser = null;
-      let userRole = 'student';
+    }
+    
+    if (!currentUser.preferences) {
+      currentUser.preferences = { schedule: 'flexible', updates: false };
+    }
+    
+    if (!currentUser.interests) {
+      currentUser.interests = [];
+    }
+    
+    if (!currentUser.enrolledCourses && userRole === 'student') {
+      currentUser.enrolledCourses = [];
+    }
+    
+    if (!currentUser.coursesCreated && userRole === 'instructor') {
+      currentUser.coursesCreated = [];
+    }
+    
+    return true;
+  }
 
-      // Load user data from localStorage
-      function loadUser() {
-        // First try to get from auth storage
-        const auth = localStorage.getItem(STORAGE_KEYS.auth);
-        if (auth) {
-          try { 
-            currentUser = JSON.parse(auth); 
-            userRole = currentUser.role || 'student'; 
-            return;
-          } catch (e) {
-            console.error('Error parsing auth data', e);
-          }
-        }
-        
-        // If no auth, try student storage
-        const studentData = localStorage.getItem(STORAGE_KEYS.student);
-        if (studentData) {
-          try {
-            currentUser = JSON.parse(studentData);
-            userRole = 'student';
-            // Sync to auth
-            localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(currentUser));
-            return;
-          } catch (e) {
-            console.error('Error parsing student data', e);
-          }
-        }
-        
-        // If no student, try instructor storage
-        const instructorData = localStorage.getItem(STORAGE_KEYS.instructor);
-        if (instructorData) {
-          try {
-            currentUser = JSON.parse(instructorData);
-            userRole = 'instructor';
-            // Sync to auth
-            localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(currentUser));
-            return;
-          } catch (e) {
-            console.error('Error parsing instructor data', e);
-          }
-        }
-        
-        // If no data at all, use fallback
-        fallback();
-      }
-      
-      function fallback() {
-        currentUser = { 
-          firstName: 'Alex', 
-          lastName: 'Morgan', 
-          email: 'alex.m@example.com', 
-          role: 'student', 
-          goals: 'Master frontend development', 
-          bio: '', 
-          stats: { streak: 12, completed: 4 },
-          experience: 'intermediate',
-          interests: ['web', 'design']
-        };
-        userRole = 'student';
-        // Save fallback to storage
-        localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(currentUser));
-        localStorage.setItem(STORAGE_KEYS.student, JSON.stringify(currentUser));
-      }
-      
-      // Load user data
-      loadUser();
+  // Update header with user data
+  function updateHeader() {
+    const fullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'User';
+    displayName.innerText = fullName;
+    roleBadge.innerText = userRole === 'student' ? 'Student' : 'Instructor';
+    displayEmail.innerText = currentUser.email || 'user@example.com';
+    
+    if (userRole === 'instructor') {
+      avatar.innerHTML = `<i class="bi bi-easel"></i>`;
+    } else {
+      avatar.innerHTML = `<i class="bi bi-person-circle"></i>`;
+    }
+  }
 
-      // DOM elements
-      const navItems = document.querySelectorAll('.nav-item[data-section]');
-      const sections = {
-        overview: document.getElementById('overviewSection'),
-        courses: document.getElementById('coursesSection'),
-        messages: document.getElementById('messagesSection'),
-        certificates: document.getElementById('certificatesSection'),
-        payments: document.getElementById('paymentsSection'),
-        settings: document.getElementById('settingsSection')
-      };
-      
-      const displayName = document.getElementById('displayName');
-      const roleBadge = document.getElementById('roleBadge');
-      const displayEmail = document.getElementById('displayEmail');
-      const avatar = document.getElementById('avatar');
-      
-      const overviewContent = document.getElementById('overviewContent');
-      const coursesContent = document.getElementById('coursesContent');
-      const messagesContent = document.getElementById('messagesContent');
-      const certificatesContent = document.getElementById('certificatesContent');
-      const paymentsContent = document.getElementById('paymentsContent');
-      const settingsCard = document.getElementById('settingsCard');
-      
-      const achievementsGrid = document.getElementById('achievementsGrid');
-      const analyticsContent = document.getElementById('analyticsContent');
-      const remindersContent = document.getElementById('remindersContent');
-      const mentorGrid = document.getElementById('mentorGrid');
-      const recommendationsGrid = document.getElementById('recommendationsGrid');
-      const insightMessage = document.getElementById('insightMessage');
+  // AI insights
+  const insights = [
+    `✨ Welcome back, ${currentUser?.firstName || 'User'}! You're making great progress.`,
+    `🏆 You're ${currentUser?.stats?.completed || 0} courses closer to your goals!`,
+    `📈 Keep up the momentum! Your streak is ${currentUser?.stats?.streak || 0} days.`,
+    `💡 Based on your interests, try our advanced courses.`,
+    `🎯 You've completed great progress toward your learning goals.`
+  ];
+  
+  let insightIndex = 0;
+  setInterval(() => { 
+    if (insightMessage && currentUser) {
+      insightIndex = (insightIndex + 1) % insights.length; 
+      insightMessage.innerText = insights[insightIndex]; 
+    }
+  }, 6000);
 
-      // Update header with real user data
-      function updateHeader() {
-        const fullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'User';
-        displayName.innerText = fullName;
-        roleBadge.innerText = userRole === 'student' ? 'Student' : 'Instructor';
-        displayEmail.innerText = currentUser.email || 'user@example.com';
-        
-        // Set avatar based on role
-        if (userRole === 'instructor') {
-          avatar.innerHTML = `<i class="bi bi-easel"></i>`;
-        } else {
-          avatar.innerHTML = `<i class="bi bi-person-circle"></i>`;
-        }
-      }
-
-      // AI insights based on user data
-      const insights = [
-        `✨ Welcome back, ${currentUser.firstName || 'User'}! You're making great progress.`,
-        `🏆 You're ${currentUser.stats?.completed || 0} courses closer to your goals!`,
-        `📈 Keep up the momentum! Your streak is ${currentUser.stats?.streak || 0} days.`,
-        `💡 Based on your interests, try our advanced courses.`,
-        `🎯 You've completed 75% of your current learning goal.`
-      ];
-      
-      let insightIndex = 0;
-      setInterval(() => { 
-        insightIndex = (insightIndex + 1) % insights.length; 
-        insightMessage.innerText = insights[insightIndex]; 
-      }, 6000);
-
-      // Render overview with real user data
-      function renderOverview() {
-        // Overview stats
-        if (userRole === 'student') {
-          overviewContent.innerHTML = `
-            <div class="card-grid">
-              <div class="premium-card">
-                <i class="bi bi-lightning-charge fs-1 text-accent"></i>
-                <h4>Learning streak</h4>
-                <p class="fw-bold fs-3">${currentUser.stats?.streak || 0} days</p>
-              </div>
-              <div class="premium-card">
-                <i class="bi bi-trophy fs-1 text-accent"></i>
-                <h4>Courses completed</h4>
-                <p class="fw-bold fs-3">${currentUser.stats?.completed || 0}</p>
-              </div>
-              <div class="premium-card">
-                <i class="bi bi-clock-history fs-1 text-accent"></i>
-                <h4>Experience level</h4>
-                <p class="fw-bold fs-5">${currentUser.experience || 'Beginner'}</p>
-              </div>
-            </div>
-          `;
-        } else {
-          overviewContent.innerHTML = `
-            <div class="card-grid">
-              <div class="premium-card">
-                <i class="bi bi-people fs-1 text-accent"></i>
-                <h4>Students</h4>
-                <p class="fw-bold fs-3">${currentUser.stats?.students || 0}</p>
-              </div>
-              <div class="premium-card">
-                <i class="bi bi-star fs-1 text-accent"></i>
-                <h4>Rating</h4>
-                <p class="fw-bold fs-3">${currentUser.stats?.rating || '4.8'}</p>
-              </div>
-              <div class="premium-card">
-                <i class="bi bi-play-circle fs-1 text-accent"></i>
-                <h4>Courses</h4>
-                <p class="fw-bold fs-3">${currentUser.coursesCreated?.length || 0}</p>
-              </div>
-            </div>
-          `;
-        }
-
-        // Achievements based on user data
-        let badges = '';
-        if (userRole === 'student') {
-          const interests = currentUser.interests || [];
-          badges = `
-            <div class="premium-card badge-item">
-              <div class="badge-icon"><i class="bi bi-award"></i></div>
-              <h6>Getting Started</h6>
-              <small>Joined SkillForge</small>
-            </div>
-            ${interests.includes('web') ? `
-            <div class="premium-card badge-item">
-              <div class="badge-icon"><i class="bi bi-code-slash"></i></div>
-              <h6>Web Developer</h6>
-              <small>Interested in web dev</small>
-            </div>` : ''}
-            ${currentUser.stats?.streak > 5 ? `
-            <div class="premium-card badge-item">
-              <div class="badge-icon"><i class="bi bi-fire"></i></div>
-              <h6>On Fire!</h6>
-              <small>${currentUser.stats?.streak} day streak</small>
-              <div class="progress mt-2"><div class="progress-bar" style="width:${Math.min(100, (currentUser.stats?.streak/30)*100)}%"></div></div>
-            </div>` : ''}
-          `;
-        } else {
-          badges = `
-            <div class="premium-card badge-item">
-              <div class="badge-icon"><i class="bi bi-mic"></i></div>
-              <h6>Rising instructor</h6>
-              <small>Expert in ${currentUser.expertise || 'your field'}</small>
-            </div>
-            <div class="premium-card badge-item">
-              <div class="badge-icon"><i class="bi bi-star"></i></div>
-              <h6>Premium Educator</h6>
-              <small>Sharing knowledge</small>
-            </div>
-          `;
-        }
-        achievementsGrid.innerHTML = badges;
-
-        // Productivity analytics
-        analyticsContent.innerHTML = `
-          <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-            <div><i class="bi bi-clock"></i> Goal: ${currentUser.goals || 'Complete courses'} <span class="text-accent">in progress</span></div>
-            <div><i class="bi bi-bar-chart"></i> Level: ${currentUser.experience || 'beginner'}</div>
-            <div><i class="bi bi-graph-up"></i> Status: <span class="text-accent">active learner</span></div>
-          </div>
-          <div class="progress mt-3"><div class="progress-bar" style="width:${Math.min(100, (currentUser.stats?.completed || 0) * 25)}%"></div></div>
-          <p class="mt-2">${(currentUser.stats?.completed || 0) * 25}% toward next milestone</p>
-        `;
-
-        // Smart reminders based on user data
-        remindersContent.innerHTML = `
-          <div><i class="bi bi-exclamation-circle"></i> ${userRole === 'student' ? 
-            `Continue your ${currentUser.interests?.length ? currentUser.interests[0] : 'learning'} journey` : 
-            'Create your next course'}</div>
-          <div class="mt-2"><i class="bi bi-chat"></i> Connect with the community</div>
-          <div class="mt-2"><i class="bi bi-calendar"></i> Study session scheduled tomorrow</div>
-          <button class="btn btn-sm btn-outline-success rounded-pill mt-3" id="dismissReminder">Dismiss</button>
-        `;
-        
-        document.getElementById('dismissReminder')?.addEventListener('click', (e) => {
-          e.target.parentElement.style.opacity = '0.5';
-        });
-
-        // Mentor suggestions based on user interests
-        if (userRole === 'student') {
-          mentorGrid.innerHTML = `
-            <div class="premium-card">
-              <i class="bi bi-person-circle fs-1"></i>
-              <h5>Sarah Chen</h5>
-              <p>${currentUser.interests?.includes('web') ? 'Web expert' : 'Learning advisor'} · 98% match</p>
-              <button class="btn btn-sm btn-outline-primary rounded-pill">Connect</button>
-            </div>
-            <div class="premium-card">
-              <i class="bi bi-person-circle fs-1"></i>
-              <h5>Marcus Lee</h5>
-              <p>${currentUser.interests?.includes('design') ? 'UI/UX designer' : 'Career coach'} · 85% match</p>
-              <button class="btn btn-sm btn-outline-primary rounded-pill">Connect</button>
-            </div>
-          `;
-        }
-
-        // Recommendations based on interests
-        recommendationsGrid.innerHTML = `
+  // Render functions
+  function renderOverview() {
+    if (!currentUser) return;
+    
+    if (userRole === 'student') {
+      overviewContent.innerHTML = `
+        <div class="card-grid">
           <div class="premium-card">
-            <h5>${currentUser.interests?.includes('web') ? 'TypeScript Deep Dive' : 'Getting Started Guide'}</h5>
-            <p class="text-muted">Recommended for you</p>
-            <div class="progress"><div class="progress-bar" style="width:0%"></div></div>
+            <i class="bi bi-lightning-charge fs-1 text-accent"></i>
+            <h4>Learning streak</h4>
+            <p class="fw-bold fs-3">${currentUser.stats?.streak || 0} days</p>
           </div>
           <div class="premium-card">
-            <h5>${currentUser.interests?.includes('data') ? 'Data Science Fundamentals' : 'Next Steps in Learning'}</h5>
-            <p class="text-muted">Based on your profile</p>
+            <i class="bi bi-trophy fs-1 text-accent"></i>
+            <h4>Courses completed</h4>
+            <p class="fw-bold fs-3">${currentUser.stats?.completed || 0}</p>
           </div>
-        `;
-      }
-
-      // Render courses with real data
-      function renderCourses() {
-        if (userRole === 'student') {
-          const enrolledCourses = currentUser.enrolledCourses || [];
-          if (enrolledCourses.length > 0) {
-            coursesContent.innerHTML = enrolledCourses.map(course => `
-              <div class="premium-card">
-                <h5>${course.name}</h5>
-                <p>${course.progress}%</p>
-                <div class="progress"><div class="progress-bar" style="width:${course.progress}%"></div></div>
-                <button class="btn btn-sm btn-outline-success rounded-pill mt-3">Continue</button>
-              </div>
-            `).join('');
-          } else {
-            coursesContent.innerHTML = `
-              <div class="premium-card">
-                <h5>Start your first course</h5>
-                <p>Based on your interests: ${currentUser.interests?.join(', ') || 'various topics'}</p>
-                <button class="btn btn-sm btn-success rounded-pill">Browse courses</button>
-              </div>
-            `;
-          }
-        } else {
-          const createdCourses = currentUser.coursesCreated || [];
-          if (createdCourses.length > 0) {
-            coursesContent.innerHTML = createdCourses.map(course => `
-              <div class="premium-card">
-                <h5>${course.name}</h5>
-                <p>Students: ${course.students || 0} · Rating ${course.rating || '4.5'}</p>
-                <span class="badge bg-success">Published</span>
-              </div>
-            `).join('');
-          } else {
-            coursesContent.innerHTML = `
-              <div class="premium-card">
-                <h5>Create your first course</h5>
-                <p>Share your expertise in ${currentUser.expertise || 'your field'}</p>
-                <button class="btn btn-sm btn-success rounded-pill">Start creating</button>
-              </div>
-            `;
-          }
-        }
-      }
-
-      function renderMessages() {
-        messagesContent.innerHTML = userRole === 'student' 
-          ? `<div class="message-item"><i class="bi bi-person-circle"></i><div><b>Welcome!</b><p>Start your learning journey today</p></div></div>`
-          : `<div class="message-item"><i class="bi bi-person-circle"></i><div><b>Getting started</b><p>Create your first course</p></div></div>`;
-      }
-
-      function renderCertificates() {
-        certificatesContent.innerHTML = userRole === 'student' 
-          ? `<div class="premium-card"><i class="bi bi-award fs-1"></i><h5>Keep learning</h5><p>Complete courses to earn certificates</p></div>`
-          : `<p>Certificates you award appear here.</p>`;
-      }
-
-      function renderPayments() {
-        paymentsContent.innerHTML = `
           <div class="premium-card">
-            <h5>Membership</h5>
-            <p class="fs-2">Free tier</p>
-            <p>Upgrade for premium features</p>
+            <i class="bi bi-clock-history fs-1 text-accent"></i>
+            <h4>Experience level</h4>
+            <p class="fw-bold fs-5">${currentUser.experience || 'Beginner'}</p>
+          </div>
+        </div>
+      `;
+    } else {
+      overviewContent.innerHTML = `
+        <div class="card-grid">
+          <div class="premium-card">
+            <i class="bi bi-people fs-1 text-accent"></i>
+            <h4>Students</h4>
+            <p class="fw-bold fs-3">${currentUser.stats?.students || 0}</p>
+          </div>
+          <div class="premium-card">
+            <i class="bi bi-star fs-1 text-accent"></i>
+            <h4>Rating</h4>
+            <p class="fw-bold fs-3">${currentUser.stats?.rating || '4.8'}</p>
+          </div>
+          <div class="premium-card">
+            <i class="bi bi-play-circle fs-1 text-accent"></i>
+            <h4>Courses</h4>
+            <p class="fw-bold fs-3">${currentUser.coursesCreated?.length || 0}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Achievements
+    let badges = '';
+    if (userRole === 'student') {
+      const interests = currentUser.interests || [];
+      badges = `
+        <div class="premium-card badge-item">
+          <div class="badge-icon"><i class="bi bi-award"></i></div>
+          <h6>Getting Started</h6>
+          <small>Joined ${new Date(currentUser.createdAt).toLocaleDateString()}</small>
+        </div>
+        ${interests.includes('web') ? `
+        <div class="premium-card badge-item">
+          <div class="badge-icon"><i class="bi bi-code-slash"></i></div>
+          <h6>Web Developer</h6>
+          <small>Interested in web dev</small>
+        </div>` : ''}
+        ${currentUser.stats?.streak > 5 ? `
+        <div class="premium-card badge-item">
+          <div class="badge-icon"><i class="bi bi-fire"></i></div>
+          <h6>On Fire!</h6>
+          <small>${currentUser.stats?.streak} day streak</small>
+          <div class="progress mt-2"><div class="progress-bar" style="width:${Math.min(100, (currentUser.stats?.streak/30)*100)}%"></div></div>
+        </div>` : ''}
+      `;
+    } else {
+      badges = `
+        <div class="premium-card badge-item">
+          <div class="badge-icon"><i class="bi bi-mic"></i></div>
+          <h6>Rising instructor</h6>
+          <small>Expert in ${currentUser.expertise || currentUser.experience || 'your field'}</small>
+        </div>
+        <div class="premium-card badge-item">
+          <div class="badge-icon"><i class="bi bi-star"></i></div>
+          <h6>Premium Educator</h6>
+          <small>Sharing knowledge since ${new Date(currentUser.createdAt).toLocaleDateString()}</small>
+        </div>
+      `;
+    }
+    achievementsGrid.innerHTML = badges;
+
+    // Analytics
+    analyticsContent.innerHTML = `
+      <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+        <div><i class="bi bi-clock"></i> Goal: ${currentUser.goals || (userRole === 'student' ? 'Complete courses' : 'Create courses')} <span class="text-accent">in progress</span></div>
+        <div><i class="bi bi-bar-chart"></i> Level: ${currentUser.experience || 'beginner'}</div>
+        <div><i class="bi bi-graph-up"></i> Status: <span class="text-accent">active ${userRole}</span></div>
+      </div>
+      <div class="progress mt-3"><div class="progress-bar" style="width:${Math.min(100, (currentUser.stats?.completed || 0) * 25)}%"></div></div>
+      <p class="mt-2">${(currentUser.stats?.completed || 0) * 25}% toward next milestone</p>
+    `;
+
+    // Reminders
+    remindersContent.innerHTML = `
+      <div><i class="bi bi-exclamation-circle"></i> ${userRole === 'student' ? 
+        `Continue your ${currentUser.interests?.length ? currentUser.interests[0] : 'learning'} journey` : 
+        'Create your next course'}</div>
+      <div class="mt-2"><i class="bi bi-chat"></i> Connect with the community</div>
+      <div class="mt-2"><i class="bi bi-calendar"></i> ${userRole === 'student' ? 'Study session' : 'Teaching session'} scheduled tomorrow</div>
+      <button class="btn btn-sm btn-outline-success rounded-pill mt-3" id="dismissReminder">Dismiss</button>
+    `;
+    
+    document.getElementById('dismissReminder')?.addEventListener('click', (e) => {
+      e.target.parentElement.style.opacity = '0.5';
+    });
+
+    // Mentor suggestions
+    if (userRole === 'student') {
+      mentorGrid.innerHTML = `
+        <div class="premium-card">
+          <i class="bi bi-person-circle fs-1"></i>
+          <h5>Sarah Chen</h5>
+          <p>${currentUser.interests?.includes('web') ? 'Web expert' : 'Learning advisor'} · 98% match</p>
+          <button class="btn btn-sm btn-outline-primary rounded-pill">Connect</button>
+        </div>
+        <div class="premium-card">
+          <i class="bi bi-person-circle fs-1"></i>
+          <h5>Marcus Lee</h5>
+          <p>${currentUser.interests?.includes('design') ? 'UI/UX designer' : 'Career coach'} · 85% match</p>
+          <button class="btn btn-sm btn-outline-primary rounded-pill">Connect</button>
+        </div>
+      `;
+    }
+
+    // Recommendations
+    recommendationsGrid.innerHTML = `
+      <div class="premium-card">
+        <h5>${currentUser.interests?.includes('web') ? 'TypeScript Deep Dive' : 'Getting Started Guide'}</h5>
+        <p class="text-muted">Recommended for you</p>
+        <div class="progress"><div class="progress-bar" style="width:0%"></div></div>
+      </div>
+      <div class="premium-card">
+        <h5>${currentUser.interests?.includes('data') ? 'Data Science Fundamentals' : 'Next Steps in Learning'}</h5>
+        <p class="text-muted">Based on your profile</p>
+      </div>
+    `;
+  }
+
+  function renderCourses() {
+    if (!currentUser) return;
+    
+    if (userRole === 'student') {
+      const enrolledCourses = currentUser.enrolledCourses || [];
+      if (enrolledCourses.length > 0) {
+        coursesContent.innerHTML = enrolledCourses.map(course => `
+          <div class="premium-card">
+            <h5>${course.name}</h5>
+            <p>${course.progress}%</p>
+            <div class="progress"><div class="progress-bar" style="width:${course.progress}%"></div></div>
+            <button class="btn btn-sm btn-outline-success rounded-pill mt-3">Continue</button>
+          </div>
+        `).join('');
+      } else {
+        coursesContent.innerHTML = `
+          <div class="premium-card">
+            <h5>Start your first course</h5>
+            <p>Based on your interests: ${currentUser.interests?.join(', ') || 'various topics'}</p>
+            <button class="btn btn-sm btn-success rounded-pill">Browse courses</button>
           </div>
         `;
       }
-
-      function renderSettings() {
-        settingsCard.innerHTML = `
-          <h5>Profile Information</h5>
-          <p><strong>Name:</strong> ${currentUser.firstName} ${currentUser.lastName}</p>
-          <p><strong>Email:</strong> ${currentUser.email}</p>
-          <p><strong>Role:</strong> ${userRole}</p>
-          ${userRole === 'student' ? `
-            <p><strong>Goals:</strong> ${currentUser.goals || 'Not set'}</p>
-            <p><strong>Experience:</strong> ${currentUser.experience || 'Beginner'}</p>
-            <p><strong>Interests:</strong> ${currentUser.interests?.join(', ') || 'None selected'}</p>
-          ` : `
-            <p><strong>Expertise:</strong> ${currentUser.expertise || 'Not set'}</p>
-            <p><strong>Bio:</strong> ${currentUser.bio || 'No bio yet'}</p>
-            ${currentUser.linkedin ? `<p><strong>LinkedIn:</strong> ${currentUser.linkedin}</p>` : ''}
-          `}
-          <button class="btn btn-premium rounded-pill mt-3" id="inlineEditBtn">Edit profile</button>
-          <hr>
-          <h6>Account Security</h6>
-          <p>Last login: today · <i class="bi bi-shield"></i> active</p>
+    } else {
+      const createdCourses = currentUser.coursesCreated || [];
+      if (createdCourses.length > 0) {
+        coursesContent.innerHTML = createdCourses.map(course => `
+          <div class="premium-card">
+            <h5>${course.name}</h5>
+            <p>Students: ${course.students || 0} · Rating ${course.rating || '4.5'}</p>
+            <span class="badge bg-success">Published</span>
+          </div>
+        `).join('');
+      } else {
+        coursesContent.innerHTML = `
+          <div class="premium-card">
+            <h5>Create your first course</h5>
+            <p>Share your expertise in ${currentUser.expertise || currentUser.experience || 'your field'}</p>
+            <button class="btn btn-sm btn-success rounded-pill">Start creating</button>
+          </div>
         `;
-        
-        document.getElementById('inlineEditBtn')?.addEventListener('click', openEditModal);
       }
+    }
+  }
 
-      function showSection(section) {
-        Object.values(sections).forEach(s => {
-          if (s) s.classList.add('hidden');
-        });
-        
-        if (sections[section]) {
-          sections[section].classList.remove('hidden');
-        }
-        
-        navItems.forEach(n => n.classList.remove('active'));
-        const activeNav = document.querySelector(`.nav-item[data-section="${section}"]`);
-        if (activeNav) activeNav.classList.add('active');
-        
-        // Render section content
-        if (section === 'overview') renderOverview();
-        if (section === 'courses') renderCourses();
-        if (section === 'messages') renderMessages();
-        if (section === 'certificates') renderCertificates();
-        if (section === 'payments') renderPayments();
-        if (section === 'settings') renderSettings();
-      }
+  function renderMessages() {
+    messagesContent.innerHTML = userRole === 'student' 
+      ? `<div class="message-item"><i class="bi bi-person-circle"></i><div><b>Welcome to SkillForge!</b><p>Start your learning journey today</p></div></div>`
+      : `<div class="message-item"><i class="bi bi-person-circle"></i><div><b>Getting started as an instructor</b><p>Create your first course to begin teaching</p></div></div>`;
+  }
 
-      // Navigation
-      navItems.forEach(item => {
-        item.addEventListener('click', () => {
-          const section = item.getAttribute('data-section');
-          if (section) showSection(section);
-        });
-      });
+  function renderCertificates() {
+    certificatesContent.innerHTML = userRole === 'student' 
+      ? `<div class="premium-card"><i class="bi bi-award fs-1"></i><h5>Keep learning</h5><p>Complete courses to earn certificates</p></div>`
+      : `<div class="premium-card"><i class="bi bi-award fs-1"></i><h5>Your impact</h5><p>Certificates you've awarded appear here</p></div>`;
+  }
 
-      // Edit modal functionality
-      const editModal = document.getElementById('editProfileModal');
-      const backdrop = document.getElementById('modalBackdrop');
-      const openEditBtn = document.getElementById('openEditProfileBtn');
-      const cancelEdit = document.getElementById('cancelEdit');
-      const editForm = document.getElementById('editProfileForm');
-      const editName = document.getElementById('editName');
-      const editEmail = document.getElementById('editEmail');
-      const editGoals = document.getElementById('editGoals');
-      const editBio = document.getElementById('editBio');
+  function renderPayments() {
+    paymentsContent.innerHTML = `
+      <div class="premium-card">
+        <h5>Membership</h5>
+        <p class="fs-2">Free tier</p>
+        <p>Upgrade for premium features</p>
+        <button class="btn btn-sm btn-success rounded-pill mt-2">View plans</button>
+      </div>
+    `;
+  }
 
-      function openEditModal() {
-        if (!editModal || !backdrop) return;
-        
-        editName.value = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
-        editEmail.value = currentUser.email || '';
-        
-        if (userRole === 'student') {
-          const studentGoalField = document.getElementById('studentGoalField');
-          const instructorBioField = document.getElementById('instructorBioField');
-          if (studentGoalField) studentGoalField.classList.remove('hidden');
-          if (instructorBioField) instructorBioField.classList.add('hidden');
-          editGoals.value = currentUser.goals || '';
-        } else {
-          const studentGoalField = document.getElementById('studentGoalField');
-          const instructorBioField = document.getElementById('instructorBioField');
-          if (studentGoalField) studentGoalField.classList.add('hidden');
-          if (instructorBioField) instructorBioField.classList.remove('hidden');
-          editBio.value = currentUser.bio || '';
-        }
-        
-        editModal.classList.remove('hidden');
-        backdrop.classList.remove('hidden');
-      }
+  function renderSettings() {
+    if (!currentUser) return;
+    
+    settingsCard.innerHTML = `
+      <h5>Profile Information</h5>
+      <p><strong>Name:</strong> ${currentUser.firstName} ${currentUser.lastName}</p>
+      <p><strong>Email:</strong> ${currentUser.email}</p>
+      <p><strong>Role:</strong> ${userRole === 'student' ? 'Student' : 'Instructor'}</p>
+      <p><strong>Member since:</strong> ${new Date(currentUser.createdAt).toLocaleDateString()}</p>
+      ${userRole === 'student' ? `
+        <p><strong>Goals:</strong> ${currentUser.goals || 'Not set'}</p>
+        <p><strong>Experience:</strong> ${currentUser.experience || 'Beginner'}</p>
+        <p><strong>Interests:</strong> ${currentUser.interests?.join(', ') || 'None selected'}</p>
+        <p><strong>Preferred schedule:</strong> ${currentUser.preferences?.schedule || 'Flexible'}</p>
+      ` : `
+        <p><strong>Expertise:</strong> ${currentUser.expertise || currentUser.experience || 'Not set'}</p>
+        <p><strong>Bio:</strong> ${currentUser.bio || currentUser.motivation || 'No bio yet'}</p>
+        <p><strong>Preferred schedule:</strong> ${currentUser.preferences?.schedule || 'Flexible'}</p>
+      `}
+      <button class="btn btn-premium rounded-pill mt-3" id="inlineEditBtn">Edit profile</button>
+      <hr>
+      <h6>Account Security</h6>
+      <p>Last login: ${new Date(currentUser.lastLogin || Date.now()).toLocaleString()} · <i class="bi bi-shield"></i> active</p>
+    `;
+    
+    document.getElementById('inlineEditBtn')?.addEventListener('click', openEditModal);
+  }
 
-      if (openEditBtn) {
-        openEditBtn.addEventListener('click', openEditModal);
-      }
-      
-      if (cancelEdit) {
-        cancelEdit.addEventListener('click', () => {
-          editModal.classList.add('hidden');
-          backdrop.classList.add('hidden');
-        });
-      }
-      
-      if (backdrop) {
-        backdrop.addEventListener('click', () => {
-          editModal.classList.add('hidden');
-          backdrop.classList.add('hidden');
-        });
-      }
+  function showSection(section) {
+    Object.values(sections).forEach(s => {
+      if (s) s.classList.add('hidden');
+    });
+    
+    if (sections[section]) {
+      sections[section].classList.remove('hidden');
+    }
+    
+    navItems.forEach(n => n.classList.remove('active'));
+    const activeNav = document.querySelector(`.nav-item[data-section="${section}"]`);
+    if (activeNav) activeNav.classList.add('active');
+    
+    // Render section content
+    if (section === 'overview') renderOverview();
+    if (section === 'courses') renderCourses();
+    if (section === 'messages') renderMessages();
+    if (section === 'certificates') renderCertificates();
+    if (section === 'payments') renderPayments();
+    if (section === 'settings') renderSettings();
+  }
 
-      if (editForm) {
-        editForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          
-          const nameParts = editName.value.trim().split(' ');
-          currentUser.firstName = nameParts[0] || '';
-          currentUser.lastName = nameParts.slice(1).join(' ') || '';
-          currentUser.email = editEmail.value;
-          
-          if (userRole === 'student') {
-            currentUser.goals = editGoals.value;
-          } else {
-            currentUser.bio = editBio.value;
-          }
-          
-          // Save updated user data to all storage locations
-          localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(currentUser));
-          
-          if (userRole === 'student') {
-            localStorage.setItem(STORAGE_KEYS.student, JSON.stringify(currentUser));
-          } else {
-            localStorage.setItem(STORAGE_KEYS.instructor, JSON.stringify(currentUser));
-          }
-          
-          // Update UI
+  // Edit modal functions
+  function openEditModal() {
+    if (!editModal || !backdrop || !currentUser) return;
+    
+    editName.value = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+    editEmail.value = currentUser.email || '';
+    
+    if (userRole === 'student') {
+      const studentGoalField = document.getElementById('studentGoalField');
+      const instructorBioField = document.getElementById('instructorBioField');
+      if (studentGoalField) studentGoalField.classList.remove('hidden');
+      if (instructorBioField) instructorBioField.classList.add('hidden');
+      editGoals.value = currentUser.goals || '';
+    } else {
+      const studentGoalField = document.getElementById('studentGoalField');
+      const instructorBioField = document.getElementById('instructorBioField');
+      if (studentGoalField) studentGoalField.classList.add('hidden');
+      if (instructorBioField) instructorBioField.classList.remove('hidden');
+      editBio.value = currentUser.bio || currentUser.motivation || '';
+    }
+    
+    editModal.classList.remove('hidden');
+    backdrop.classList.remove('hidden');
+  }
+
+  // Real-time updates across tabs
+  function setupRealTimeUpdates() {
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEYS.auth) {
+        if (e.newValue) {
+          currentUser = JSON.parse(e.newValue);
+          userRole = currentUser.role || 'student';
           updateHeader();
           renderOverview();
-          renderSettings();
-          
-          editModal.classList.add('hidden');
-          backdrop.classList.add('hidden');
-          
-          showGlobalMessage('Profile updated successfully!', 'success');
-        });
+          showGlobalMessage('Your profile was updated in another tab', 'success');
+        }
       }
+    });
+  }
 
-      // Logout
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          // Clear auth but keep user data for next login
-          localStorage.removeItem(STORAGE_KEYS.auth);
-          window.location.href = 'sign-in.html';
-        });
+  // ---------- EVENT LISTENERS ----------
+  
+  // Navigation
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const section = item.getAttribute('data-section');
+      if (section) showSection(section);
+    });
+  });
+
+  // Edit modal
+  if (openEditBtn) {
+    openEditBtn.addEventListener('click', openEditModal);
+  }
+  
+  if (cancelEdit) {
+    cancelEdit.addEventListener('click', () => {
+      editModal.classList.add('hidden');
+      backdrop.classList.add('hidden');
+    });
+  }
+  
+  if (backdrop) {
+    backdrop.addEventListener('click', () => {
+      editModal.classList.add('hidden');
+      backdrop.classList.add('hidden');
+    });
+  }
+
+  // Edit form submission
+  if (editForm) {
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const nameParts = editName.value.trim().split(' ');
+      currentUser.firstName = nameParts[0] || '';
+      currentUser.lastName = nameParts.slice(1).join(' ') || '';
+      currentUser.email = editEmail.value;
+      
+      if (userRole === 'student') {
+        currentUser.goals = editGoals.value;
+      } else {
+        currentUser.bio = editBio.value;
+        currentUser.motivation = editBio.value;
       }
-
-      // Global message helper
-      function showGlobalMessage(text, type = 'success') {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `global-message ${type}`;
-        msgDiv.style.position = 'fixed';
-        msgDiv.style.top = '1rem';
-        msgDiv.style.left = '50%';
-        msgDiv.style.transform = 'translateX(-50%)';
-        msgDiv.style.zIndex = '3000';
-        msgDiv.style.minWidth = '300px';
-        msgDiv.style.textAlign = 'center';
-        msgDiv.innerHTML = (type === 'success' ? '<i class="bi bi-check-circle-fill"></i> ' : '<i class="bi bi-shield-exclamation"></i> ') + text;
-        document.body.appendChild(msgDiv);
-        
-        setTimeout(() => {
-          msgDiv.remove();
-        }, 3000);
+      
+      // Update password if provided
+      const newPassword = document.getElementById('editPassword')?.value;
+      if (newPassword && newPassword.length >= 6) {
+        currentUser.password = btoa(newPassword);
       }
-
-      // Initial render
+      
+      // Save updated user data
+      updateUserData(currentUser);
+      
+      // Update UI immediately
       updateHeader();
       renderOverview();
-      showSection('overview');
-      if (insightMessage) {
-        insightMessage.innerText = insights[0];
-      }
+      renderSettings();
+      
+      editModal.classList.add('hidden');
+      backdrop.classList.add('hidden');
+      
+      showGlobalMessage('Profile updated successfully!', 'success');
+      
+      // Update all dashboard sections
+      renderCourses();
+      renderMessages();
+      renderCertificates();
+    });
+  }
 
-      // Check if user just signed up (redirect from enroll page)
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('new') === 'true') {
-        showGlobalMessage('Welcome to SkillForge! Your profile is ready.', 'success');
-      }
-    })();
-  </script>
+  // Logout
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEYS.auth);
+      localStorage.removeItem(STORAGE_KEYS.session);
+      
+      showGlobalMessage('You have been logged out. See you soon!', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'sign-in.html';
+      }, 1500);
+    });
+  }
+
+  // Check URL parameters for login success
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('login') === 'success') {
+    showGlobalMessage('Welcome to SkillForge! Your profile is ready.', 'success');
+  }
+
+  // Initialize
+  if (loadUser()) {
+    updateHeader();
+    renderOverview();
+    showSection('overview');
+    if (insightMessage) {
+      insightMessage.innerText = insights[0];
+    }
+    setupRealTimeUpdates();
+  }
+})();
+</script>
 </body>
 </html>
